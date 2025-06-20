@@ -1,5 +1,5 @@
-#ifndef GPS_READER_H
-#define GPS_READER_H
+#ifndef SERIAL_READER_H
+#define SERIAL_READER_H
 
 #include <QCoreApplication>
 #include <QSerialPort>
@@ -7,12 +7,13 @@
 #include <QTextStream>
 #include <QDebug>
 
-class GPS_Reader : public QObject
+class SerialReader : public QObject
 {
     Q_OBJECT
 
     public:
-        GPS_Reader();
+        SerialReader();
+        ~SerialReader();
 
         bool openSerialDevice();
         void closeSerialDevice();
@@ -33,12 +34,11 @@ class GPS_Reader : public QObject
         void readData();
 
     private:
-        //Parameters
         QSerialPort serial;
         QByteArray buffer;
 
 
 };
 
-#endif // GPS_READER_H
+#endif // SERIAL_READER_H
 

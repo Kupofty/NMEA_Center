@@ -3,17 +3,14 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
-    GPS_Data_Displayer w;
-    w.show();
-    return a.exec();
+    QApplication app(argc, argv);
+    GPS_Data_Displayer gui;
+    gui.show();
+    return app.exec();
 }
 
 // TO-DO LIST & IDEAS
-// change project to NMEA_DISPLAY with tab "gps", "sensor1", "sensor"2" etc...
-// accept UDP or TCP connection
-// print decoded data from nmea as speed=x, heading=x, position=x
-// use new widgets
-// push code to github
-// new class to handle NMEA (to hide from main code)
-// handle disconnection + alert msg
+// change name to NMEA_Center (for gps only for now)
+// accept UDP or TCP connection (inputs)
+// output data on com, tcp or udp
+// handle disconnection + alert msg (sudden disconnection)

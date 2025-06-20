@@ -18,74 +18,13 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>2</number>
       </property>
       <widget class="QWidget" name="tab_connection">
        <attribute name="title">
         <string>Connection</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
-        <item row="0" column="1">
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Orientation::Vertical</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Policy::Expanding</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>285</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="1" column="0">
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Policy::Expanding</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>402</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="1" column="2">
-         <spacer name="horizontalSpacer_3">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="2" column="1">
-         <spacer name="verticalSpacer_2">
-          <property name="orientation">
-           <enum>Qt::Orientation::Vertical</enum>
-          </property>
-          <property name="sizeType">
-           <enum>QSizePolicy::Policy::Expanding</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>285</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
         <item row="1" column="1">
          <widget class="QFrame" name="frame">
           <property name="minimumSize">
@@ -161,13 +100,13 @@
             </item>
            </layout>
           </widget>
-          <widget class="QWidget" name="gridLayoutWidget">
+          <widget class="QFrame" name="gridFrame">
            <property name="geometry">
             <rect>
              <x>50</x>
              <y>140</y>
              <width>191</width>
-             <height>81</height>
+             <height>101</height>
             </rect>
            </property>
            <layout class="QGridLayout" name="gridLayout_3">
@@ -221,15 +160,246 @@
           </widget>
          </widget>
         </item>
+        <item row="1" column="2">
+         <spacer name="horizontalSpacer_3">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="2" column="1">
+         <spacer name="verticalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Orientation::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Policy::Expanding</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>285</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="0" column="1">
+         <spacer name="verticalSpacer">
+          <property name="orientation">
+           <enum>Qt::Orientation::Vertical</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Policy::Expanding</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>285</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="0">
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Policy::Expanding</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>402</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
        </layout>
       </widget>
-      <widget class="QWidget" name="tab_raw_text">
+      <widget class="QWidget" name="tab_gps_decoded_data">
        <attribute name="title">
-        <string>Raw Sentences</string>
+        <string>GPS Data</string>
+       </attribute>
+       <widget class="QWidget" name="layoutWidget">
+        <property name="geometry">
+         <rect>
+          <x>350</x>
+          <y>220</y>
+          <width>129</width>
+          <height>73</height>
+         </rect>
+        </property>
+        <layout class="QVBoxLayout" name="verticalLayout_9">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>Satellites : </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLCDNumber" name="lcdNumber_satellitesInView"/>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QLabel" name="label_10">
+        <property name="geometry">
+         <rect>
+          <x>280</x>
+          <y>455</y>
+          <width>141</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>15</pointsize>
+          <bold>true</bold>
+          <underline>true</underline>
+         </font>
+        </property>
+        <property name="text">
+         <string>Position GGA</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_11">
+        <property name="geometry">
+         <rect>
+          <x>240</x>
+          <y>500</y>
+          <width>49</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Latitude :</string>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_12">
+        <property name="geometry">
+         <rect>
+          <x>230</x>
+          <y>530</y>
+          <width>71</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Longitude : </string>
+        </property>
+       </widget>
+       <widget class="QLCDNumber" name="lcdNumber_latitude">
+        <property name="geometry">
+         <rect>
+          <x>310</x>
+          <y>492</y>
+          <width>161</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="digitCount">
+         <number>10</number>
+        </property>
+        <property name="segmentStyle">
+         <enum>QLCDNumber::SegmentStyle::Flat</enum>
+        </property>
+       </widget>
+       <widget class="QLCDNumber" name="lcdNumber_longitude">
+        <property name="geometry">
+         <rect>
+          <x>310</x>
+          <y>530</y>
+          <width>161</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="digitCount">
+         <number>10</number>
+        </property>
+        <property name="segmentStyle">
+         <enum>QLCDNumber::SegmentStyle::Flat</enum>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_13">
+        <property name="geometry">
+         <rect>
+          <x>330</x>
+          <y>310</y>
+          <width>81</width>
+          <height>16</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Frequency :</string>
+        </property>
+       </widget>
+       <widget class="QLCDNumber" name="lcdNumber_frequency_satellites">
+        <property name="geometry">
+         <rect>
+          <x>430</x>
+          <y>310</y>
+          <width>64</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="smallDecimalPoint">
+         <bool>true</bool>
+        </property>
+        <property name="digitCount">
+         <number>5</number>
+        </property>
+        <property name="segmentStyle">
+         <enum>QLCDNumber::SegmentStyle::Flat</enum>
+        </property>
+       </widget>
+       <widget class="QLabel" name="label_14">
+        <property name="geometry">
+         <rect>
+          <x>390</x>
+          <y>170</y>
+          <width>41</width>
+          <height>31</height>
+         </rect>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>15</pointsize>
+          <bold>true</bold>
+          <underline>true</underline>
+         </font>
+        </property>
+        <property name="text">
+         <string>GSV</string>
+        </property>
+       </widget>
+      </widget>
+      <widget class="QWidget" name="tab_gps_raw_data">
+       <attribute name="title">
+        <string>GPS Raw Sentences</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="1" column="1">
-         <layout class="QVBoxLayout" name="verticalLayout">
+        <item row="2" column="0">
+         <layout class="QVBoxLayout" name="verticalLayout_3">
           <property name="leftMargin">
            <number>9</number>
           </property>
@@ -243,7 +413,7 @@
            <number>9</number>
           </property>
           <item>
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="label_3">
             <property name="font">
              <font>
               <pointsize>17</pointsize>
@@ -251,7 +421,7 @@
              </font>
             </property>
             <property name="text">
-             <string>RMC</string>
+             <string>GSV</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -259,7 +429,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPlainTextEdit" name="plainTextEdit_rmc">
+           <widget class="QPlainTextEdit" name="plainTextEdit_gsv">
             <property name="readOnly">
              <bool>true</bool>
             </property>
@@ -306,7 +476,7 @@
           </item>
          </layout>
         </item>
-        <item row="3" column="1">
+        <item row="2" column="1">
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <property name="leftMargin">
            <number>9</number>
@@ -345,8 +515,8 @@
           </item>
          </layout>
         </item>
-        <item row="1" column="0">
-         <layout class="QVBoxLayout" name="verticalLayout_5">
+        <item row="2" column="4">
+         <layout class="QVBoxLayout" name="verticalLayout_6">
           <property name="leftMargin">
            <number>9</number>
           </property>
@@ -360,7 +530,7 @@
            <number>9</number>
           </property>
           <item>
-           <widget class="QLabel" name="label_5">
+           <widget class="QLabel" name="label_6">
             <property name="font">
              <font>
               <pointsize>17</pointsize>
@@ -368,7 +538,7 @@
              </font>
             </property>
             <property name="text">
-             <string>TXT</string>
+             <string>Others</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -376,46 +546,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPlainTextEdit" name="plainTextEdit_txt">
-            <property name="readOnly">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="3" column="0">
-         <layout class="QVBoxLayout" name="verticalLayout_3">
-          <property name="leftMargin">
-           <number>9</number>
-          </property>
-          <property name="topMargin">
-           <number>9</number>
-          </property>
-          <property name="rightMargin">
-           <number>9</number>
-          </property>
-          <property name="bottomMargin">
-           <number>9</number>
-          </property>
-          <item>
-           <widget class="QLabel" name="label_3">
-            <property name="font">
-             <font>
-              <pointsize>17</pointsize>
-              <bold>true</bold>
-             </font>
-            </property>
-            <property name="text">
-             <string>GSV</string>
-            </property>
-            <property name="alignment">
-             <set>Qt::AlignmentFlag::AlignCenter</set>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPlainTextEdit" name="plainTextEdit_gsv">
+           <widget class="QPlainTextEdit" name="plainTextEdit_others">
             <property name="readOnly">
              <bool>true</bool>
             </property>
@@ -462,8 +593,23 @@
           </item>
          </layout>
         </item>
-        <item row="3" column="4">
-         <layout class="QVBoxLayout" name="verticalLayout_6">
+        <item row="3" column="1">
+         <widget class="QPushButton" name="pushButton_clear_raw_sentences_screens">
+          <property name="font">
+           <font>
+            <pointsize>12</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string> Clear</string>
+          </property>
+          <property name="icon">
+           <iconset theme="QIcon::ThemeIcon::EditDelete"/>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <layout class="QVBoxLayout" name="verticalLayout">
           <property name="leftMargin">
            <number>9</number>
           </property>
@@ -477,7 +623,7 @@
            <number>9</number>
           </property>
           <item>
-           <widget class="QLabel" name="label_6">
+           <widget class="QLabel" name="label">
             <property name="font">
              <font>
               <pointsize>17</pointsize>
@@ -485,7 +631,7 @@
              </font>
             </property>
             <property name="text">
-             <string>Others</string>
+             <string>RMC</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignmentFlag::AlignCenter</set>
@@ -493,7 +639,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPlainTextEdit" name="plainTextEdit_others">
+           <widget class="QPlainTextEdit" name="plainTextEdit_rmc">
             <property name="readOnly">
              <bool>true</bool>
             </property>
@@ -502,6 +648,24 @@
          </layout>
         </item>
         <item row="3" column="2">
+         <widget class="QPushButton" name="pushButton_freeze_raw_sentences_screens">
+          <property name="font">
+           <font>
+            <pointsize>12</pointsize>
+           </font>
+          </property>
+          <property name="text">
+           <string> Freeze</string>
+          </property>
+          <property name="icon">
+           <iconset theme="QIcon::ThemeIcon::MediaPlaybackPause"/>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="2">
          <layout class="QVBoxLayout" name="verticalLayout_8">
           <property name="leftMargin">
            <number>9</number>
@@ -540,45 +704,46 @@
           </item>
          </layout>
         </item>
-        <item row="4" column="1">
-         <widget class="QPushButton" name="pushButton_clear_raw_sentences_screens">
-          <property name="font">
-           <font>
-            <pointsize>12</pointsize>
-           </font>
+        <item row="1" column="0">
+         <layout class="QVBoxLayout" name="verticalLayout_5">
+          <property name="leftMargin">
+           <number>9</number>
           </property>
-          <property name="text">
-           <string>Clear</string>
+          <property name="topMargin">
+           <number>9</number>
           </property>
-          <property name="icon">
-           <iconset theme="QIcon::ThemeIcon::EditDelete"/>
+          <property name="rightMargin">
+           <number>9</number>
           </property>
-         </widget>
-        </item>
-        <item row="4" column="2">
-         <widget class="QPushButton" name="pushButton_freeze_raw_sentences_screens">
-          <property name="font">
-           <font>
-            <pointsize>12</pointsize>
-           </font>
+          <property name="bottomMargin">
+           <number>9</number>
           </property>
-          <property name="text">
-           <string>Freeze</string>
-          </property>
-          <property name="icon">
-           <iconset theme="QIcon::ThemeIcon::MediaPlaybackPause"/>
-          </property>
-          <property name="checkable">
-           <bool>true</bool>
-          </property>
-         </widget>
+          <item>
+           <widget class="QLabel" name="label_5">
+            <property name="font">
+             <font>
+              <pointsize>17</pointsize>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>TXT</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignmentFlag::AlignCenter</set>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPlainTextEdit" name="plainTextEdit_txt">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
-      </widget>
-      <widget class="QWidget" name="tab_2">
-       <attribute name="title">
-        <string>Tab 2</string>
-       </attribute>
       </widget>
      </widget>
     </item>
