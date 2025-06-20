@@ -1,10 +1,9 @@
 #include "gps_data_displayer.h"
-#include "ui_gps_data_displayer.h"
 
 /////////////
 /// CLASS ///
 /////////////
-GPS_Data_Displayer::GPS_Data_Displayer(QWidget *parent) : QMainWindow(parent), ui(new Ui::GPS_Data_Displayer), serial(new SerialReader), nmea_handler(new NMEA_Handler)
+GPS_Data_Displayer::GPS_Data_Displayer(QWidget *parent) : QMainWindow(parent), ui(new Ui::GPS_Data_Displayer), serial(new SerialReader), nmea_handler(new NMEA_Handler), udp_sender(new UdpSender)
 {
     //Setup UI
     ui->setupUi(this);
@@ -29,6 +28,15 @@ void GPS_Data_Displayer::connectSignalSlot()
 {
     //Serial data
     QObject::connect(serial, &SerialReader::newLineReceived, nmea_handler, &NMEA_Handler::handleRawSentences);
+
+    //Send raw NMEA to UDP publisher
+    QObject::connect(nmea_handler, &NMEA_Handler::newGGASentence, udp_sender, &UdpSender::publishGGA);
+    QObject::connect(nmea_handler, &NMEA_Handler::newRMCSentence, udp_sender, &UdpSender::publishRMC);
+    QObject::connect(nmea_handler, &NMEA_Handler::newGSVSentence, udp_sender, &UdpSender::publishGSV);
+    QObject::connect(nmea_handler, &NMEA_Handler::newGLLSentence, udp_sender, &UdpSender::publishGLL);
+    QObject::connect(nmea_handler, &NMEA_Handler::newGSASentence, udp_sender, &UdpSender::publishGSA);
+    QObject::connect(nmea_handler, &NMEA_Handler::newVTGSentence, udp_sender, &UdpSender::publishVTG);
+    QObject::connect(nmea_handler, &NMEA_Handler::newOtherSentence, udp_sender, &UdpSender::publishOthers);
 
     //Display raw NMEA from nmea_handler
     QObject::connect(nmea_handler, &NMEA_Handler::newTXTSentence, this, &GPS_Data_Displayer::displayTXTSentence);
@@ -197,9 +205,80 @@ void GPS_Data_Displayer::on_pushButton_refresh_available_ports_list_clicked()
     listAvailablePorts();
 }
 
+void GPS_Data_Displayer::on_pushButton_check_all_udp_output_clicked()
+{
+    ui->checkBox_udp_output_gga->setChecked(true);
+    ui->checkBox_udp_output_rmc->setChecked(true);
+    ui->checkBox_udp_output_gsv->setChecked(true);
+    ui->checkBox_udp_output_gll->setChecked(true);
+    ui->checkBox_udp_output_gsa->setChecked(true);
+    ui->checkBox_udp_output_vtg->setChecked(true);
+    ui->checkBox_udp_output_others->setChecked(true);
+}
+
+void GPS_Data_Displayer::on_pushButtonuncheck_all_udp_output_clicked()
+{
+    ui->checkBox_udp_output_gga->setChecked(false);
+    ui->checkBox_udp_output_rmc->setChecked(false);
+    ui->checkBox_udp_output_gsv->setChecked(false);
+    ui->checkBox_udp_output_gll->setChecked(false);
+    ui->checkBox_udp_output_gsa->setChecked(false);
+    ui->checkBox_udp_output_vtg->setChecked(false);
+    ui->checkBox_udp_output_others->setChecked(false);
+}
 
 
+////////////////
+/// SPIN BOX ///
+////////////////
+void GPS_Data_Displayer::on_spinBox_update_udp_port_valueChanged(int udp_port)
+{
+     udp_sender->updateUdpPort(udp_port);
+}
 
+
+/////////////////
+/// CHECK BOX ///
+/////////////////
+void GPS_Data_Displayer::on_checkBox_udp_output_gga_toggled(bool checked)
+{
+    udp_sender->updateOutputGGA(checked);
+}
+
+void GPS_Data_Displayer::on_checkBox_udp_output_rmc_toggled(bool checked)
+{
+    udp_sender->updateOutputRMC(checked);
+}
+
+
+void GPS_Data_Displayer::on_checkBox_udp_output_gsv_toggled(bool checked)
+{
+    udp_sender->updateOutputGSV(checked);
+}
+
+
+void GPS_Data_Displayer::on_checkBox_udp_output_gll_toggled(bool checked)
+{
+    udp_sender->updateOutputGLL(checked);
+}
+
+
+void GPS_Data_Displayer::on_checkBox_udp_output_gsa_toggled(bool checked)
+{
+    udp_sender->updateOutputGSA(checked);
+}
+
+
+void GPS_Data_Displayer::on_checkBox_udp_output_vtg_toggled(bool checked)
+{
+    udp_sender->updateOutputVTG(checked);
+}
+
+
+void GPS_Data_Displayer::on_checkBox_udp_others_toggled(bool checked)
+{
+    udp_sender->updateOutputOthers(checked);
+}
 
 
 
