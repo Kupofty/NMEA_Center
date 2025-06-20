@@ -12,10 +12,13 @@ class UdpSender : public QObject
 
     public:
         UdpSender();
+
         void sendData(const QString data);
 
         //Update members
         void updateUdpPort(int port);
+        void updateUdpMethod(QHostAddress udpAddress);
+
         void updateOutputGGA(bool check);
         void updateOutputRMC(bool check);
         void updateOutputGSV(bool check);

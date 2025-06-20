@@ -1,8 +1,8 @@
 #include "udp_sender.h"
 
-////////////
-/// Class///
-////////////
+/////////////
+/// Class ///
+/////////////
 UdpSender::UdpSender()
 {
 
@@ -68,15 +68,24 @@ void UdpSender::publishOthers(const QString line)
 
 
 
-//////////////////////
-/// Update members ///
-//////////////////////
-
+///////////////////////
+/// Update settings ///
+///////////////////////
 void UdpSender::updateUdpPort(int port)
 {
     udpPort = port;
 }
 
+void UdpSender::updateUdpMethod(QHostAddress method)
+{
+    udpAddress = method;
+}
+
+
+
+//////////////////////
+/// Update outputs ///
+//////////////////////
 void UdpSender::updateOutputGGA(bool check)
 {
     outputGGA = check;

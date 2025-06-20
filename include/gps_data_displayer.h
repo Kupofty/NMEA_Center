@@ -36,6 +36,7 @@ class GPS_Data_Displayer : public QMainWindow
         void closeSerial();
         void clearRawSentencesScreens();
         void listAvailablePorts();
+        void hideGUI();
         void connectSignalSlot();
 
     private slots:
@@ -46,22 +47,17 @@ class GPS_Data_Displayer : public QMainWindow
         void on_spinBox_update_udp_port_valueChanged(int port);
 
         void on_checkBox_udp_output_gga_toggled(bool checked);
-
         void on_checkBox_udp_output_rmc_toggled(bool checked);
-
         void on_checkBox_udp_output_gsv_toggled(bool checked);
-
         void on_checkBox_udp_output_gll_toggled(bool checked);
-
         void on_checkBox_udp_output_gsa_toggled(bool checked);
-
         void on_checkBox_udp_output_vtg_toggled(bool checked);
-
         void on_checkBox_udp_others_toggled(bool checked);
-
         void on_pushButton_check_all_udp_output_clicked();
-
         void on_pushButtonuncheck_all_udp_output_clicked();
+
+        void on_comboBox_udp_host_address_currentTextChanged(const QString &arg1);
+        void on_lineEdit_udp_ip_address_editingFinished();
 
     public slots:
         void displayTXTSentence(const QString line);

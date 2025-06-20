@@ -3,12 +3,16 @@
 /////////////
 /// CLASS ///
 /////////////
-GPS_Data_Displayer::GPS_Data_Displayer(QWidget *parent) : QMainWindow(parent), ui(new Ui::GPS_Data_Displayer), serial(new SerialReader), nmea_handler(new NMEA_Handler), udp_sender(new UdpSender)
+GPS_Data_Displayer::GPS_Data_Displayer(QWidget *parent) : QMainWindow(parent), ui(new Ui::GPS_Data_Displayer),
+    serial(new SerialReader), nmea_handler(new NMEA_Handler), udp_sender(new UdpSender)
 {
     //Setup UI
     ui->setupUi(this);
     ui->tabWidget->setCurrentWidget(ui->tab_connection);
     this->showMaximized();
+
+    //Hide widgets
+    hideGUI();
 
     //Setup GPS GUI
     listAvailablePorts();
@@ -60,19 +64,21 @@ void GPS_Data_Displayer::connectSignalSlot()
 
 
 
-/////////////////
-/// FUNCTIONS ///
-/////////////////
-void GPS_Data_Displayer::clearRawSentencesScreens()
+///////////
+/// GUI ///
+///////////
+void GPS_Data_Displayer::hideGUI()
 {
-    ui->plainTextEdit_gga->clear();
-    ui->plainTextEdit_rmc->clear();
-    ui->plainTextEdit_gsv->clear();
-    ui->plainTextEdit_gll->clear();
-    ui->plainTextEdit_gsa->clear();
-    ui->plainTextEdit_vtg->clear();
+    ui->horizontalFrame_udp_ip_address->hide();
 }
 
+
+
+//////////////
+/// Serial ///
+//////////////
+
+// Connection
 void GPS_Data_Displayer::closeSerial()
 {
     if(serial->isSerialOpen())
@@ -84,6 +90,30 @@ void GPS_Data_Displayer::closeSerial()
         ui->plainTextEdit_connection_status->setPlainText("Connection not opened");
 }
 
+void GPS_Data_Displayer::on_pushButton_connect_clicked()
+{
+    serial->setPortName(ui->comboBox_available_ports->currentText());
+
+    QString result;
+    if(serial->openSerialDevice())
+    {
+        result =  "Connected to " + serial->getPortName();
+        ui->plainTextEdit_txt->clear();
+        ui->tabWidget->setCurrentWidget(ui->tab_gps_decoded_data);
+    }
+    else
+        result =  "Failed to open " + serial->getPortName() + " : " + serial->getErrorString();
+
+    ui->plainTextEdit_connection_status->setPlainText(result);
+}
+
+void GPS_Data_Displayer::on_pushButton_disconnect_clicked()
+{
+    closeSerial();
+}
+
+
+//COM ports
 void GPS_Data_Displayer::listAvailablePorts()
 {
     const auto ports = QSerialPortInfo::availablePorts();
@@ -93,13 +123,19 @@ void GPS_Data_Displayer::listAvailablePorts()
     }
 }
 
+void GPS_Data_Displayer::on_pushButton_refresh_available_ports_list_clicked()
+{
+    ui->comboBox_available_ports->clear();
+    listAvailablePorts();
+}
 
 
-////////////////////////
-/// SLOTS UPDATE GUI ///
-////////////////////////
 
-// Raw Sentences
+///////////////////////////
+/// Raw Nmea Sentences  ///
+///////////////////////////
+
+//Display On Screens
 void GPS_Data_Displayer::displayTXTSentence(const QString nmeaText)
 {
     ui->plainTextEdit_txt->appendPlainText(nmeaText);
@@ -147,8 +183,29 @@ void GPS_Data_Displayer::displayOtherSentence(const QString nmeaText)
         ui->plainTextEdit_others->appendPlainText(nmeaText);
 }
 
+//Clear Screens
+void GPS_Data_Displayer::clearRawSentencesScreens()
+{
+    ui->plainTextEdit_gga->clear();
+    ui->plainTextEdit_rmc->clear();
+    ui->plainTextEdit_gsv->clear();
+    ui->plainTextEdit_gll->clear();
+    ui->plainTextEdit_gsa->clear();
+    ui->plainTextEdit_vtg->clear();
+}
 
-//Decoded NMEA
+void GPS_Data_Displayer::on_pushButton_clear_raw_sentences_screens_clicked()
+{
+    clearRawSentencesScreens();
+}
+
+
+
+//////////////////////////////////
+/// Display Decoded NMEA data  ///
+//////////////////////////////////
+
+//Data
 void GPS_Data_Displayer::updatePosition(double latitude, double longitude)
 {
     ui->lcdNumber_latitude->display(latitude);
@@ -160,7 +217,6 @@ void GPS_Data_Displayer::updateSatellitesInView(int satellitesInView)
     ui->lcdNumber_satellitesInView->display(satellitesInView);
 }
 
-
 //Frequency
 void GPS_Data_Displayer::updateGsvFrequency(double frequency)
 {
@@ -169,40 +225,70 @@ void GPS_Data_Displayer::updateGsvFrequency(double frequency)
 
 
 
-//////////////////////
-/// ON_PUSH_BUTTON ///
-//////////////////////
-void GPS_Data_Displayer::on_pushButton_clear_raw_sentences_screens_clicked()
+///////////////////////
+/// UDP Output Data ///
+///////////////////////
+
+//UDP Settings
+void GPS_Data_Displayer::on_spinBox_update_udp_port_valueChanged(int udp_port)
 {
-    clearRawSentencesScreens();
+    udp_sender->updateUdpPort(udp_port);
 }
 
-void GPS_Data_Displayer::on_pushButton_connect_clicked()
+void GPS_Data_Displayer::on_comboBox_udp_host_address_currentTextChanged(const QString &udpMethod)
 {
-    serial->setPortName(ui->comboBox_available_ports->currentText());
-
-    QString result;
-    if(serial->openSerialDevice())
+    if(udpMethod == "Broadcast")
     {
-        result =  "Connected to " + serial->getPortName();
-        ui->plainTextEdit_txt->clear();
-        ui->tabWidget->setCurrentWidget(ui->tab_gps_decoded_data);
+        udp_sender->updateUdpMethod(QHostAddress::Broadcast);
+        ui->horizontalFrame_udp_ip_address->hide();
     }
-    else
-        result =  "Failed to open " + serial->getPortName() + " : " + serial->getErrorString();
-
-    ui->plainTextEdit_connection_status->setPlainText(result);
+    else if(udpMethod == "Unicast" || udpMethod == "Multicast")
+    {
+        emit ui->lineEdit_udp_ip_address->editingFinished();
+        ui->horizontalFrame_udp_ip_address->show();
+    }
 }
 
-void GPS_Data_Displayer::on_pushButton_disconnect_clicked()
+void GPS_Data_Displayer::on_lineEdit_udp_ip_address_editingFinished()
 {
-    closeSerial();
+    udp_sender->updateUdpMethod(QHostAddress(ui->lineEdit_udp_ip_address->text()));
 }
 
-void GPS_Data_Displayer::on_pushButton_refresh_available_ports_list_clicked()
+
+//Check data to outpout
+void GPS_Data_Displayer::on_checkBox_udp_output_gga_toggled(bool checked)
 {
-    ui->comboBox_available_ports->clear();
-    listAvailablePorts();
+    udp_sender->updateOutputGGA(checked);
+}
+
+void GPS_Data_Displayer::on_checkBox_udp_output_rmc_toggled(bool checked)
+{
+    udp_sender->updateOutputRMC(checked);
+}
+
+void GPS_Data_Displayer::on_checkBox_udp_output_gsv_toggled(bool checked)
+{
+    udp_sender->updateOutputGSV(checked);
+}
+
+void GPS_Data_Displayer::on_checkBox_udp_output_gll_toggled(bool checked)
+{
+    udp_sender->updateOutputGLL(checked);
+}
+
+void GPS_Data_Displayer::on_checkBox_udp_output_gsa_toggled(bool checked)
+{
+    udp_sender->updateOutputGSA(checked);
+}
+
+void GPS_Data_Displayer::on_checkBox_udp_output_vtg_toggled(bool checked)
+{
+    udp_sender->updateOutputVTG(checked);
+}
+
+void GPS_Data_Displayer::on_checkBox_udp_others_toggled(bool checked)
+{
+    udp_sender->updateOutputOthers(checked);
 }
 
 void GPS_Data_Displayer::on_pushButton_check_all_udp_output_clicked()
@@ -227,58 +313,6 @@ void GPS_Data_Displayer::on_pushButtonuncheck_all_udp_output_clicked()
     ui->checkBox_udp_output_others->setChecked(false);
 }
 
-
-////////////////
-/// SPIN BOX ///
-////////////////
-void GPS_Data_Displayer::on_spinBox_update_udp_port_valueChanged(int udp_port)
-{
-     udp_sender->updateUdpPort(udp_port);
-}
-
-
-/////////////////
-/// CHECK BOX ///
-/////////////////
-void GPS_Data_Displayer::on_checkBox_udp_output_gga_toggled(bool checked)
-{
-    udp_sender->updateOutputGGA(checked);
-}
-
-void GPS_Data_Displayer::on_checkBox_udp_output_rmc_toggled(bool checked)
-{
-    udp_sender->updateOutputRMC(checked);
-}
-
-
-void GPS_Data_Displayer::on_checkBox_udp_output_gsv_toggled(bool checked)
-{
-    udp_sender->updateOutputGSV(checked);
-}
-
-
-void GPS_Data_Displayer::on_checkBox_udp_output_gll_toggled(bool checked)
-{
-    udp_sender->updateOutputGLL(checked);
-}
-
-
-void GPS_Data_Displayer::on_checkBox_udp_output_gsa_toggled(bool checked)
-{
-    udp_sender->updateOutputGSA(checked);
-}
-
-
-void GPS_Data_Displayer::on_checkBox_udp_output_vtg_toggled(bool checked)
-{
-    udp_sender->updateOutputVTG(checked);
-}
-
-
-void GPS_Data_Displayer::on_checkBox_udp_others_toggled(bool checked)
-{
-    udp_sender->updateOutputOthers(checked);
-}
 
 
 

@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
 }
 
 // TO-DO LIST & IDEAS
-// change name to NMEA_Center (for gps only for now)
+// change name to NMEA_Center (gps only for now)
 // accept UDP or TCP connection (inputs)
-// output data on com, tcp or udp
+// output data on com, tcp
 // handle disconnection + alert msg (sudden disconnection)
