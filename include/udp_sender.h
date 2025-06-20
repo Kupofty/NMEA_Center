@@ -19,6 +19,7 @@ class UdpSender : public QObject
         void updateUdpPort(int port);
         void updateUdpMethod(QHostAddress udpAddress);
 
+        void updateOutputNMEA(bool check);
         void updateOutputGGA(bool check);
         void updateOutputRMC(bool check);
         void updateOutputGSV(bool check);
@@ -44,6 +45,7 @@ class UdpSender : public QObject
         int udpPort = 1024;
 
         //Allowed output sentences
+        bool outputNMEA = 0;
         bool outputGGA = 0;
         bool outputRMC = 0;
         bool outputGSV = 0;

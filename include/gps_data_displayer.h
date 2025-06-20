@@ -52,12 +52,15 @@ class GPS_Data_Displayer : public QMainWindow
         void on_checkBox_udp_output_gll_toggled(bool checked);
         void on_checkBox_udp_output_gsa_toggled(bool checked);
         void on_checkBox_udp_output_vtg_toggled(bool checked);
-        void on_checkBox_udp_others_toggled(bool checked);
+        void on_pushButton_activate_udp_output_toggled(bool checked);
+        void on_checkBox_udp_output_others_toggled(bool checked);
+
         void on_pushButton_check_all_udp_output_clicked();
         void on_pushButtonuncheck_all_udp_output_clicked();
 
         void on_comboBox_udp_host_address_currentTextChanged(const QString &arg1);
         void on_lineEdit_udp_ip_address_editingFinished();
+
 
     public slots:
         void displayTXTSentence(const QString line);

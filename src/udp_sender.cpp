@@ -15,8 +15,11 @@ UdpSender::UdpSender()
 /////////////////
 void UdpSender::sendData(const QString line)
 {
-    QByteArray data = line.toUtf8();
-    udpSocket.writeDatagram(data, udpAddress, udpPort);
+    if(outputNMEA)
+    {
+        QByteArray data = line.toUtf8();
+        udpSocket.writeDatagram(data, udpAddress, udpPort);
+    }
 }
 
 
@@ -86,6 +89,11 @@ void UdpSender::updateUdpMethod(QHostAddress method)
 //////////////////////
 /// Update outputs ///
 //////////////////////
+void UdpSender::updateOutputNMEA(bool check)
+{
+    outputNMEA = check;
+}
+
 void UdpSender::updateOutputGGA(bool check)
 {
     outputGGA = check;

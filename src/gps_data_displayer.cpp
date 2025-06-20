@@ -256,6 +256,11 @@ void GPS_Data_Displayer::on_lineEdit_udp_ip_address_editingFinished()
 
 
 //Check data to outpout
+void GPS_Data_Displayer::on_pushButton_activate_udp_output_toggled(bool checked)
+{
+    udp_sender->updateOutputNMEA(checked);
+}
+
 void GPS_Data_Displayer::on_checkBox_udp_output_gga_toggled(bool checked)
 {
     udp_sender->updateOutputGGA(checked);
@@ -286,7 +291,7 @@ void GPS_Data_Displayer::on_checkBox_udp_output_vtg_toggled(bool checked)
     udp_sender->updateOutputVTG(checked);
 }
 
-void GPS_Data_Displayer::on_checkBox_udp_others_toggled(bool checked)
+void GPS_Data_Displayer::on_checkBox_udp_output_others_toggled(bool checked)
 {
     udp_sender->updateOutputOthers(checked);
 }
@@ -312,7 +317,3 @@ void GPS_Data_Displayer::on_pushButtonuncheck_all_udp_output_clicked()
     ui->checkBox_udp_output_vtg->setChecked(false);
     ui->checkBox_udp_output_others->setChecked(false);
 }
-
-
-
-
