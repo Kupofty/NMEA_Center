@@ -2,14 +2,16 @@
 #define GPS_DATA_DISPLAYER_H
 
 #include <QMainWindow>
-#include <QTcpSocket>
-#include <QUdpSocket>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QStandardPaths>
 
 #include "ui_gps_data_displayer.h"
 
 #include "serial_reader.h"
 #include "nmea_handler.h"
 #include "udp_sender.h"
+#include "text_file_writter.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -31,6 +33,7 @@ class GPS_Data_Displayer : public QMainWindow
         SerialReader *serial;
         NMEA_Handler *nmea_handler;
         UdpSender *udp_sender;
+        TextFileWritter *text_file_writer;
 
     private:
         void closeSerial();
@@ -58,19 +61,27 @@ class GPS_Data_Displayer : public QMainWindow
         void on_pushButton_check_all_udp_output_clicked();
         void on_pushButtonuncheck_all_udp_output_clicked();
 
-        void on_comboBox_udp_host_address_currentTextChanged(const QString &arg1);
+        void on_comboBox_udp_host_address_currentTextChanged(const QString &hostAddress);
         void on_lineEdit_udp_ip_address_editingFinished();
 
+        void on_pushButton_browse_folder_path_clicked();
+        void on_pushButton_save_txt_file_toggled(bool checked);
+        void on_pushButton_automatic_txt_file_name_clicked();
+
+
+        void on_pushButton_folder_path_documents_clicked();
+
+        void on_pushButton_folder_path_downloads_clicked();
 
     public slots:
-        void displayTXTSentence(const QString line);
-        void displayGGASentence(const QString line);
-        void displayRMCSentence(const QString line);
-        void displayGSVSentence(const QString line);
-        void displayGLLSentence(const QString line);
-        void displayGSASentence(const QString line);
-        void displayVTGSentence(const QString line);
-        void displayOtherSentence(const QString line);
+        void displayTXTSentence(const QString &line);
+        void displayGGASentence(const QString &line);
+        void displayRMCSentence(const QString &line);
+        void displayGSVSentence(const QString &line);
+        void displayGLLSentence(const QString &line);
+        void displayGSASentence(const QString &line);
+        void displayVTGSentence(const QString &line);
+        void displayOtherSentence(const QString &line);
 
         void updateSatellitesInView(int totalSatellites);
         void updatePosition(double latitude, double longitude);

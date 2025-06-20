@@ -13,7 +13,7 @@ UdpSender::UdpSender()
 /////////////////
 /// Functions ///
 /////////////////
-void UdpSender::sendData(const QString line)
+void UdpSender::sendData(const QString &line)
 {
     if(outputNMEA)
     {
@@ -27,43 +27,43 @@ void UdpSender::sendData(const QString line)
 ////////////////////
 /// Public slots ///
 ////////////////////
-void UdpSender::publishGGA(const QString line)
+void UdpSender::publishGGA(const QString &line)
 {
     if(outputGGA)
         sendData(line);
 }
 
-void UdpSender::publishRMC(const QString line)
+void UdpSender::publishRMC(const QString &line)
 {
     if(outputRMC)
         sendData(line);
 }
 
-void UdpSender::publishGSV(const QString line)
+void UdpSender::publishGSV(const QString &line)
 {
     if(outputGSV)
         sendData(line);
 }
 
-void UdpSender::publishGLL(const QString line)
+void UdpSender::publishGLL(const QString &line)
 {
     if(outputGLL)
         sendData(line);
 }
 
-void UdpSender::publishGSA(const QString line)
+void UdpSender::publishGSA(const QString &line)
 {
     if(outputGSA)
         sendData(line);
 }
 
-void UdpSender::publishVTG(const QString line)
+void UdpSender::publishVTG(const QString &line)
 {
     if(outputVTG)
         sendData(line);
 }
 
-void UdpSender::publishOthers(const QString line)
+void UdpSender::publishOthers(const QString &line)
 {
     if(outputOthers)
         sendData(line);
@@ -79,7 +79,7 @@ void UdpSender::updateUdpPort(int port)
     udpPort = port;
 }
 
-void UdpSender::updateUdpMethod(QHostAddress method)
+void UdpSender::updateUdpMethod(const QHostAddress &method)
 {
     udpAddress = method;
 }

@@ -13,11 +13,11 @@ class UdpSender : public QObject
     public:
         UdpSender();
 
-        void sendData(const QString data);
+        void sendData(const QString &data);
 
         //Update members
         void updateUdpPort(int port);
-        void updateUdpMethod(QHostAddress udpAddress);
+        void updateUdpMethod(const QHostAddress &udpAddress);
 
         void updateOutputNMEA(bool check);
         void updateOutputGGA(bool check);
@@ -29,13 +29,13 @@ class UdpSender : public QObject
         void updateOutputOthers(bool check);
 
     public slots:
-        void publishGGA(const QString line);
-        void publishRMC(const QString line);
-        void publishGSV(const QString line);
-        void publishGLL(const QString line);
-        void publishGSA(const QString line);
-        void publishVTG(const QString line);
-        void publishOthers(const QString line);
+        void publishGGA(const QString &line);
+        void publishRMC(const QString &line);
+        void publishGSV(const QString &line);
+        void publishGLL(const QString &line);
+        void publishGSA(const QString &line);
+        void publishVTG(const QString &line);
+        void publishOthers(const QString &line);
 
 
     private:

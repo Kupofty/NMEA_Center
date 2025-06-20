@@ -12,12 +12,14 @@ SOURCES += \
     src/main.cpp \
     src/gps_data_displayer.cpp \
     src/serial_reader.cpp \
+    src/text_file_writter.cpp \
     src/udp_sender.cpp
 
 HEADERS += \
     include/gps_data_displayer.h \
     include/serial_reader.h \
     include/nmea_handler.h \
+    include/text_file_writter.h \
     include/udp_sender.h
 
 FORMS += \

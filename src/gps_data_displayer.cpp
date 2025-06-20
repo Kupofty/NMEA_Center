@@ -4,7 +4,7 @@
 /// CLASS ///
 /////////////
 GPS_Data_Displayer::GPS_Data_Displayer(QWidget *parent) : QMainWindow(parent), ui(new Ui::GPS_Data_Displayer),
-    serial(new SerialReader), nmea_handler(new NMEA_Handler), udp_sender(new UdpSender)
+    serial(new SerialReader), nmea_handler(new NMEA_Handler), udp_sender(new UdpSender), text_file_writer(new TextFileWritter)
 {
     //Setup UI
     ui->setupUi(this);
@@ -32,6 +32,7 @@ void GPS_Data_Displayer::connectSignalSlot()
 {
     //Serial data
     QObject::connect(serial, &SerialReader::newLineReceived, nmea_handler, &NMEA_Handler::handleRawSentences);
+    QObject::connect(serial, &SerialReader::newLineReceived, text_file_writer, &TextFileWritter::writeRawSentences);
 
     //Send raw NMEA to UDP publisher
     QObject::connect(nmea_handler, &NMEA_Handler::newGGASentence, udp_sender, &UdpSender::publishGGA);
@@ -136,48 +137,48 @@ void GPS_Data_Displayer::on_pushButton_refresh_available_ports_list_clicked()
 ///////////////////////////
 
 //Display On Screens
-void GPS_Data_Displayer::displayTXTSentence(const QString nmeaText)
+void GPS_Data_Displayer::displayTXTSentence(const QString &nmeaText)
 {
     ui->plainTextEdit_txt->appendPlainText(nmeaText);
 }
 
-void GPS_Data_Displayer::displayGGASentence(const QString nmeaText)
+void GPS_Data_Displayer::displayGGASentence(const QString &nmeaText)
 {
     if(!ui->pushButton_freeze_raw_sentences_screens->isChecked())
         ui->plainTextEdit_gga->appendPlainText(nmeaText);
 }
 
-void GPS_Data_Displayer::displayRMCSentence(const QString nmeaText)
+void GPS_Data_Displayer::displayRMCSentence(const QString &nmeaText)
 {
     if(!ui->pushButton_freeze_raw_sentences_screens->isChecked())
         ui->plainTextEdit_rmc->appendPlainText(nmeaText);
 }
 
-void GPS_Data_Displayer::displayGSVSentence(const QString nmeaText)
+void GPS_Data_Displayer::displayGSVSentence(const QString &nmeaText)
 {
     if(!ui->pushButton_freeze_raw_sentences_screens->isChecked())
         ui->plainTextEdit_gsv->appendPlainText(nmeaText);
 }
 
-void GPS_Data_Displayer::displayGLLSentence(const QString nmeaText)
+void GPS_Data_Displayer::displayGLLSentence(const QString &nmeaText)
 {
     if(!ui->pushButton_freeze_raw_sentences_screens->isChecked())
         ui->plainTextEdit_gll->appendPlainText(nmeaText);
 }
 
-void GPS_Data_Displayer::displayGSASentence(const QString nmeaText)
+void GPS_Data_Displayer::displayGSASentence(const QString &nmeaText)
 {
     if(!ui->pushButton_freeze_raw_sentences_screens->isChecked())
         ui->plainTextEdit_gsa->appendPlainText(nmeaText);
 }
 
-void GPS_Data_Displayer::displayVTGSentence(const QString nmeaText)
+void GPS_Data_Displayer::displayVTGSentence(const QString &nmeaText)
 {
     if(!ui->pushButton_freeze_raw_sentences_screens->isChecked())
         ui->plainTextEdit_vtg->appendPlainText(nmeaText);
 }
 
-void GPS_Data_Displayer::displayOtherSentence(const QString nmeaText)
+void GPS_Data_Displayer::displayOtherSentence(const QString &nmeaText)
 {
     if(!ui->pushButton_freeze_raw_sentences_screens->isChecked())
         ui->plainTextEdit_others->appendPlainText(nmeaText);
@@ -317,3 +318,70 @@ void GPS_Data_Displayer::on_pushButtonuncheck_all_udp_output_clicked()
     ui->checkBox_udp_output_vtg->setChecked(false);
     ui->checkBox_udp_output_others->setChecked(false);
 }
+
+
+
+/////////////////////
+/// Save TXT File ///
+/////////////////////
+void GPS_Data_Displayer::on_pushButton_folder_path_documents_clicked()
+{
+    ui->plainTextEdit_txt_file_path->setPlainText(QStandardPaths::writableLocation(QStandardPaths::DocumentsLocation));
+}
+
+void GPS_Data_Displayer::on_pushButton_folder_path_downloads_clicked()
+{
+    ui->plainTextEdit_txt_file_path->setPlainText(QStandardPaths::writableLocation(QStandardPaths::DownloadLocation));
+}
+
+void GPS_Data_Displayer::on_pushButton_browse_folder_path_clicked()
+{
+    QString dirPath = QFileDialog::getExistingDirectory(this, "Select Output Directory",
+                                                        QStandardPaths::writableLocation(QStandardPaths::HomeLocation),  QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+
+
+    if (!dirPath.isEmpty())
+        ui->plainTextEdit_txt_file_path->setPlainText(dirPath);
+}
+
+void GPS_Data_Displayer::on_pushButton_automatic_txt_file_name_clicked()
+{
+    QString automaticFileName = "Log_NMEA_" + QDateTime::currentDateTime().toString("yyyy_MM_dd_HH_mm_ss");
+    ui->plainTextEdit_txt_file_name->setPlainText(automaticFileName);
+}
+
+void GPS_Data_Displayer::on_pushButton_save_txt_file_toggled(bool checked)
+{
+
+    if(checked)
+    {
+        QString dirPath = ui->plainTextEdit_txt_file_path->toPlainText().trimmed();
+        QString fileName = ui->plainTextEdit_txt_file_name->toPlainText().trimmed();
+        QString fileExtension = ui->comboBox_txt_file_extension->currentText();
+        QString totalFilePath = QDir(dirPath).filePath(fileName + fileExtension);
+
+        if (dirPath.isEmpty() || fileName.isEmpty()) {
+            QMessageBox::warning(this, "Missing Information", "Please select an output folder and enter a file name before saving.");
+            ui->pushButton_save_txt_file->setChecked(false);
+            return;
+        }
+
+        int result = text_file_writer->createFile(totalFilePath);
+        if(!result)
+            return;
+
+        ui->pushButton_save_txt_file->setText(" Stop Recording");
+    }
+    else
+    {
+        text_file_writer->closeFile();
+        ui->pushButton_save_txt_file->setText(" Record Data To File");
+    }
+
+}
+
+
+
+
+
+

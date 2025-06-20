@@ -13,7 +13,7 @@ class NMEA_Handler : public QObject
         NMEA_Handler();
 
     public slots:
-        void handleRawSentences(const QByteArray line);
+        void handleRawSentences(const QByteArray &line);
 
     private:
         //Frequency timers
@@ -21,22 +21,22 @@ class NMEA_Handler : public QObject
         qint64 lastUpdateTimeMsGSV = -1;
 
     private:
-        void handleGGA(const QList<QByteArray> fields);
-        void handleRMC(const QList<QByteArray> fields);
-        void handleGSV(const QList<QByteArray> fields);
-        void handleGLL(const QList<QByteArray> fields);
-        void handleGSA(const QList<QByteArray> fields);
-        void handleVTG(const QList<QByteArray> fields);
+        void handleGGA(const QList<QByteArray> &fields);
+        void handleRMC(const QList<QByteArray> &fields);
+        void handleGSV(const QList<QByteArray> &fields);
+        void handleGLL(const QList<QByteArray> &fields);
+        void handleGSA(const QList<QByteArray> &fields);
+        void handleVTG(const QList<QByteArray> &fields);
 
     signals:
-        void newTXTSentence(const QString nmeaText);
-        void newGGASentence(const QString nmeaText);
-        void newRMCSentence(const QString nmeaText);
-        void newGSVSentence(const QString nmeaText);
-        void newGLLSentence(const QString nmeaText);
-        void newGSASentence(const QString nmeaText);
-        void newVTGSentence(const QString nmeaText);
-        void newOtherSentence(const QString nmeaText);
+        void newTXTSentence(const QString &nmeaText);
+        void newGGASentence(const QString &nmeaText);
+        void newRMCSentence(const QString &nmeaText);
+        void newGSVSentence(const QString &nmeaText);
+        void newGLLSentence(const QString &nmeaText);
+        void newGSASentence(const QString &nmeaText);
+        void newVTGSentence(const QString &nmeaText);
+        void newOtherSentence(const QString &nmeaText);
 
         void newSatellitesInView(int totalSatellites);
         void newPosition(double latitude, double longitude);

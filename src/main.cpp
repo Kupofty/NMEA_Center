@@ -5,12 +5,7 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     GPS_Data_Displayer gui;
+
     gui.show();
     return app.exec();
 }
-
-// TO-DO LIST & IDEAS
-// change name to NMEA_Center (gps only for now)
-// accept UDP or TCP connection (inputs)
-// output data on com, tcp
-// handle disconnection + alert msg (sudden disconnection)

@@ -13,7 +13,7 @@ NMEA_Handler::NMEA_Handler()
 ////////////////////////////
 /// Detect NMEA Sentence ///
 ////////////////////////////
-void NMEA_Handler::handleRawSentences(const QByteArray line)
+void NMEA_Handler::handleRawSentences(const QByteArray &line)
 {
     QString nmeaText = QString::fromUtf8(line).trimmed();
     const QList<QByteArray> fields = line.split(',');
@@ -69,7 +69,7 @@ void NMEA_Handler::handleRawSentences(const QByteArray line)
 ///////////////////
 /// Handle Data ///
 ///////////////////
-void NMEA_Handler::handleGGA(const QList<QByteArray> fields)
+void NMEA_Handler::handleGGA(const QList<QByteArray> &fields)
 {
     if (fields.size() < 6)
         return;
@@ -107,12 +107,12 @@ void NMEA_Handler::handleGGA(const QList<QByteArray> fields)
     emit newPosition(latitude, longitude);
 }
 
-void NMEA_Handler::handleRMC(const QList<QByteArray> fields)
+void NMEA_Handler::handleRMC(const QList<QByteArray> &fields)
 {
 
 }
 
-void NMEA_Handler::handleGSV(const QList<QByteArray> fields)
+void NMEA_Handler::handleGSV(const QList<QByteArray> &fields)
 {
     if (fields.size() < 4)
         return;
@@ -148,17 +148,17 @@ void NMEA_Handler::handleGSV(const QList<QByteArray> fields)
 
 }
 
-void NMEA_Handler::handleGLL(const QList<QByteArray> fields)
+void NMEA_Handler::handleGLL(const QList<QByteArray> &fields)
 {
 
 }
 
-void NMEA_Handler::handleGSA(const QList<QByteArray> fields)
+void NMEA_Handler::handleGSA(const QList<QByteArray> &fields)
 {
 
 }
 
-void NMEA_Handler::handleVTG(const QList<QByteArray> fields)
+void NMEA_Handler::handleVTG(const QList<QByteArray> &fields)
 {
 
 
