@@ -5,6 +5,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QStandardPaths>
+#include <QTimer>
 
 #include "ui_gps_data_displayer.h"
 
@@ -36,6 +37,7 @@ class GPS_Data_Displayer : public QMainWindow
         NMEA_Handler *nmea_handler;
         UdpWriter *udp_writer;
         TextFileWritter *text_file_writer;
+        QTimer *fileRecordingSizeTimer;
 
     private:
         void closeInputSerial();
@@ -45,6 +47,8 @@ class GPS_Data_Displayer : public QMainWindow
         void hideGUI();
         void connectSignalSlot();
         void updateGuiAfterSerialConnection(bool connectSuccess);
+        void updateFileSize();
+        QString getRecordingFilePath();
 
     private slots:
         void on_pushButton_clear_raw_sentences_screens_clicked();

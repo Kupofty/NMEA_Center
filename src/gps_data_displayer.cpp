@@ -29,6 +29,8 @@ GPS_Data_Displayer::GPS_Data_Displayer(QWidget *parent) : QMainWindow(parent),
 
 GPS_Data_Displayer::~GPS_Data_Displayer()
 {
+    delete fileRecordingSizeTimer;
+
     delete serial;
     delete nmea_handler;
     delete udp_writer;
@@ -77,7 +79,9 @@ void GPS_Data_Displayer::connectSignalSlot()
     //Display NMEA update frequency
     QObject::connect(nmea_handler, &NMEA_Handler::newGsvFrequency, this, &GPS_Data_Displayer::updateGsvFrequency);
 
-
+    //Timers
+    fileRecordingSizeTimer = new QTimer(this);
+    connect(fileRecordingSizeTimer, &QTimer::timeout, this, &GPS_Data_Displayer::updateFileSize);
 }
 
 
@@ -386,13 +390,10 @@ void GPS_Data_Displayer::on_pushButton_automatic_txt_file_name_clicked()
 
 void GPS_Data_Displayer::on_pushButton_save_txt_file_toggled(bool checked)
 {
-
     if(checked)
     {
         QString dirPath = ui->plainTextEdit_txt_file_path->toPlainText().trimmed();
         QString fileName = ui->plainTextEdit_txt_file_name->toPlainText().trimmed();
-        QString fileExtension = ui->comboBox_txt_file_extension->currentText();
-        QString totalFilePath = QDir(dirPath).filePath(fileName + fileExtension);
 
         if (dirPath.isEmpty() || fileName.isEmpty()) {
             QMessageBox::warning(this, "Missing Information", "Please select an output folder and enter a file name before saving.");
@@ -400,18 +401,45 @@ void GPS_Data_Displayer::on_pushButton_save_txt_file_toggled(bool checked)
             return;
         }
 
-        int result = text_file_writer->createFile(totalFilePath);
+        int result = text_file_writer->createFile(getRecordingFilePath());
         if(!result)
             return;
 
+        fileRecordingSizeTimer->start(1000);
         ui->pushButton_save_txt_file->setText(" Stop Recording");
     }
     else
     {
+        fileRecordingSizeTimer->stop();
+        ui->label_file_txt_size->setText("Not recording");
         text_file_writer->closeFile();
         ui->pushButton_save_txt_file->setText(" Record Data To File");
     }
 
+}
+
+void GPS_Data_Displayer::updateFileSize()
+{
+    QFile file(getRecordingFilePath());
+    if (file.exists())
+    {
+        qint64 size = file.size();
+        ui->label_file_txt_size->setText(QString("%1 Kb").arg(static_cast<int>(std::round(size / 1000.0))));
+    }
+    else
+    {
+        ui->label_file_txt_size->setText("File missing");
+    }
+}
+
+QString GPS_Data_Displayer::getRecordingFilePath()
+{
+    QString dirPath = ui->plainTextEdit_txt_file_path->toPlainText().trimmed();
+    QString fileName = ui->plainTextEdit_txt_file_name->toPlainText().trimmed();
+    QString fileExtension = ui->comboBox_txt_file_extension->currentText();
+    QString fullPath = QDir(dirPath).filePath(fileName + fileExtension);
+
+    return fullPath;
 }
 
 
