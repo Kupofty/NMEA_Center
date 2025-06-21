@@ -1,10 +1,10 @@
-#include "gps_data_displayer.h"
+#include "interface.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    GPS_Data_Displayer gui;
+    Interface gui;
 
     gui.show();
     return app.exec();

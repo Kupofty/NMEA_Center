@@ -8,9 +8,9 @@ CONFIG += c++17
 INCLUDEPATH += include
 
 SOURCES += \
+    src/interface.cpp \
     src/nmea_handler.cpp \
     src/main.cpp \
-    src/gps_data_displayer.cpp \
     src/output_writer.cpp \
     src/serial_reader.cpp \
     src/serial_writer.cpp \
@@ -18,7 +18,7 @@ SOURCES += \
     src/udp_sender.cpp
 
 HEADERS += \
-    include/gps_data_displayer.h \
+    include/interface.h \
     include/output_writer.h \
     include/serial_reader.h \
     include/nmea_handler.h \
@@ -27,7 +27,7 @@ HEADERS += \
     include/udp_sender.h
 
 FORMS += \
-    ui/gps_data_displayer.ui
+    ui/interface.ui
 
 
 # Default rules for deployment.

@@ -1,5 +1,5 @@
-#ifndef GPS_DATA_DISPLAYER_H
-#define GPS_DATA_DISPLAYER_H
+#ifndef INTERFACE_H
+#define INTERFACE_H
 
 #include <QMainWindow>
 #include <QFileDialog>
@@ -7,7 +7,7 @@
 #include <QStandardPaths>
 #include <QTimer>
 
-#include "ui_gps_data_displayer.h"
+#include "ui_interface.h"
 
 #include "serial_reader.h"
 #include "serial_writer.h"
@@ -18,20 +18,20 @@
 QT_BEGIN_NAMESPACE
 namespace Ui
 {
-    class GPS_Data_Displayer;
+    class Interface;
 }
 QT_END_NAMESPACE
 
-class GPS_Data_Displayer : public QMainWindow
+class Interface : public QMainWindow
 {
     Q_OBJECT
 
     public:
-        GPS_Data_Displayer(QWidget *parent = nullptr);
-        ~GPS_Data_Displayer();
+        Interface(QWidget *parent = nullptr);
+        ~Interface();
 
     private:
-        Ui::GPS_Data_Displayer *ui;
+        Ui::Interface *ui;
         SerialReader *serial;
         SerialWriter *serial_writer;
         NMEA_Handler *nmea_handler;
@@ -109,4 +109,4 @@ class GPS_Data_Displayer : public QMainWindow
         void updateGsvFrequency(double frequency);
 };
 
-#endif // GPS_DATA_DISPLAYER_H
+#endif // INTERFACE_H
