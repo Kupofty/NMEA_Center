@@ -6,6 +6,7 @@
 #include <QSerialPort>
 
 //Need to create serial class and inherit from it & from output_writer
+// problem -> inherit 2 time from QObject
 
 class SerialWriter : public OutputWriter
 {

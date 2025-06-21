@@ -6,13 +6,13 @@
 #include <QUdpSocket>
 #include <QHostAddress>
 
-class UdpSender : public OutputWriter
+class UdpWriter : public OutputWriter
 {
     Q_OBJECT
 
 public:
-    explicit UdpSender(QObject *parent = nullptr);
-    ~UdpSender();
+    explicit UdpWriter(QObject *parent = nullptr);
+    ~UdpWriter();
 
     //Specific to UDP
     void sendData(const QString &data) override;

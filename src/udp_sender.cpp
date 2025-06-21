@@ -3,12 +3,12 @@
 /////////////
 /// Class ///
 /////////////
-UdpSender::UdpSender(QObject *parent) : OutputWriter(parent)
+UdpWriter::UdpWriter(QObject *parent) : OutputWriter(parent)
 {
 
 }
 
-UdpSender::~UdpSender()
+UdpWriter::~UdpWriter()
 {
 
 }
@@ -18,7 +18,7 @@ UdpSender::~UdpSender()
 /////////////////
 /// Functions ///
 /////////////////
-void UdpSender::sendData(const QString &line)
+void UdpWriter::sendData(const QString &line)
 {
     if(getOutputNMEA())
     {
@@ -31,12 +31,12 @@ void UdpSender::sendData(const QString &line)
 ///////////////////////
 /// Update settings ///
 ///////////////////////
-void UdpSender::updateUdpPort(int port)
+void UdpWriter::updateUdpPort(int port)
 {
     udpPort = port;
 }
 
-void UdpSender::updateUdpMethod(const QHostAddress &method)
+void UdpWriter::updateUdpMethod(const QHostAddress &method)
 {
     udpAddress = method;
 }

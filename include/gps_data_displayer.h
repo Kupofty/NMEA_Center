@@ -9,6 +9,7 @@
 #include "ui_gps_data_displayer.h"
 
 #include "serial_reader.h"
+#include "serial_writer.h"
 #include "nmea_handler.h"
 #include "udp_sender.h"
 #include "text_file_writter.h"
@@ -31,12 +32,14 @@ class GPS_Data_Displayer : public QMainWindow
     private:
         Ui::GPS_Data_Displayer *ui;
         SerialReader *serial;
+        SerialWriter *serial_writer;
         NMEA_Handler *nmea_handler;
-        UdpSender *udp_sender;
+        UdpWriter *udp_writer;
         TextFileWritter *text_file_writer;
 
     private:
-        void closeSerial();
+        void closeInputSerial();
+        void closeOutputSerial();
         void clearRawSentencesScreens();
         void listAvailablePorts(QComboBox *comboBox);
         void hideGUI();
@@ -68,13 +71,23 @@ class GPS_Data_Displayer : public QMainWindow
         void on_pushButton_browse_folder_path_clicked();
         void on_pushButton_save_txt_file_toggled(bool checked);
         void on_pushButton_automatic_txt_file_name_clicked();
-
-
         void on_pushButton_folder_path_documents_clicked();
-
         void on_pushButton_folder_path_downloads_clicked();
 
         void on_pushButton_refresh_available_port_serial_output_clicked();
+        void on_pushButton_connect_serial_output_clicked();
+        void on_pushButton_disconnect_serial_output_clicked();
+        void on_checkBox_serial_output_gga_toggled(bool checked);
+
+        void on_pushButton_activate_serial_output_toggled(bool checked);
+        void on_checkBox_serial_output_gsv_toggled(bool checked);
+        void on_checkBox_serial_output_rmc_toggled(bool checked);
+        void on_checkBox_serial_output_gsa_toggled(bool checked);
+        void on_checkBox_serial_output_gll_toggled(bool checked);
+        void on_checkBox_serial_output_vtg_toggled(bool checked);
+        void on_checkBox_serial_output_others_toggled(bool checked);
+        void on_pushButton_check_all_serial_output_clicked();
+        void on_pushButtonuncheck_all_serial_output_clicked();
 
     public slots:
         void displayTXTSentence(const QString &line);
