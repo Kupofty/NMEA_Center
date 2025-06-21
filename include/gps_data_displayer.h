@@ -38,9 +38,10 @@ class GPS_Data_Displayer : public QMainWindow
     private:
         void closeSerial();
         void clearRawSentencesScreens();
-        void listAvailablePorts();
+        void listAvailablePorts(QComboBox *comboBox);
         void hideGUI();
         void connectSignalSlot();
+        void updateGuiAfterSerialConnection(bool connectSuccess);
 
     private slots:
         void on_pushButton_clear_raw_sentences_screens_clicked();
@@ -72,6 +73,8 @@ class GPS_Data_Displayer : public QMainWindow
         void on_pushButton_folder_path_documents_clicked();
 
         void on_pushButton_folder_path_downloads_clicked();
+
+        void on_pushButton_refresh_available_port_serial_output_clicked();
 
     public slots:
         void displayTXTSentence(const QString &line);

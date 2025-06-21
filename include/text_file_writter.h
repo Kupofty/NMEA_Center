@@ -12,6 +12,7 @@ class TextFileWritter : public QObject
 
     public:
         explicit TextFileWritter(QObject *parent = nullptr);
+        ~TextFileWritter();
 
         bool createFile(const QString &file_path);
         void closeFile();

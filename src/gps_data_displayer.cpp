@@ -4,7 +4,10 @@
 /// CLASS ///
 /////////////
 GPS_Data_Displayer::GPS_Data_Displayer(QWidget *parent) : QMainWindow(parent), ui(new Ui::GPS_Data_Displayer),
-    serial(new SerialReader), nmea_handler(new NMEA_Handler), udp_sender(new UdpSender), text_file_writer(new TextFileWritter)
+    serial(new SerialReader),
+    nmea_handler(new NMEA_Handler),
+    udp_sender(new UdpSender),
+    text_file_writer(new TextFileWritter)
 {
     //Setup UI
     ui->setupUi(this);
@@ -15,7 +18,7 @@ GPS_Data_Displayer::GPS_Data_Displayer(QWidget *parent) : QMainWindow(parent), u
     hideGUI();
 
     //Setup GPS GUI
-    listAvailablePorts();
+    listAvailablePorts(ui->comboBox_serial_input_port_list);
 
     //Qt connects
     connectSignalSlot();
@@ -24,7 +27,10 @@ GPS_Data_Displayer::GPS_Data_Displayer(QWidget *parent) : QMainWindow(parent), u
 
 GPS_Data_Displayer::~GPS_Data_Displayer()
 {
-    closeSerial();
+    delete serial;
+    delete nmea_handler;
+    delete udp_sender;
+    delete text_file_writer;
     delete ui;
 }
 
@@ -75,9 +81,9 @@ void GPS_Data_Displayer::hideGUI()
 
 
 
-//////////////
-/// Serial ///
-//////////////
+////////////////////
+/// Serial Input ///
+////////////////////
 
 // Connection
 void GPS_Data_Displayer::closeSerial()
@@ -93,41 +99,52 @@ void GPS_Data_Displayer::closeSerial()
 
 void GPS_Data_Displayer::on_pushButton_connect_clicked()
 {
-    serial->setPortName(ui->comboBox_available_ports->currentText());
+    //Update serial settings
+    serial->setPortName(ui->comboBox_serial_input_port_list->currentText());
+    serial->setBaudRate((ui->comboBox_serial_input_port_baudrate->currentText()).toInt());
 
+    //Try to connect
     QString result;
     if(serial->openSerialDevice())
     {
         result =  "Connected to " + serial->getPortName();
         ui->plainTextEdit_txt->clear();
-        ui->tabWidget->setCurrentWidget(ui->tab_gps_decoded_data);
+        updateGuiAfterSerialConnection(true);
     }
     else
         result =  "Failed to open " + serial->getPortName() + " : " + serial->getErrorString();
 
+    //Display connection status
     ui->plainTextEdit_connection_status->setPlainText(result);
 }
 
 void GPS_Data_Displayer::on_pushButton_disconnect_clicked()
 {
     closeSerial();
+    updateGuiAfterSerialConnection(false);
 }
 
+void GPS_Data_Displayer::updateGuiAfterSerialConnection(bool connectSuccess)
+{
+    ui->horizontalFrame_serial_input_connection->setEnabled(!connectSuccess);
+    ui->pushButton_connect->setEnabled(!connectSuccess);
+    ui->pushButton_disconnect->setEnabled(connectSuccess);
+}
 
 //COM ports
-void GPS_Data_Displayer::listAvailablePorts()
+void GPS_Data_Displayer::listAvailablePorts(QComboBox *comboBox)
 {
+    comboBox->clear();
     const auto ports = QSerialPortInfo::availablePorts();
     for (const QSerialPortInfo &port : ports)
     {
-        ui->comboBox_available_ports->addItem(port.portName());
+        comboBox->addItem(port.portName());
     }
 }
 
 void GPS_Data_Displayer::on_pushButton_refresh_available_ports_list_clicked()
 {
-    ui->comboBox_available_ports->clear();
-    listAvailablePorts();
+    listAvailablePorts(ui->comboBox_serial_input_port_list);
 }
 
 
@@ -184,6 +201,7 @@ void GPS_Data_Displayer::displayOtherSentence(const QString &nmeaText)
         ui->plainTextEdit_others->appendPlainText(nmeaText);
 }
 
+
 //Clear Screens
 void GPS_Data_Displayer::clearRawSentencesScreens()
 {
@@ -217,6 +235,7 @@ void GPS_Data_Displayer::updateSatellitesInView(int satellitesInView)
 {
     ui->lcdNumber_satellitesInView->display(satellitesInView);
 }
+
 
 //Frequency
 void GPS_Data_Displayer::updateGsvFrequency(double frequency)
@@ -383,5 +402,20 @@ void GPS_Data_Displayer::on_pushButton_save_txt_file_toggled(bool checked)
 
 
 
+//////////////////////////
+/// Serial Output Data ///
+//////////////////////////
+void GPS_Data_Displayer::on_pushButton_refresh_available_port_serial_output_clicked()
+{
+    listAvailablePorts(ui->comboBox_serial_output_port_list);
 
+    //Remove input COM as output choice
+    if(serial->isSerialOpen())
+    {
+        int indexToRemove = ui->comboBox_serial_output_port_list->findText(ui->comboBox_serial_input_port_list->currentText());
+        if (indexToRemove != -1)
+            ui->comboBox_serial_output_port_list->removeItem(indexToRemove);
+    }
+
+}
 

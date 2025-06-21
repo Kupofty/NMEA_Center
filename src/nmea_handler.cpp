@@ -9,6 +9,12 @@ NMEA_Handler::NMEA_Handler()
 
 }
 
+NMEA_Handler::~NMEA_Handler()
+{
+
+}
+
+
 
 ////////////////////////////
 /// Detect NMEA Sentence ///
@@ -66,6 +72,7 @@ void NMEA_Handler::handleRawSentences(const QByteArray &line)
 }
 
 
+
 ///////////////////
 /// Handle Data ///
 ///////////////////
@@ -109,7 +116,7 @@ void NMEA_Handler::handleGGA(const QList<QByteArray> &fields)
 
 void NMEA_Handler::handleRMC(const QList<QByteArray> &fields)
 {
-
+    Q_UNUSED(fields);
 }
 
 void NMEA_Handler::handleGSV(const QList<QByteArray> &fields)
@@ -150,16 +157,15 @@ void NMEA_Handler::handleGSV(const QList<QByteArray> &fields)
 
 void NMEA_Handler::handleGLL(const QList<QByteArray> &fields)
 {
-
+    Q_UNUSED(fields);
 }
 
 void NMEA_Handler::handleGSA(const QList<QByteArray> &fields)
 {
-
+    Q_UNUSED(fields);
 }
 
 void NMEA_Handler::handleVTG(const QList<QByteArray> &fields)
 {
-
-
+    Q_UNUSED(fields);
 }

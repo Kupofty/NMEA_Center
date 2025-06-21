@@ -9,6 +9,12 @@ TextFileWritter::TextFileWritter(QObject *parent) : QObject{parent}
 
 }
 
+TextFileWritter::~TextFileWritter()
+{
+
+}
+
+
 
 ///////////////////
 /// Handle File ///

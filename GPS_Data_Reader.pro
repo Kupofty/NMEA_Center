@@ -11,14 +11,18 @@ SOURCES += \
     src/nmea_handler.cpp \
     src/main.cpp \
     src/gps_data_displayer.cpp \
+    src/output_writer.cpp \
     src/serial_reader.cpp \
+    src/serial_writer.cpp \
     src/text_file_writter.cpp \
     src/udp_sender.cpp
 
 HEADERS += \
     include/gps_data_displayer.h \
+    include/output_writer.h \
     include/serial_reader.h \
     include/nmea_handler.h \
+    include/serial_writer.h \
     include/text_file_writter.h \
     include/udp_sender.h
 

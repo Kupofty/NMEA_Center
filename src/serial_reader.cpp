@@ -7,7 +7,7 @@ SerialReader::SerialReader()
 {
     //Set serial parameters
     serial.setPortName("COM0");
-    serial.setBaudRate(QSerialPort::Baud4800);
+    serial.setBaudRate(QSerialPort::Baud115200);
     serial.setDataBits(QSerialPort::Data8);
     serial.setParity(QSerialPort::NoParity);
     serial.setStopBits(QSerialPort::OneStop);
@@ -19,9 +19,10 @@ SerialReader::SerialReader()
 
 SerialReader::~SerialReader()
 {
-    if(isSerialOpen())
-        closeSerialDevice();
+    closeSerialDevice();
 }
+
+
 
 //////////////////
 /// Connection ///
@@ -33,7 +34,8 @@ bool SerialReader::openSerialDevice()
 
 void SerialReader::closeSerialDevice()
 {
-    serial.close();
+    if(isSerialOpen())
+        serial.close();
 }
 
 
@@ -56,6 +58,7 @@ void SerialReader::readData()
 }
 
 
+
 //////////////////////
 /// Set parameters ///
 //////////////////////
@@ -68,6 +71,7 @@ void SerialReader::setBaudRate(qint32 baudRate)
 {
     serial.setBaudRate(baudRate);
 }
+
 
 
 ////////////////

@@ -11,6 +11,7 @@ class NMEA_Handler : public QObject
 
     public:
         NMEA_Handler();
+        ~NMEA_Handler();
 
     public slots:
         void handleRawSentences(const QByteArray &line);
