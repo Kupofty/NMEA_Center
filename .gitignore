@@ -1,54 +1,60 @@
-ÿþ# C++ objects and libs
-*.slo
-*.lo
+# Build directories (adjust as needed)
+build/
+debug/
+release/
+*.pro.user.*
+
+# Qt build artifacts
+*.obj
 *.o
 *.a
-*.la
-*.lai
+*.lib
 *.so
-*.so.*
 *.dll
-*.dylib
+*.exe
+*.user
+*.user.*
+*.ncb
+*.sdf
+*.suo
 
-# Qt-es
-object_script.*.Release
-object_script.*.Debug
-*_plugin_import.cpp
-/.qmake.cache
-/.qmake.stash
+# Qt Creator specific
+*.autosave
 *.pro.user
-*.pro.user.*
-*.qbs.user
-*.qbs.user.*
-*.moc
+*.qmlproject.user
+*.qmake.stash
+Makefile*
 moc_*.cpp
 moc_*.h
-qrc_*.cpp
 ui_*.h
-*.qmlc
-*.jsc
-Makefile*
-*build-*
-*.qm
-*.prl
+qrc_*.cpp
 
-# Qt unit tests
-target_wrapper.*
+# CMake (if used)
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+CTestTestfile.cmake
+Makefile
+*.cbp
 
-# QtCreator
-*.autosave
+# Logs and temporary files
+*.log
+*.tmp
+*.bak
+*.swp
 
-# QtCreator Qml
-*.qmlproject.user
-*.qmlproject.user.*
+# OS-specific
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
 
-# QtCreator CMake
-CMakeLists.txt.user*
+# Visual Studio (if using)
+.vs/
+*.VC.db
+*.VC.opendb
 
-# QtCreator 4.8< compilation database
-compile_commands.json
-
-# QtCreator local machine specific files for imported projects
-*creator.user*
-
-*_qmlcache.qrc
+# Qt Installer Framework
+*.ipk
+*.7z
+*.sha1
