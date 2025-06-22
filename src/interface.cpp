@@ -63,21 +63,12 @@ void Interface::connectSignalSlot()
     QObject::connect(nmea_handler, &NMEA_Handler::newOtherSentence, serial_writer, &UdpWriter::publishOthers);
 
     //Display raw NMEA from nmea_handler
-    QObject::connect(nmea_handler, &NMEA_Handler::newTXTSentence, this, &Interface::displayTXTSentence);
-    QObject::connect(nmea_handler, &NMEA_Handler::newGGASentence, this, &Interface::displayGGASentence);
-    QObject::connect(nmea_handler, &NMEA_Handler::newRMCSentence, this, &Interface::displayRMCSentence);
-    QObject::connect(nmea_handler, &NMEA_Handler::newGSVSentence, this, &Interface::displayGSVSentence);
-    QObject::connect(nmea_handler, &NMEA_Handler::newGLLSentence, this, &Interface::displayGLLSentence);
-    QObject::connect(nmea_handler, &NMEA_Handler::newGSASentence, this, &Interface::displayGSASentence);
-    QObject::connect(nmea_handler, &NMEA_Handler::newVTGSentence, this, &Interface::displayVTGSentence);
-    QObject::connect(nmea_handler, &NMEA_Handler::newOtherSentence, this, &Interface::displayOtherSentence);
+    QObject::connect(nmea_handler, &NMEA_Handler::newNMEASentence, this, &Interface::displayRawNmeaSentence);
 
     //Display decoded NMEA data
-    QObject::connect(nmea_handler, &NMEA_Handler::newPosition, this, &Interface::updatePosition);
-    QObject::connect(nmea_handler, &NMEA_Handler::newSatellitesInView, this, &Interface::updateSatellitesInView);
+    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedGGA, this, &Interface::updateDataGGA);
+    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedGSV, this, &Interface::updateDataGSV);
 
-    //Display NMEA update frequency
-    QObject::connect(nmea_handler, &NMEA_Handler::newGsvFrequency, this, &Interface::updateGsvFrequency);
 
     //Timers
     fileRecordingSizeTimer = new QTimer(this);
@@ -171,53 +162,39 @@ void Interface::on_pushButton_refresh_available_ports_list_clicked()
 ///////////////////////////
 
 //Display On Screens
-void Interface::displayTXTSentence(const QString &nmeaText)
+void Interface::displayRawNmeaSentence(const QString &type, const QString &nmeaText)
 {
-    ui->plainTextEdit_txt->appendPlainText(nmeaText);
-}
+    if(type=="TXT")
+        ui->plainTextEdit_txt->appendPlainText(nmeaText);
 
-void Interface::displayGGASentence(const QString &nmeaText)
-{
-    if(!ui->pushButton_freeze_raw_sentences_screens->isChecked())
+    //Don't update screen if "freeze" button is checked
+    if(ui->pushButton_freeze_raw_sentences_screens->isChecked())
+        return;
+
+    if(type=="TXT")
+        ui->plainTextEdit_txt->appendPlainText(nmeaText);
+
+    else if(type=="GGA")
         ui->plainTextEdit_gga->appendPlainText(nmeaText);
-}
 
-void Interface::displayRMCSentence(const QString &nmeaText)
-{
-    if(!ui->pushButton_freeze_raw_sentences_screens->isChecked())
+    else if(type=="RMC")
         ui->plainTextEdit_rmc->appendPlainText(nmeaText);
-}
 
-void Interface::displayGSVSentence(const QString &nmeaText)
-{
-    if(!ui->pushButton_freeze_raw_sentences_screens->isChecked())
+    else if(type=="GSV")
         ui->plainTextEdit_gsv->appendPlainText(nmeaText);
-}
 
-void Interface::displayGLLSentence(const QString &nmeaText)
-{
-    if(!ui->pushButton_freeze_raw_sentences_screens->isChecked())
+    else if(type=="GLL")
         ui->plainTextEdit_gll->appendPlainText(nmeaText);
-}
 
-void Interface::displayGSASentence(const QString &nmeaText)
-{
-    if(!ui->pushButton_freeze_raw_sentences_screens->isChecked())
+    else if(type=="GSA")
         ui->plainTextEdit_gsa->appendPlainText(nmeaText);
-}
 
-void Interface::displayVTGSentence(const QString &nmeaText)
-{
-    if(!ui->pushButton_freeze_raw_sentences_screens->isChecked())
+    else if(type=="VTG")
         ui->plainTextEdit_vtg->appendPlainText(nmeaText);
-}
 
-void Interface::displayOtherSentence(const QString &nmeaText)
-{
-    if(!ui->pushButton_freeze_raw_sentences_screens->isChecked())
+    else if(type=="OTHER")
         ui->plainTextEdit_others->appendPlainText(nmeaText);
 }
-
 
 //Clear Screens
 void Interface::clearRawSentencesScreens()
@@ -243,24 +220,18 @@ void Interface::on_pushButton_clear_raw_sentences_screens_clicked()
 //////////////////////////////////
 
 //Data
-void Interface::updatePosition(double latitude, double longitude)
+void Interface::updateDataGGA(double latitude, double longitude, double frequency)
 {
     ui->lcdNumber_latitude->display(latitude);
     ui->lcdNumber_longitude->display(longitude);
+    ui->lcdNumber_frequency_gga->display(frequency);
 }
 
-void Interface::updateSatellitesInView(int satellitesInView)
+void Interface::updateDataGSV(int satellitesInView, double frequency)
 {
     ui->lcdNumber_satellitesInView->display(satellitesInView);
+    ui->lcdNumber_frequency_gsv->display(frequency);
 }
-
-
-//Frequency
-void Interface::updateGsvFrequency(double frequency)
-{
-    ui->lcdNumber_frequency_satellites->display(frequency);
-}
-
 
 
 

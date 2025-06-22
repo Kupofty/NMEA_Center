@@ -18,8 +18,8 @@ class NMEA_Handler : public QObject
 
     private:
         //Frequency timers
-        QElapsedTimer timer_gsv;
-        qint64 lastUpdateTimeMsGSV = -1;
+        QElapsedTimer timer_gsv, timer_gga;
+        qint64 lastUpdateTimeGGA = -1, lastUpdateTimeGSV = -1, lastUpdateTimeRMC = -1;
 
     private:
         void handleGGA(const QList<QByteArray> &fields);
@@ -29,7 +29,11 @@ class NMEA_Handler : public QObject
         void handleGSA(const QList<QByteArray> &fields);
         void handleVTG(const QList<QByteArray> &fields);
 
+        double calculateCoordinates(const QString &valueStr, const QString &direction);
+        double calculateFrequency(QElapsedTimer &timer, qint64 &lastTime);
+
     signals:
+        void newNMEASentence(const QString &type, const QString &nmeaText);
         void newTXTSentence(const QString &nmeaText);
         void newGGASentence(const QString &nmeaText);
         void newRMCSentence(const QString &nmeaText);
@@ -39,10 +43,11 @@ class NMEA_Handler : public QObject
         void newVTGSentence(const QString &nmeaText);
         void newOtherSentence(const QString &nmeaText);
 
-        void newSatellitesInView(int totalSatellites);
-        void newPosition(double latitude, double longitude);
+        void newDecodedGSV(int totalSatellites, double freqHz);
+        void newDecodedGGA(double latitude, double longitude, double freqHz);
 
-        void newGsvFrequency(double frequency);
+        void newGsvFrequency(double freq);
+        void newGgaFrequency(double freq);
 
 };
 

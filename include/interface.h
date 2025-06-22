@@ -94,19 +94,11 @@ class Interface : public QMainWindow
         void on_pushButtonuncheck_all_serial_output_clicked();
 
     public slots:
-        void displayTXTSentence(const QString &line);
-        void displayGGASentence(const QString &line);
-        void displayRMCSentence(const QString &line);
-        void displayGSVSentence(const QString &line);
-        void displayGLLSentence(const QString &line);
-        void displayGSASentence(const QString &line);
-        void displayVTGSentence(const QString &line);
-        void displayOtherSentence(const QString &line);
+        void displayRawNmeaSentence(const QString &type, const QString &line);
 
-        void updateSatellitesInView(int totalSatellites);
-        void updatePosition(double latitude, double longitude);
+        void updateDataGSV(int totalSatellites, double freq);
+        void updateDataGGA(double latitude, double longitude, double freq);
 
-        void updateGsvFrequency(double frequency);
 };
 
 #endif // INTERFACE_H

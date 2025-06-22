@@ -26,48 +26,48 @@ void NMEA_Handler::handleRawSentences(const QByteArray &line)
 
     if(line.startsWith("$GPTXT"))
     {
-        emit newTXTSentence(nmeaText);
+        emit newNMEASentence("TXT", nmeaText);
     }
 
     else if (line.startsWith("$GPGGA"))
     {
-        emit newGGASentence(nmeaText);
+        emit newNMEASentence("GGA", nmeaText);
         handleGGA(fields);
     }
 
     else if(line.startsWith("$GPRMC"))
     {
-        emit newRMCSentence(nmeaText);
+        emit newNMEASentence("RMC", nmeaText);
         handleRMC(fields);
     }
 
     else if(line.startsWith("$GPGSV"))
     {
-        emit newGSVSentence(nmeaText);
+        emit newNMEASentence("GSV", nmeaText);
         handleGSV(fields);
     }
 
     else if(line.startsWith("$GPGLL"))
     {
-        emit newGLLSentence(nmeaText);
+        emit newNMEASentence("GLL", nmeaText);
         handleGLL(fields);
     }
 
     else if(line.startsWith("$GPGSA"))
     {
-        emit newGSASentence(nmeaText);
+        emit newNMEASentence("GSA", nmeaText);
         handleGSA(fields);
     }
 
     else if(line.startsWith("$GPVTG"))
     {
-        emit newVTGSentence(nmeaText);
+        emit newNMEASentence("VTG", nmeaText);
         handleVTG(fields);
     }
 
     else
     {
-        emit newOtherSentence(nmeaText);
+        emit newNMEASentence("OTHER", nmeaText);
     }
 }
 
@@ -76,96 +76,115 @@ void NMEA_Handler::handleRawSentences(const QByteArray &line)
 ///////////////////
 /// Handle Data ///
 ///////////////////
+
+//GGA
 void NMEA_Handler::handleGGA(const QList<QByteArray> &fields)
 {
+    //Check size
     if (fields.size() < 6)
         return;
 
-    // Parse latitude
-    QString latStr = fields[2];
-    QString latDir = fields[3];
-
-    // Parse longitude
-    QString lonStr = fields[4];
-    QString lonDir = fields[5];
-
-    bool ok1 = false, ok2 = false;
-
-    double latRaw = latStr.toDouble(&ok1);
-    double lonRaw = lonStr.toDouble(&ok2);
-
-    if (!ok1 || !ok2)
+    // Parse position
+    QString latStr = fields[2]; QString latDir = fields[3];
+    QString lonStr = fields[4]; QString lonDir = fields[5];
+    double latitude = calculateCoordinates(latStr, latDir);
+    double longitude = calculateCoordinates(lonStr, lonDir);
+    if (std::isnan(latitude) || std::isnan(longitude))
         return;
 
-    // Convert latitude
-    double latDeg = floor(latRaw / 100.0);
-    double latMin = latRaw - (latDeg * 100.0);
-    double latitude = latDeg + (latMin / 60.0);
-    if (latDir == "S")
-        latitude *= -1;
+    //Calculate frequency
+    double freqHz = calculateFrequency(timer_gga, lastUpdateTimeGGA);
 
-    // Convert longitude
-    double lonDeg = floor(lonRaw / 100.0);
-    double lonMin = lonRaw - (lonDeg * 100.0);
-    double longitude = lonDeg + (lonMin / 60.0);
-    if (lonDir == "W")
-        longitude *= -1;
+    emit newDecodedGGA(latitude, longitude, freqHz);
 
-    emit newPosition(latitude, longitude);
 }
 
+//RMC
 void NMEA_Handler::handleRMC(const QList<QByteArray> &fields)
 {
     Q_UNUSED(fields);
 }
 
+//GSV
 void NMEA_Handler::handleGSV(const QList<QByteArray> &fields)
 {
+    //Check size
     if (fields.size() < 4)
         return;
 
-    // Get number of satellites
-    bool ok = false;
-    int totalSatellites = fields[3].toInt(&ok);
-    if(!ok)
+    // Parse GSV
+    bool ok1 = false, ok2 = false;
+    int sentenceNumber = fields[2].toInt(&ok1);
+    int totalSatellites = fields[3].toInt(&ok2);
+    if (!ok1 || !ok2)
         return;
 
-    emit newSatellitesInView(totalSatellites);
-
-    // Frequency measurement
-    if (lastUpdateTimeMsGSV == -1)
+    //GSV is composed of multiples sub-messages
+    if (sentenceNumber == 1 )
     {
-        timer_gsv.start();
-        lastUpdateTimeMsGSV = 0;
-        return ;
+        double freqHz = calculateFrequency(timer_gsv, lastUpdateTimeGSV);
+        emit newDecodedGSV(totalSatellites, freqHz);
     }
-
-    qint64 now = timer_gsv.elapsed();
-    qint64 delta_time = now - lastUpdateTimeMsGSV;
-    lastUpdateTimeMsGSV = now;
-
-    if (delta_time > 0)
-    {
-        double freqHz = 1000.0 / static_cast<double>(delta_time);
-        if(freqHz<100)//Bug when 2 GSV are received to close to another --> +1000Hz
-            emit newGsvFrequency(freqHz);
-    }
-
-
-
 }
 
+//GLL
 void NMEA_Handler::handleGLL(const QList<QByteArray> &fields)
 {
     Q_UNUSED(fields);
 }
 
+//GSA
 void NMEA_Handler::handleGSA(const QList<QByteArray> &fields)
 {
     Q_UNUSED(fields);
 }
 
+//VTG
 void NMEA_Handler::handleVTG(const QList<QByteArray> &fields)
 {
     Q_UNUSED(fields);
+}
+
+
+
+/////////////////////////
+/// Generic Functions ///
+/////////////////////////
+double NMEA_Handler::calculateCoordinates(const QString &valueStr, const QString &direction)
+{
+    bool ok = false;
+    double raw = valueStr.toDouble(&ok);
+    if (!ok)
+        return std::numeric_limits<double>::quiet_NaN();
+
+    double degrees = floor(raw / 100.0);
+    double minutes = raw - (degrees * 100.0);
+    double result = degrees + (minutes / 60.0);
+
+    if (direction == "S" || direction == "W")
+        result *= -1.0;
+
+    return result;
+}
+
+double NMEA_Handler::calculateFrequency(QElapsedTimer &timer, qint64 &lastUpdateTime)
+{
+    if (lastUpdateTime == -1)
+    {
+        timer.start();
+        lastUpdateTime = 0;
+        return 0;
+    }
+
+    qint64 now = timer.elapsed();
+    qint64 delta_time = now - lastUpdateTime;
+    lastUpdateTime = now;
+
+    if (delta_time > 0)
+    {
+        double freqHz = 1000.0 / static_cast<double>(delta_time);
+        return freqHz;
+    }
+
+    return 0;
 }
