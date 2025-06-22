@@ -1,9 +1,9 @@
-# NMEA IO Hub — Monitoring & Forwarding Tool
+# NMEA IO Hub — Monitoring & Forwarding Tool for NMEA0183
 
 ## Features
 
 1. **NMEA Device Connection**  
-   Connect any NMEA-compatible devices via serial interface.
+   Connect any NMEA0183 compatible device via serial interface.
 
 2. **Live NMEA Monitoring**  
    Display both raw and decoded NMEA sentences (GGA, RMC, GSV, etc.) in real-time.
@@ -18,9 +18,9 @@
 
 5. **Data Logging**  
    Record data to a local file in multiple formats:  
-   - `.txt` (raw lines)  
-   - `.csv` (structured fields)  
-   - `.nmea` (standard extension)  
-   - `.log` (generic logs)
+   - `.txt` 
+   - `.csv`  
+   - `.nmea` 
+   - `.log`
 
 

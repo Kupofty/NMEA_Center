@@ -22,7 +22,7 @@ OutputWriter::~OutputWriter()
 /////////////////
 void OutputWriter::sendData(const QString &line)
 {
-
+    Q_UNUSED(line);
 }
 
 
