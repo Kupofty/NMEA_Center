@@ -1,5 +1,5 @@
-#ifndef UDP_SENDER_H
-#define UDP_SENDER_H
+#ifndef UDP_WRITER_H
+#define UDP_WRITER_H
 
 #include "output_writer.h"
 
@@ -27,4 +27,4 @@ private:
     int udpPort = 1024;
 };
 
-#endif // UDP_SENDER_H
+#endif // UDP_WRITER_H

@@ -12,7 +12,7 @@
 #include "serial_reader.h"
 #include "serial_writer.h"
 #include "nmea_handler.h"
-#include "udp_sender.h"
+#include "udp_writer.h"
 #include "text_file_writter.h"
 
 QT_BEGIN_NAMESPACE

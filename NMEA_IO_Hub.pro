@@ -15,7 +15,7 @@ SOURCES += \
     src/serial_reader.cpp \
     src/serial_writer.cpp \
     src/text_file_writter.cpp \
-    src/udp_sender.cpp
+    src/udp_writer.cpp
 
 HEADERS += \
     include/interface.h \
@@ -24,13 +24,19 @@ HEADERS += \
     include/nmea_handler.h \
     include/serial_writer.h \
     include/text_file_writter.h \
-    include/udp_sender.h
+    include/udp_writer.h
 
 FORMS += \
     ui/interface.ui
+
+RESOURCES += \
+
 
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+RESOURCES += \
+    resources/images.qrc
