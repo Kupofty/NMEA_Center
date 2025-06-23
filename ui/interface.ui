@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWidget">
       <property name="currentIndex">
-       <number>3</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_connection">
        <attribute name="title">
@@ -379,226 +379,7 @@
         <string>Decoded NMEA Data</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_8">
-        <item row="1" column="6">
-         <spacer name="horizontalSpacer_11">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>132</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="1" column="2">
-         <spacer name="horizontalSpacer_10">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>133</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="0" column="2">
-         <spacer name="verticalSpacer_17">
-          <property name="orientation">
-           <enum>Qt::Orientation::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>335</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="1" column="0">
-         <spacer name="horizontalSpacer_9">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>132</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="2" column="2">
-         <spacer name="verticalSpacer_18">
-          <property name="orientation">
-           <enum>Qt::Orientation::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>335</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="1" column="4">
-         <spacer name="horizontalSpacer_12">
-          <property name="orientation">
-           <enum>Qt::Orientation::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-        <item row="1" column="1">
-         <widget class="QFrame" name="verticalFrame">
-          <property name="frameShape">
-           <enum>QFrame::Shape::StyledPanel</enum>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_13">
-           <property name="leftMargin">
-            <number>9</number>
-           </property>
-           <property name="topMargin">
-            <number>9</number>
-           </property>
-           <property name="rightMargin">
-            <number>9</number>
-           </property>
-           <property name="bottomMargin">
-            <number>9</number>
-           </property>
-           <item>
-            <widget class="QLabel" name="label_10">
-             <property name="font">
-              <font>
-               <pointsize>15</pointsize>
-               <bold>true</bold>
-               <underline>true</underline>
-              </font>
-             </property>
-             <property name="text">
-              <string>GGA</string>
-             </property>
-             <property name="alignment">
-              <set>Qt::AlignmentFlag::AlignCenter</set>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_6">
-             <property name="leftMargin">
-              <number>9</number>
-             </property>
-             <property name="topMargin">
-              <number>9</number>
-             </property>
-             <property name="rightMargin">
-              <number>9</number>
-             </property>
-             <property name="bottomMargin">
-              <number>9</number>
-             </property>
-             <item>
-              <widget class="QLabel" name="label_11">
-               <property name="text">
-                <string>Latitude :</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLCDNumber" name="lcdNumber_latitude">
-               <property name="digitCount">
-                <number>10</number>
-               </property>
-               <property name="segmentStyle">
-                <enum>QLCDNumber::SegmentStyle::Flat</enum>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_7">
-             <property name="leftMargin">
-              <number>9</number>
-             </property>
-             <property name="topMargin">
-              <number>9</number>
-             </property>
-             <property name="rightMargin">
-              <number>9</number>
-             </property>
-             <property name="bottomMargin">
-              <number>9</number>
-             </property>
-             <item>
-              <widget class="QLabel" name="label_12">
-               <property name="text">
-                <string>Longitude : </string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLCDNumber" name="lcdNumber_longitude">
-               <property name="digitCount">
-                <number>10</number>
-               </property>
-               <property name="segmentStyle">
-                <enum>QLCDNumber::SegmentStyle::Flat</enum>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <widget class="Line" name="line_7">
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_22">
-             <property name="leftMargin">
-              <number>9</number>
-             </property>
-             <property name="topMargin">
-              <number>9</number>
-             </property>
-             <property name="rightMargin">
-              <number>9</number>
-             </property>
-             <property name="bottomMargin">
-              <number>9</number>
-             </property>
-             <item>
-              <widget class="QLabel" name="label_29">
-               <property name="text">
-                <string>Frequency :</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLCDNumber" name="lcdNumber_frequency_gga">
-               <property name="segmentStyle">
-                <enum>QLCDNumber::SegmentStyle::Flat</enum>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </widget>
-        </item>
-        <item row="1" column="3">
+        <item row="0" column="1">
          <widget class="QFrame" name="verticalFrame_2">
           <property name="frameShape">
            <enum>QFrame::Shape::StyledPanel</enum>
@@ -655,7 +436,7 @@
               </widget>
              </item>
              <item>
-              <widget class="QLCDNumber" name="lcdNumber_satellitesInView">
+              <widget class="QLCDNumber" name="lcdNumber_satellites_gsv">
                <property name="segmentStyle">
                 <enum>QLCDNumber::SegmentStyle::Flat</enum>
                </property>
@@ -712,12 +493,12 @@
           </layout>
          </widget>
         </item>
-        <item row="1" column="5">
-         <widget class="QFrame" name="verticalFrame_3">
+        <item row="0" column="2">
+         <widget class="QFrame" name="horizontalFrame">
           <property name="frameShape">
            <enum>QFrame::Shape::StyledPanel</enum>
           </property>
-          <layout class="QVBoxLayout" name="verticalLayout_15">
+          <layout class="QVBoxLayout" name="verticalLayout_28">
            <property name="leftMargin">
             <number>9</number>
            </property>
@@ -740,11 +521,365 @@
               </font>
              </property>
              <property name="text">
-              <string>Coming soon...</string>
+              <string>VTG</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignmentFlag::AlignCenter</set>
              </property>
             </widget>
            </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_24">
+             <property name="leftMargin">
+              <number>9</number>
+             </property>
+             <property name="topMargin">
+              <number>9</number>
+             </property>
+             <property name="rightMargin">
+              <number>9</number>
+             </property>
+             <property name="bottomMargin">
+              <number>9</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label_31">
+               <property name="text">
+                <string>Track (T) :</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLCDNumber" name="lcdNumber_track_true_vtg">
+               <property name="segmentStyle">
+                <enum>QLCDNumber::SegmentStyle::Flat</enum>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_23">
+             <property name="leftMargin">
+              <number>9</number>
+             </property>
+             <property name="topMargin">
+              <number>9</number>
+             </property>
+             <property name="rightMargin">
+              <number>9</number>
+             </property>
+             <property name="bottomMargin">
+              <number>9</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label_32">
+               <property name="text">
+                <string>Speed (kn) :</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLCDNumber" name="lcdNumber_speed_knot_vtg">
+               <property name="segmentStyle">
+                <enum>QLCDNumber::SegmentStyle::Flat</enum>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="Line" name="line_8">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_26">
+             <property name="leftMargin">
+              <number>9</number>
+             </property>
+             <property name="topMargin">
+              <number>9</number>
+             </property>
+             <property name="rightMargin">
+              <number>9</number>
+             </property>
+             <property name="bottomMargin">
+              <number>9</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label_33">
+               <property name="text">
+                <string>Frequency :</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLCDNumber" name="lcdNumber_frequency_vtg">
+               <property name="frameShadow">
+                <enum>QFrame::Shadow::Raised</enum>
+               </property>
+               <property name="smallDecimalPoint">
+                <bool>false</bool>
+               </property>
+               <property name="digitCount">
+                <number>5</number>
+               </property>
+               <property name="segmentStyle">
+                <enum>QLCDNumber::SegmentStyle::Flat</enum>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
           </layout>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QFrame" name="verticalFrame">
+          <property name="frameShape">
+           <enum>QFrame::Shape::StyledPanel</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_13">
+           <property name="leftMargin">
+            <number>9</number>
+           </property>
+           <property name="topMargin">
+            <number>9</number>
+           </property>
+           <property name="rightMargin">
+            <number>9</number>
+           </property>
+           <property name="bottomMargin">
+            <number>9</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label_10">
+             <property name="font">
+              <font>
+               <pointsize>15</pointsize>
+               <bold>true</bold>
+               <underline>true</underline>
+              </font>
+             </property>
+             <property name="text">
+              <string>GGA</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignmentFlag::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_6">
+             <property name="leftMargin">
+              <number>9</number>
+             </property>
+             <property name="topMargin">
+              <number>9</number>
+             </property>
+             <property name="rightMargin">
+              <number>9</number>
+             </property>
+             <property name="bottomMargin">
+              <number>9</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label_11">
+               <property name="text">
+                <string>Latitude :</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLCDNumber" name="lcdNumber_latitude_gga">
+               <property name="digitCount">
+                <number>10</number>
+               </property>
+               <property name="segmentStyle">
+                <enum>QLCDNumber::SegmentStyle::Flat</enum>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_7">
+             <property name="leftMargin">
+              <number>9</number>
+             </property>
+             <property name="topMargin">
+              <number>9</number>
+             </property>
+             <property name="rightMargin">
+              <number>9</number>
+             </property>
+             <property name="bottomMargin">
+              <number>9</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label_12">
+               <property name="text">
+                <string>Longitude : </string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLCDNumber" name="lcdNumber_longitude_gga">
+               <property name="digitCount">
+                <number>10</number>
+               </property>
+               <property name="segmentStyle">
+                <enum>QLCDNumber::SegmentStyle::Flat</enum>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <widget class="Line" name="line_7">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QHBoxLayout" name="horizontalLayout_22">
+             <property name="leftMargin">
+              <number>9</number>
+             </property>
+             <property name="topMargin">
+              <number>9</number>
+             </property>
+             <property name="rightMargin">
+              <number>9</number>
+             </property>
+             <property name="bottomMargin">
+              <number>9</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label_29">
+               <property name="text">
+                <string>Frequency :</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLCDNumber" name="lcdNumber_frequency_gga">
+               <property name="segmentStyle">
+                <enum>QLCDNumber::SegmentStyle::Flat</enum>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="0" column="3">
+         <widget class="QFrame" name="verticalFrame_12">
+          <property name="frameShape">
+           <enum>QFrame::Shape::StyledPanel</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_15"/>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QFrame" name="verticalFrame_5">
+          <property name="frameShape">
+           <enum>QFrame::Shape::StyledPanel</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_21"/>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QFrame" name="verticalFrame_13">
+          <property name="frameShape">
+           <enum>QFrame::Shape::StyledPanel</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_29"/>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QFrame" name="verticalFrame_4">
+          <property name="frameShape">
+           <enum>QFrame::Shape::StyledPanel</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_20"/>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QFrame" name="verticalFrame_6">
+          <property name="frameShape">
+           <enum>QFrame::Shape::StyledPanel</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_22"/>
+         </widget>
+        </item>
+        <item row="2" column="2">
+         <widget class="QFrame" name="verticalFrame_10">
+          <property name="frameShape">
+           <enum>QFrame::Shape::StyledPanel</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_26"/>
+         </widget>
+        </item>
+        <item row="2" column="3">
+         <widget class="QFrame" name="verticalFrame_8">
+          <property name="frameShape">
+           <enum>QFrame::Shape::StyledPanel</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_24"/>
+         </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="QFrame" name="verticalFrame_7">
+          <property name="frameShape">
+           <enum>QFrame::Shape::StyledPanel</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_23"/>
+         </widget>
+        </item>
+        <item row="3" column="3">
+         <widget class="QFrame" name="verticalFrame_3">
+          <property name="frameShape">
+           <enum>QFrame::Shape::StyledPanel</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_19"/>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="QFrame" name="verticalFrame_11">
+          <property name="frameShape">
+           <enum>QFrame::Shape::StyledPanel</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_27"/>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QFrame" name="verticalFrame_2">
+          <property name="frameShape">
+           <enum>QFrame::Shape::StyledPanel</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_18"/>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QFrame" name="verticalFrame">
+          <property name="frameShape">
+           <enum>QFrame::Shape::StyledPanel</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_17"/>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QFrame" name="verticalFrame">
+          <property name="frameShape">
+           <enum>QFrame::Shape::StyledPanel</enum>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_25"/>
          </widget>
         </item>
        </layout>

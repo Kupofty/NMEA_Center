@@ -21,54 +21,25 @@ NMEA_Handler::~NMEA_Handler()
 ////////////////////////////
 void NMEA_Handler::handleRawSentences(const QByteArray &line)
 {
+    //Remove malformed sentences
+    if (!line.startsWith('$'))
+        return;
+
     QString nmeaText = QString::fromUtf8(line).trimmed();
-    const QList<QByteArray> fields = line.split(',');
+    QList<QByteArray> fields = line.split(',');
+    QString nmeaFormat = QString::fromUtf8(line.mid(3, 3));
 
-    if(line.startsWith("$GPTXT"))
-    {
-        emit newNMEASentence("TXT", nmeaText);
-    }
+    static const QSet<QString> supportedFormats = { "GGA", "RMC", "GSV", "GLL", "GSA", "VTG", "TXT" };
+    if (!supportedFormats.contains(nmeaFormat))
+        nmeaFormat ="OTHER";
+    emit newNMEASentence(nmeaFormat, nmeaText);
 
-    else if (line.startsWith("$GPGGA"))
-    {
-        emit newNMEASentence("GGA", nmeaText);
-        handleGGA(fields);
-    }
-
-    else if(line.startsWith("$GPRMC"))
-    {
-        emit newNMEASentence("RMC", nmeaText);
-        handleRMC(fields);
-    }
-
-    else if(line.startsWith("$GPGSV"))
-    {
-        emit newNMEASentence("GSV", nmeaText);
-        handleGSV(fields);
-    }
-
-    else if(line.startsWith("$GPGLL"))
-    {
-        emit newNMEASentence("GLL", nmeaText);
-        handleGLL(fields);
-    }
-
-    else if(line.startsWith("$GPGSA"))
-    {
-        emit newNMEASentence("GSA", nmeaText);
-        handleGSA(fields);
-    }
-
-    else if(line.startsWith("$GPVTG"))
-    {
-        emit newNMEASentence("VTG", nmeaText);
-        handleVTG(fields);
-    }
-
-    else
-    {
-        emit newNMEASentence("OTHER", nmeaText);
-    }
+    if      (nmeaFormat == "GGA") handleGGA(fields);
+    else if (nmeaFormat == "RMC") handleRMC(fields);
+    else if (nmeaFormat == "GSV") handleGSV(fields);
+    else if (nmeaFormat == "GLL") handleGLL(fields);
+    else if (nmeaFormat == "GSA") handleGSA(fields);
+    else if (nmeaFormat == "VTG") handleVTG(fields);
 }
 
 

@@ -18,8 +18,8 @@ class NMEA_Handler : public QObject
 
     private:
         //Frequency timers
-        QElapsedTimer timer_gsv, timer_gga;
-        qint64 lastUpdateTimeGGA = -1, lastUpdateTimeGSV = -1, lastUpdateTimeRMC = -1;
+        QElapsedTimer timer_gsv, timer_gga, timer_vtg;
+        qint64 lastUpdateTimeGGA = -1, lastUpdateTimeGSV = -1, lastUpdateTimeRMC = -1, lastUpdateTimeVTG = -1;
 
     private:
         void handleGGA(const QList<QByteArray> &fields);
@@ -45,9 +45,7 @@ class NMEA_Handler : public QObject
 
         void newDecodedGSV(int totalSatellites, double freqHz);
         void newDecodedGGA(double latitude, double longitude, double freqHz);
-
-        void newGsvFrequency(double freq);
-        void newGgaFrequency(double freq);
+        void newDecodedVTG(double track_true, double speed_kn, double freqHz);
 
 };
 

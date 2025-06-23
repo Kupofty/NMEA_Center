@@ -98,6 +98,7 @@ class Interface : public QMainWindow
 
         void updateDataGSV(int totalSatellites, double freq);
         void updateDataGGA(double latitude, double longitude, double freq);
+        void updateDataVTG(double track_true, double speed_knot, double frequency);
 
 };
 

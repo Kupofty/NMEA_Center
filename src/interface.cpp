@@ -68,6 +68,8 @@ void Interface::connectSignalSlot()
     //Display decoded NMEA data
     QObject::connect(nmea_handler, &NMEA_Handler::newDecodedGGA, this, &Interface::updateDataGGA);
     QObject::connect(nmea_handler, &NMEA_Handler::newDecodedGSV, this, &Interface::updateDataGSV);
+    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedVTG, this, &Interface::updateDataVTG);
+
 
 
     //Timers
@@ -164,47 +166,43 @@ void Interface::on_pushButton_refresh_available_ports_list_clicked()
 //Display On Screens
 void Interface::displayRawNmeaSentence(const QString &type, const QString &nmeaText)
 {
-    if(type=="TXT")
+    static const QMap<QString, QPlainTextEdit*> sentenceMap = {
+        { "TXT",   ui->plainTextEdit_txt },
+        { "GGA",   ui->plainTextEdit_gga },
+        { "RMC",   ui->plainTextEdit_rmc },
+        { "GSV",   ui->plainTextEdit_gsv },
+        { "GLL",   ui->plainTextEdit_gll },
+        { "GSA",   ui->plainTextEdit_gsa },
+        { "VTG",   ui->plainTextEdit_vtg },
+        { "OTHER", ui->plainTextEdit_others }
+    };
+
+    // Always show TXT regardless of freeze
+    if (type == "TXT")
         ui->plainTextEdit_txt->appendPlainText(nmeaText);
 
-    //Don't update screen if "freeze" button is checked
-    if(ui->pushButton_freeze_raw_sentences_screens->isChecked())
+    // Don't update rest if freeze is checked
+    if (ui->pushButton_freeze_raw_sentences_screens->isChecked())
         return;
 
-    if(type=="TXT")
-        ui->plainTextEdit_txt->appendPlainText(nmeaText);
-
-    else if(type=="GGA")
-        ui->plainTextEdit_gga->appendPlainText(nmeaText);
-
-    else if(type=="RMC")
-        ui->plainTextEdit_rmc->appendPlainText(nmeaText);
-
-    else if(type=="GSV")
-        ui->plainTextEdit_gsv->appendPlainText(nmeaText);
-
-    else if(type=="GLL")
-        ui->plainTextEdit_gll->appendPlainText(nmeaText);
-
-    else if(type=="GSA")
-        ui->plainTextEdit_gsa->appendPlainText(nmeaText);
-
-    else if(type=="VTG")
-        ui->plainTextEdit_vtg->appendPlainText(nmeaText);
-
-    else if(type=="OTHER")
-        ui->plainTextEdit_others->appendPlainText(nmeaText);
+    if (type != "TXT" && sentenceMap.contains(type))
+        sentenceMap[type]->appendPlainText(nmeaText);
 }
 
 //Clear Screens
 void Interface::clearRawSentencesScreens()
 {
-    ui->plainTextEdit_gga->clear();
-    ui->plainTextEdit_rmc->clear();
-    ui->plainTextEdit_gsv->clear();
-    ui->plainTextEdit_gll->clear();
-    ui->plainTextEdit_gsa->clear();
-    ui->plainTextEdit_vtg->clear();
+    QList<QPlainTextEdit*> editors = {
+        ui->plainTextEdit_gga,
+        ui->plainTextEdit_rmc,
+        ui->plainTextEdit_gsv,
+        ui->plainTextEdit_gll,
+        ui->plainTextEdit_gsa,
+        ui->plainTextEdit_vtg
+    };
+
+    for (QPlainTextEdit* editor : editors)
+        editor->clear();
 }
 
 void Interface::on_pushButton_clear_raw_sentences_screens_clicked()
@@ -222,17 +220,23 @@ void Interface::on_pushButton_clear_raw_sentences_screens_clicked()
 //Data
 void Interface::updateDataGGA(double latitude, double longitude, double frequency)
 {
-    ui->lcdNumber_latitude->display(latitude);
-    ui->lcdNumber_longitude->display(longitude);
+    ui->lcdNumber_latitude_gga->display(latitude);
+    ui->lcdNumber_longitude_gga->display(longitude);
     ui->lcdNumber_frequency_gga->display(frequency);
 }
 
 void Interface::updateDataGSV(int satellitesInView, double frequency)
 {
-    ui->lcdNumber_satellitesInView->display(satellitesInView);
+    ui->lcdNumber_satellites_gsv->display(satellitesInView);
     ui->lcdNumber_frequency_gsv->display(frequency);
 }
 
+void Interface::updateDataVTG(double track_true, double speed_knot, double frequency)
+{
+    ui->lcdNumber_track_true_vtg->display(track_true);
+    ui->lcdNumber_speed_knot_vtg->display(speed_knot);
+    ui->lcdNumber_frequency_vtg->display(frequency);
+}
 
 
 ///////////////////////
