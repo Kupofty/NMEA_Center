@@ -32,14 +32,39 @@ void NMEA_Handler::handleRawSentences(const QByteArray &line)
     static const QSet<QString> supportedFormats = { "GGA", "RMC", "GSV", "GLL", "GSA", "VTG", "TXT" };
     if (!supportedFormats.contains(nmeaFormat))
         nmeaFormat ="OTHER";
+
     emit newNMEASentence(nmeaFormat, nmeaText);
 
-    if      (nmeaFormat == "GGA") handleGGA(fields);
-    else if (nmeaFormat == "RMC") handleRMC(fields);
-    else if (nmeaFormat == "GSV") handleGSV(fields);
-    else if (nmeaFormat == "GLL") handleGLL(fields);
-    else if (nmeaFormat == "GSA") handleGSA(fields);
-    else if (nmeaFormat == "VTG") handleVTG(fields);
+    if(nmeaFormat == "GGA")
+    {
+        handleGGA(fields);
+        emit newGGASentence(nmeaText);
+    }
+    else if (nmeaFormat == "RMC")
+    {
+        handleRMC(fields);
+        emit newRMCSentence(nmeaText);
+    }
+    else if (nmeaFormat == "GSV")
+    {
+        handleGSV(fields);
+        emit newGSVSentence(nmeaText);
+    }
+    else if (nmeaFormat == "GLL")
+    {
+        handleGLL(fields);
+        emit newGLLSentence(nmeaText);
+    }
+    else if (nmeaFormat == "GSA")
+    {
+        handleGSA(fields);
+        emit newGSASentence(nmeaText);
+    }
+    else if (nmeaFormat == "VTG")
+    {
+        handleVTG(fields);
+        emit newVTGSentence(nmeaText);
+    }
 }
 
 
@@ -106,7 +131,6 @@ void NMEA_Handler::handleRMC(const QList<QByteArray> &fields)
 
     // Speed over ground (knots) and convert to m/s
     double speedKnots = fields[7].toDouble();
-    double speedMps = speedKnots * 0.514444;
 
     // Course over ground
     double course = fields[8].toDouble();
@@ -134,9 +158,8 @@ void NMEA_Handler::handleRMC(const QList<QByteArray> &fields)
     double freqHz = calculateFrequency(timer_rmc, lastUpdateTimeRMC);
 
     // Emit or process parsed data
-    emit newDecodedRMC(formattedDate, utcTime.toString(), latitude, longitude, speedMps, course, magVar, freqHz);
+    emit newDecodedRMC(formattedDate, utcTime.toString(), latitude, longitude, speedKnots, course, magVar, freqHz);
 }
-
 
 //GSV
 void NMEA_Handler::handleGSV(const QList<QByteArray> &fields)
