@@ -67,8 +67,14 @@ void Interface::connectSignalSlot()
 
     //Display decoded NMEA data
     QObject::connect(nmea_handler, &NMEA_Handler::newDecodedGGA, this, &Interface::updateDataGGA);
+    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedGLL, this, &Interface::updateDataGLL);
     QObject::connect(nmea_handler, &NMEA_Handler::newDecodedGSV, this, &Interface::updateDataGSV);
     QObject::connect(nmea_handler, &NMEA_Handler::newDecodedVTG, this, &Interface::updateDataVTG);
+    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedGSA, this, &Interface::updateDataGSA);
+    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedRMC, this, &Interface::updateDataRMC);
+
+
+
 
 
 
@@ -218,11 +224,24 @@ void Interface::on_pushButton_clear_raw_sentences_screens_clicked()
 //////////////////////////////////
 
 //Data
-void Interface::updateDataGGA(double latitude, double longitude, double frequency)
+void Interface::updateDataGGA(QString time, double latitude, double longitude, int fixQuality, int numSatellites, double hdop, double altitude, double freqHz)
 {
+    ui->label_utcTime_gga->setText(time);
     ui->lcdNumber_latitude_gga->display(latitude);
     ui->lcdNumber_longitude_gga->display(longitude);
-    ui->lcdNumber_frequency_gga->display(frequency);
+    ui->lcdNumber_fixQuality_gga->display(fixQuality);
+    ui->lcdNumber_satellites_gga->display(numSatellites);
+    ui->lcdNumber_hdop_gga->display(hdop);
+    ui->lcdNumber_altitude_gga->display(altitude);
+    ui->lcdNumber_frequency_gga->display(freqHz);
+}
+
+void Interface::updateDataGLL(QString utc, double latitude, double longitude, double freqHz)
+{
+    ui->label_utcTime_gll->setText(utc);
+    ui->lcdNumber_latitude_gll->display(latitude);
+    ui->lcdNumber_longitude_gll->display(longitude);
+    ui->lcdNumber_frequency_gll->display(freqHz);
 }
 
 void Interface::updateDataGSV(int satellitesInView, double frequency)
@@ -231,11 +250,34 @@ void Interface::updateDataGSV(int satellitesInView, double frequency)
     ui->lcdNumber_frequency_gsv->display(frequency);
 }
 
-void Interface::updateDataVTG(double track_true, double speed_knot, double frequency)
+void Interface::updateDataVTG(double track_true, double track_mag, double speed_knot, double speedKmh, double frequency)
 {
     ui->lcdNumber_track_true_vtg->display(track_true);
+    ui->lcdNumber_track_mag_vtg->display(track_mag);
     ui->lcdNumber_speed_knot_vtg->display(speed_knot);
+    ui->lcdNumber_speed_kmh_vtg->display(speedKmh);
     ui->lcdNumber_frequency_vtg->display(frequency);
+}
+
+void Interface::updateDataGSA(double pdop, double hdop, double vdop, double freqHz)
+{
+    ui->lcdNumber_pdop_gsa->display(pdop);
+    ui->lcdNumber_hdop_gsa->display(hdop);
+    ui->lcdNumber_vdop_gsa->display(vdop);
+    ui->lcdNumber_frequency_gsa->display(freqHz);
+}
+
+void Interface::updateDataRMC(QString utcDate, QString utcTime, double latitude, double longitude, double speedMps, double course, double magVar, double freqHz)
+{
+    ui->label_date_rmc->setText(utcDate);
+    ui->label_utcTime_rmc->setText(utcTime);
+    ui->lcdNumber_latitude_rmc->display(latitude);
+    ui->lcdNumber_longitude_rmc->display(longitude);
+    ui->lcdNumber_sog_rmc->display(speedMps);
+    ui->lcdNumber_cog_rmc->display(course);
+    ui->lcdNumber_magVar_rmc->display(magVar);
+    ui->lcdNumber_frequency_rmc->display(freqHz);
+
 }
 
 

@@ -97,9 +97,11 @@ class Interface : public QMainWindow
         void displayRawNmeaSentence(const QString &type, const QString &line);
 
         void updateDataGSV(int totalSatellites, double freq);
-        void updateDataGGA(double latitude, double longitude, double freq);
-        void updateDataVTG(double track_true, double speed_knot, double frequency);
-
+        void updateDataGGA(QString time, double latitude, double longitude, int fixQuality, int numSatellites, double hdop, double altitude, double freqHz);
+        void updateDataGLL(QString utc, double latitude, double longitude,  double freqHz);
+        void updateDataVTG(double track_true, double track_mag, double speed_knot, double speedKmh, double frequency);
+        void updateDataGSA(double pdop, double hdop, double vdop, double freqHz);
+        void updateDataRMC(QString utcDate, QString utcTime, double latitude, double longitude, double speedMps, double course, double magVar, double freqHz);
 };
 
 #endif // INTERFACE_H
