@@ -1,9 +1,9 @@
-# NMEA IO Hub — Monitoring & Forwarding Tool for NMEA0183
+# NMEA Center — Monitoring & Forwarding Tool for NMEA0183
 
 ## Features
 
 1. **NMEA Device Connection**  
-   Connect any NMEA0183 compatible device via serial interface.
+   Connect any NMEA0183 compatible device via serial or UDP.
 
 2. **Live NMEA Monitoring**  
    Display both raw and decoded NMEA sentences (GGA, RMC, GSV, etc.) in real-time.

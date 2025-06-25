@@ -15,6 +15,7 @@ SOURCES += \
     src/serial_reader.cpp \
     src/serial_writer.cpp \
     src/text_file_writter.cpp \
+    src/udp_reader.cpp \
     src/udp_writer.cpp
 
 HEADERS += \
@@ -24,6 +25,7 @@ HEADERS += \
     include/nmea_handler.h \
     include/serial_writer.h \
     include/text_file_writter.h \
+    include/udp_reader.h \
     include/udp_writer.h
 
 FORMS += \
