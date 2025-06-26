@@ -220,7 +220,7 @@ void NMEA_Handler::handleGSA(const QList<QByteArray> &fields)
 
 void NMEA_Handler::handleVTG(const QList<QByteArray> &fields)
 {
-    //checkMinimumLineSize(fields, 10); //bug ocpn, smaller sentence
+    checkMinimumLineSize(fields, 10);
 
     // Track True
     bool okTrackTrue = false;
@@ -233,11 +233,6 @@ void NMEA_Handler::handleVTG(const QList<QByteArray> &fields)
     // Speed Knots
     bool okSpeedKnots = false;
     QByteArray speedKnotsStr = fields[5];
-    if (fields.size() < 10)
-    {
-        if (speedKnotsStr.endsWith('N')) //bug on OCPN
-            speedKnotsStr.chop(1);
-    }
     double speedKnots = speedKnotsStr.toDouble(&okSpeedKnots);
 
     // Parse Speed Km/h
