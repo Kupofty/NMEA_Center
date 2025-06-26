@@ -5,9 +5,10 @@
 /////////////
 Interface::Interface(QWidget *parent) : QMainWindow(parent),
     ui(new Ui::Interface),
-    serial(new SerialReader),
+    serial_reader(new SerialReader),
     serial_writer(new SerialWriter),
     nmea_handler(new NMEA_Handler),
+    udp_reader(new UdpReader),
     udp_writer(new UdpWriter),
     text_file_writer(new TextFileWritter)
 {
@@ -31,7 +32,7 @@ Interface::~Interface()
 {
     delete fileRecordingSizeTimer;
 
-    delete serial;
+    delete serial_reader;
     delete nmea_handler;
     delete udp_writer;
     delete text_file_writer;
@@ -40,10 +41,16 @@ Interface::~Interface()
 
 void Interface::connectSignalSlot()
 {
+    //// INPUT /////
     //Serial data
-    QObject::connect(serial, &SerialReader::newLineReceived, nmea_handler, &NMEA_Handler::handleRawSentences);
-    QObject::connect(serial, &SerialReader::newLineReceived, text_file_writer, &TextFileWritter::writeRawSentences);
+    QObject::connect(serial_reader, &SerialReader::newLineReceived, nmea_handler, &NMEA_Handler::handleRawSentences);
+    QObject::connect(serial_reader, &SerialReader::newLineReceived, text_file_writer, &TextFileWritter::writeRawSentences);
 
+    //UDP data
+    QObject::connect(udp_reader, &UdpReader::newLineReceived, nmea_handler, &NMEA_Handler::handleRawSentences);
+    QObject::connect(udp_reader, &UdpReader::newSenderDetails, this, &Interface::updateUdpSenderDetails);
+
+    //// OUTPUT /////
     //Send raw NMEA to UDP publisher
     QObject::connect(nmea_handler, &NMEA_Handler::newGGASentence, udp_writer, &UdpWriter::publishGGA);
     QObject::connect(nmea_handler, &NMEA_Handler::newRMCSentence, udp_writer, &UdpWriter::publishRMC);
@@ -62,6 +69,8 @@ void Interface::connectSignalSlot()
     QObject::connect(nmea_handler, &NMEA_Handler::newVTGSentence, serial_writer, &UdpWriter::publishVTG);
     QObject::connect(nmea_handler, &NMEA_Handler::newOtherSentence, serial_writer, &UdpWriter::publishOthers);
 
+
+    //// DISPLAY /////
     //Display raw NMEA from nmea_handler
     QObject::connect(nmea_handler, &NMEA_Handler::newNMEASentence, this, &Interface::displayRawNmeaSentence);
 
@@ -103,37 +112,38 @@ void Interface::hideGUI()
 // Connection
 void Interface::closeInputSerial()
 {
-    if(serial->isSerialOpen())
+    if(serial_reader->isSerialOpen())
     {
-        serial->closeSerialDevice();
-        ui->plainTextEdit_connection_status->setPlainText(serial->getPortName()+" closed");
+        serial_reader->closeSerialDevice();
+        ui->plainTextEdit_connection_status->setPlainText(serial_reader->getPortName()+" closed");
+        autoClearDecodedDataScreens();
     }
     else
         ui->plainTextEdit_connection_status->setPlainText("Connection not opened");
 }
 
-void Interface::on_pushButton_connect_clicked()
+void Interface::on_pushButton_connect_serial_input_clicked()
 {
     //Update serial settings
-    serial->setPortName(ui->comboBox_serial_input_port_list->currentText());
-    serial->setBaudRate((ui->comboBox_serial_input_port_baudrate->currentText()).toInt());
+    serial_reader->setPortName(ui->comboBox_serial_input_port_list->currentText());
+    serial_reader->setBaudRate((ui->comboBox_serial_input_port_baudrate->currentText()).toInt());
 
     //Try to connect
     QString result;
-    if(serial->openSerialDevice())
+    if(serial_reader->openSerialDevice())
     {
-        result =  "Connected to " + serial->getPortName();
+        result =  "Connected to " + serial_reader->getPortName();
         ui->plainTextEdit_txt->clear();
         updateGuiAfterSerialConnection(true);
     }
     else
-        result =  "Failed to open " + serial->getPortName() + " : " + serial->getErrorString();
+        result =  "Failed to open " + serial_reader->getPortName() + " : " + serial_reader->getErrorString();
 
     //Display connection status
     ui->plainTextEdit_connection_status->setPlainText(result);
 }
 
-void Interface::on_pushButton_disconnect_clicked()
+void Interface::on_pushButton_disconnect_serial_input_clicked()
 {
     closeInputSerial();
     updateGuiAfterSerialConnection(false);
@@ -142,8 +152,8 @@ void Interface::on_pushButton_disconnect_clicked()
 void Interface::updateGuiAfterSerialConnection(bool connectSuccess)
 {
     ui->horizontalFrame_serial_input_connection->setEnabled(!connectSuccess);
-    ui->pushButton_connect->setEnabled(!connectSuccess);
-    ui->pushButton_disconnect->setEnabled(connectSuccess);
+    ui->pushButton_connect_serial_input->setEnabled(!connectSuccess);
+    ui->pushButton_disconnect_serial_input->setEnabled(connectSuccess);
 }
 
 //COM ports
@@ -162,6 +172,58 @@ void Interface::on_pushButton_refresh_available_ports_list_clicked()
     listAvailablePorts(ui->comboBox_serial_input_port_list);
 }
 
+
+
+/////////////////
+/// UDP Input ///
+/////////////////
+void Interface::on_pushButton_connect_udp_input_clicked()
+{
+    int udp_port_input = ui->spinBox_port_input_udp->value();
+    int udp_port_output = ui->spinBox_update_udp_port_output->value();
+
+    //Check if port already used by UDP output
+    if (ui->pushButton_activate_udp_output->isChecked() && (udp_port_input == udp_port_output))
+    {
+        QMessageBox::warning(this, "UDP Port Error",
+                             "Input UDP port conflicts with output UDP port.\nPlease choose a different port.");
+        ui->spinBox_port_input_udp->setValue(ui->spinBox_port_input_udp->value() + 1);
+        return;
+    }
+
+    udp_reader->updatePort(udp_port_input);
+    QString result = udp_reader->connect();
+    ui->plainTextEdit_connection_status_udp->setPlainText(result);
+
+    if(udp_reader->isBounded())
+        updateGuiAfterUdpConnection(true);
+}
+
+void Interface::on_pushButton_disconnect_udp_input_clicked()
+{
+    CloseInputUdp();
+    updateGuiAfterUdpConnection(false);
+}
+
+void Interface::CloseInputUdp()
+{
+    QString result = udp_reader->disconnect();
+    ui->plainTextEdit_connection_status_udp->setPlainText(result);
+}
+
+void Interface::updateGuiAfterUdpConnection(bool connectSuccess)
+{
+    ui->spinBox_port_input_udp->setEnabled(!connectSuccess);
+    ui->pushButton_connect_udp_input->setEnabled(!connectSuccess);
+    ui->pushButton_disconnect_udp_input->setEnabled(connectSuccess);
+    ui->plainTextEdit_udp_sender_details->clear();
+    autoClearDecodedDataScreens();
+}
+
+void Interface::updateUdpSenderDetails()
+{
+    ui->plainTextEdit_udp_sender_details->setPlainText(udp_reader->getSenderDetails());
+}
 
 
 
@@ -204,7 +266,12 @@ void Interface::clearRawSentencesScreens()
         ui->plainTextEdit_gsv,
         ui->plainTextEdit_gll,
         ui->plainTextEdit_gsa,
-        ui->plainTextEdit_vtg
+        ui->plainTextEdit_vtg,
+        ui->plainTextEdit_dbt,
+        ui->plainTextEdit_others,
+        ui->plainTextEdit_vhw,
+        ui->plainTextEdit_vtg,
+        ui->plainTextEdit_hdt
     };
 
     for (QPlainTextEdit* editor : editors)
@@ -280,14 +347,214 @@ void Interface::updateDataRMC(QString utcDate, QString utcTime, double latitude,
 
 }
 
+//Clear
+void Interface::autoClearDecodedDataScreens()
+{
+    if(!ui->pushButton_disconnect_serial_input->isEnabled() && !ui->pushButton_disconnect_udp_input->isEnabled())
+        clearDecodedDataScreens();
+}
+
+void Interface::clearDecodedDataScreens()
+{
+    //RMC
+    ui->label_utcTime_rmc->clear();
+    ui->label_date_rmc->clear();
+    ui->lcdNumber_latitude_rmc->display(0);
+    ui->lcdNumber_longitude_rmc->display(0);
+    ui->lcdNumber_sog_rmc->display(0);
+    ui->lcdNumber_cog_rmc->display(0);
+    ui->lcdNumber_magVar_rmc->display(0);
+    ui->lcdNumber_frequency_rmc->display(0);
+
+    //GGA
+    ui->label_utcTime_gga->clear();
+    ui->lcdNumber_latitude_gga->display(0);
+    ui->lcdNumber_longitude_gga->display(0);
+    ui->lcdNumber_satellites_gga->display(0);
+    ui->lcdNumber_fixQuality_gga->display(0);
+    ui->lcdNumber_hdop_gga->display(0);
+    ui->lcdNumber_altitude_gga->display(0);
+    ui->lcdNumber_frequency_gga->display(0);
+
+    //GSA
+    ui->lcdNumber_pdop_gsa->display(0);
+    ui->lcdNumber_hdop_gsa->display(0);
+    ui->lcdNumber_vdop_gsa->display(0);
+    ui->lcdNumber_frequency_gsa->display(0);
+
+    //GLL
+    ui->lcdNumber_latitude_gll->display(0);
+    ui->lcdNumber_longitude_gll->display(0);
+    ui->lcdNumber_frequency_gll->display(0);
+    ui->label_utcTime_gll->clear();
+
+    //GSV
+    ui->lcdNumber_satellites_gsv->display(0);
+    ui->lcdNumber_frequency_gsv->display(0);
+
+    //VTG
+    ui->lcdNumber_track_true_vtg->display(0);
+    ui->lcdNumber_track_mag_vtg->display(0);
+    ui->lcdNumber_speed_kmh_vtg->display(0);
+    ui->lcdNumber_speed_knot_vtg->display(0);
+    ui->lcdNumber_frequency_vtg->display(0);
+}
+
+
+
+
+//////////////////////////
+/// Serial Output Data ///
+//////////////////////////
+
+//Settings
+void Interface::closeOutputSerial()
+{
+    if(serial_writer->isSerialOpen())
+    {
+        serial_writer->closeSerialDevice();
+        ui->plainTextEdit_connection_status_output_serial->setPlainText(serial_writer->getPortName()+" closed");
+    }
+    else
+        ui->plainTextEdit_connection_status_output_serial->setPlainText("Connection not opened");
+}
+
+void Interface::on_pushButton_refresh_available_port_serial_output_clicked()
+{
+    listAvailablePorts(ui->comboBox_serial_output_port_list);
+
+    //Remove input serial as output choice
+    if(serial_reader->isSerialOpen())
+    {
+        int indexToRemove = ui->comboBox_serial_output_port_list->findText(ui->comboBox_serial_input_port_list->currentText());
+        if (indexToRemove != -1)
+            ui->comboBox_serial_output_port_list->removeItem(indexToRemove);
+    }
+}
+
+void Interface::on_pushButton_connect_serial_output_clicked()
+{
+    //Update serial settings
+    serial_writer->setPortName(ui->comboBox_serial_output_port_list->currentText());
+    serial_writer->setBaudRate((ui->comboBox_serial_output_port_baudrate->currentText()).toInt());
+
+    //Try to connect
+    QString result;
+    if(serial_writer->openSerialDevice())
+        result =  "Connected to " + serial_writer->getPortName();
+    else
+        result =  "Failed to open " + serial_writer->getPortName() + " : " + serial_writer->getErrorString();
+
+    //Display connection status
+    ui->plainTextEdit_connection_status_output_serial->setPlainText(result);
+}
+
+void Interface::on_pushButton_disconnect_serial_output_clicked()
+{
+    closeOutputSerial();
+}
+
+
+//Outputs
+void Interface::on_pushButton_activate_serial_output_toggled(bool checked)
+{
+    if (!checked)
+    {
+        serial_writer->updateOutputNMEA(false);
+        return;
+    }
+
+    if (serial_writer->isSerialOpen())
+    {
+        serial_writer->updateOutputNMEA(true);
+    }
+    else
+    {
+        QMessageBox::warning(this, "Serial Output Not Available",
+                             "No serial output port is currently opened.\n\n"
+                             "Please select a valid port and click 'Connect' before enabling serial output.");
+        ui->pushButton_activate_serial_output->setChecked(false);
+    }
+}
+
+void Interface::on_checkBox_serial_output_gga_toggled(bool checked)
+{
+    serial_writer->updateOutputGGA(checked);
+}
+
+void Interface::on_checkBox_serial_output_gsv_toggled(bool checked)
+{
+    serial_writer->updateOutputGSV(checked);
+}
+
+void Interface::on_checkBox_serial_output_rmc_toggled(bool checked)
+{
+    serial_writer->updateOutputRMC(checked);
+}
+
+void Interface::on_checkBox_serial_output_gsa_toggled(bool checked)
+{
+    serial_writer->updateOutputGSA(checked);
+}
+
+void Interface::on_checkBox_serial_output_gll_toggled(bool checked)
+{
+    serial_writer->updateOutputGLL(checked);
+}
+
+void Interface::on_checkBox_serial_output_vtg_toggled(bool checked)
+{
+    serial_writer->updateOutputVTG(checked);
+}
+
+void Interface::on_checkBox_serial_output_others_toggled(bool checked)
+{
+    serial_writer->updateOutputOthers(checked);
+}
+
+void Interface::on_pushButton_check_all_serial_output_clicked()
+{
+    ui->checkBox_serial_output_gga->setChecked(true);
+    ui->checkBox_serial_output_rmc->setChecked(true);
+    ui->checkBox_serial_output_gsv->setChecked(true);
+    ui->checkBox_serial_output_gll->setChecked(true);
+    ui->checkBox_serial_output_gsa->setChecked(true);
+    ui->checkBox_serial_output_vtg->setChecked(true);
+    ui->checkBox_serial_output_others->setChecked(true);
+}
+
+void Interface::on_pushButtonuncheck_all_serial_output_clicked()
+{
+    ui->checkBox_serial_output_gga->setChecked(false);
+    ui->checkBox_serial_output_rmc->setChecked(false);
+    ui->checkBox_serial_output_gsv->setChecked(false);
+    ui->checkBox_serial_output_gll->setChecked(false);
+    ui->checkBox_serial_output_gsa->setChecked(false);
+    ui->checkBox_serial_output_vtg->setChecked(false);
+    ui->checkBox_serial_output_others->setChecked(false);
+}
+
+
+
 
 ///////////////////////
 /// UDP Output Data ///
 ///////////////////////
 
 //UDP Settings
-void Interface::on_spinBox_update_udp_port_valueChanged(int udp_port)
+void Interface::on_spinBox_update_udp_port_output_valueChanged(int udp_port)
 {
+    int inputPort = ui->spinBox_port_input_udp->value();
+
+        //Check if port already used by UDP input
+    if (udp_reader->isBounded() && udp_port == inputPort)
+    {
+        QMessageBox::warning(this, "UDP Port Error",
+                             "Output UDP port conflicts with input UDP port.\nPlease choose a different port.");
+        ui->spinBox_update_udp_port_output->setValue(ui->spinBox_update_udp_port_output->value() + 1);
+        return;
+    }
+
     udp_writer->updateUdpPort(udp_port);
 }
 
@@ -460,136 +727,4 @@ QString Interface::getRecordingFilePath()
 }
 
 
-
-
-//////////////////////////
-/// Serial Output Data ///
-//////////////////////////
-
-//Settings
-void Interface::closeOutputSerial()
-{
-    if(serial_writer->isSerialOpen())
-    {
-        serial_writer->closeSerialDevice();
-        ui->plainTextEdit_connection_status_output_serial->setPlainText(serial_writer->getPortName()+" closed");
-    }
-    else
-        ui->plainTextEdit_connection_status_output_serial->setPlainText("Connection not opened");
-}
-
-void Interface::on_pushButton_refresh_available_port_serial_output_clicked()
-{
-    listAvailablePorts(ui->comboBox_serial_output_port_list);
-
-    //Remove input serial as output choice
-    if(serial->isSerialOpen())
-    {
-        int indexToRemove = ui->comboBox_serial_output_port_list->findText(ui->comboBox_serial_input_port_list->currentText());
-        if (indexToRemove != -1)
-            ui->comboBox_serial_output_port_list->removeItem(indexToRemove);
-    }
-}
-
-void Interface::on_pushButton_connect_serial_output_clicked()
-{
-    //Update serial settings
-    serial_writer->setPortName(ui->comboBox_serial_output_port_list->currentText());
-    serial_writer->setBaudRate((ui->comboBox_serial_output_port_baudrate->currentText()).toInt());
-
-    //Try to connect
-    QString result;
-    if(serial_writer->openSerialDevice())
-        result =  "Connected to " + serial_writer->getPortName();
-    else
-        result =  "Failed to open " + serial_writer->getPortName() + " : " + serial_writer->getErrorString();
-
-    //Display connection status
-    ui->plainTextEdit_connection_status_output_serial->setPlainText(result);
-}
-
-void Interface::on_pushButton_disconnect_serial_output_clicked()
-{
-    closeOutputSerial();
-}
-
-
-//Outputs
-void Interface::on_pushButton_activate_serial_output_toggled(bool checked)
-{
-    if (!checked)
-    {
-        serial_writer->updateOutputNMEA(false);
-        return;
-    }
-
-    if (serial_writer->isSerialOpen())
-    {
-        serial_writer->updateOutputNMEA(true);
-    }
-    else
-    {
-        QMessageBox::warning(this, "Serial Output Not Available",
-                             "No serial output port is currently opened.\n\n"
-                             "Please select a valid port and click 'Connect' before enabling serial output.");
-        ui->pushButton_activate_serial_output->setChecked(false);
-    }
-}
-
-void Interface::on_checkBox_serial_output_gga_toggled(bool checked)
-{
-    serial_writer->updateOutputGGA(checked);
-}
-
-void Interface::on_checkBox_serial_output_gsv_toggled(bool checked)
-{
-    serial_writer->updateOutputGSV(checked);
-}
-
-void Interface::on_checkBox_serial_output_rmc_toggled(bool checked)
-{
-    serial_writer->updateOutputRMC(checked);
-}
-
-void Interface::on_checkBox_serial_output_gsa_toggled(bool checked)
-{
-    serial_writer->updateOutputGSA(checked);
-}
-
-void Interface::on_checkBox_serial_output_gll_toggled(bool checked)
-{
-    serial_writer->updateOutputGLL(checked);
-}
-
-void Interface::on_checkBox_serial_output_vtg_toggled(bool checked)
-{
-    serial_writer->updateOutputVTG(checked);
-}
-
-void Interface::on_checkBox_serial_output_others_toggled(bool checked)
-{
-    serial_writer->updateOutputOthers(checked);
-}
-
-void Interface::on_pushButton_check_all_serial_output_clicked()
-{
-    ui->checkBox_serial_output_gga->setChecked(true);
-    ui->checkBox_serial_output_rmc->setChecked(true);
-    ui->checkBox_serial_output_gsv->setChecked(true);
-    ui->checkBox_serial_output_gll->setChecked(true);
-    ui->checkBox_serial_output_gsa->setChecked(true);
-    ui->checkBox_serial_output_vtg->setChecked(true);
-    ui->checkBox_serial_output_others->setChecked(true);
-}
-
-void Interface::on_pushButtonuncheck_all_serial_output_clicked()
-{
-    ui->checkBox_serial_output_gga->setChecked(false);
-    ui->checkBox_serial_output_rmc->setChecked(false);
-    ui->checkBox_serial_output_gsv->setChecked(false);
-    ui->checkBox_serial_output_gll->setChecked(false);
-    ui->checkBox_serial_output_gsa->setChecked(false);
-    ui->checkBox_serial_output_vtg->setChecked(false);
-    ui->checkBox_serial_output_others->setChecked(false);
-}
 

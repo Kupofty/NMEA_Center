@@ -12,6 +12,7 @@
 #include "serial_reader.h"
 #include "serial_writer.h"
 #include "nmea_handler.h"
+#include "udp_reader.h"
 #include "udp_writer.h"
 #include "text_file_writter.h"
 
@@ -32,14 +33,19 @@ class Interface : public QMainWindow
 
     private:
         Ui::Interface *ui;
-        SerialReader *serial;
+        SerialReader *serial_reader;
         SerialWriter *serial_writer;
         NMEA_Handler *nmea_handler;
+        UdpReader *udp_reader;
         UdpWriter *udp_writer;
         TextFileWritter *text_file_writer;
         QTimer *fileRecordingSizeTimer;
 
     private:
+        void clearDecodedDataScreens();
+        void autoClearDecodedDataScreens();
+        void CloseInputUdp();
+        void updateGuiAfterUdpConnection(bool connectSuccess);
         void closeInputSerial();
         void closeOutputSerial();
         void clearRawSentencesScreens();
@@ -52,10 +58,10 @@ class Interface : public QMainWindow
 
     private slots:
         void on_pushButton_clear_raw_sentences_screens_clicked();
-        void on_pushButton_connect_clicked();
-        void on_pushButton_disconnect_clicked();
+        void on_pushButton_connect_serial_input_clicked();
+        void on_pushButton_disconnect_serial_input_clicked();
         void on_pushButton_refresh_available_ports_list_clicked();
-        void on_spinBox_update_udp_port_valueChanged(int port);
+        void on_spinBox_update_udp_port_output_valueChanged(int port);
 
         void on_checkBox_udp_output_gga_toggled(bool checked);
         void on_checkBox_udp_output_rmc_toggled(bool checked);
@@ -93,9 +99,12 @@ class Interface : public QMainWindow
         void on_pushButton_check_all_serial_output_clicked();
         void on_pushButtonuncheck_all_serial_output_clicked();
 
+        void on_pushButton_connect_udp_input_clicked();
+        void on_pushButton_disconnect_udp_input_clicked();
+
     public slots:
         void displayRawNmeaSentence(const QString &type, const QString &line);
-
+        void updateUdpSenderDetails();
         void updateDataGSV(int totalSatellites, double freq);
         void updateDataGGA(QString time, double latitude, double longitude, int fixQuality, int numSatellites, double hdop, double altitude, double freqHz);
         void updateDataGLL(QString utc, double latitude, double longitude,  double freqHz);

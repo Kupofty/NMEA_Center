@@ -1,10 +1,12 @@
 #include "serial_writer.h"
 
+//////////////
+/// Class  ///
+//////////////
 SerialWriter::SerialWriter(QObject *parent) : OutputWriter(parent)
 {
 
 }
-
 
 SerialWriter::~SerialWriter()
 {
@@ -40,6 +42,7 @@ void SerialWriter::closeSerialDevice()
     if(isSerialOpen())
         serial.close();
 }
+
 
 
 //////////////////////

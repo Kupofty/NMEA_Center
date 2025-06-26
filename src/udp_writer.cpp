@@ -28,6 +28,7 @@ void UdpWriter::sendData(const QString &line)
 }
 
 
+
 ///////////////////////
 /// Update settings ///
 ///////////////////////

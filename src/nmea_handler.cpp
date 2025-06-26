@@ -73,7 +73,6 @@ void NMEA_Handler::handleRawSentences(const QByteArray &line)
 /// Handle Data ///
 ///////////////////
 
-//GGA
 void NMEA_Handler::handleGGA(const QList<QByteArray> &fields)
 {
     //Check size
@@ -109,7 +108,6 @@ void NMEA_Handler::handleGGA(const QList<QByteArray> &fields)
     emit newDecodedGGA(utcTime.toString(), latitude, longitude, fixQuality, numSatellites, hdop, altitude, freqHz);
 }
 
-//RMC
 void NMEA_Handler::handleRMC(const QList<QByteArray> &fields)
 {
     checkMinimumLineSize(fields, 12);
@@ -161,7 +159,6 @@ void NMEA_Handler::handleRMC(const QList<QByteArray> &fields)
     emit newDecodedRMC(formattedDate, utcTime.toString(), latitude, longitude, speedKnots, course, magVar, freqHz);
 }
 
-//GSV
 void NMEA_Handler::handleGSV(const QList<QByteArray> &fields)
 {
     //Check size
@@ -182,7 +179,6 @@ void NMEA_Handler::handleGSV(const QList<QByteArray> &fields)
     }
 }
 
-//GLL
 void NMEA_Handler::handleGLL(const QList<QByteArray> &fields)
 {
     checkMinimumLineSize(fields, 7);
@@ -210,7 +206,6 @@ void NMEA_Handler::handleGLL(const QList<QByteArray> &fields)
         emit newDecodedGLL(utcTime.toString(), latitude, longitude, freqHz);
 }
 
-//GSA
 void NMEA_Handler::handleGSA(const QList<QByteArray> &fields)
 {
     checkMinimumLineSize(fields, 18);
@@ -223,7 +218,6 @@ void NMEA_Handler::handleGSA(const QList<QByteArray> &fields)
     emit newDecodedGSA(pdop, hdop, vdop, freqHz);
 }
 
-//VTG
 void NMEA_Handler::handleVTG(const QList<QByteArray> &fields)
 {
     //checkMinimumLineSize(fields, 10); //bug ocpn, smaller sentence
