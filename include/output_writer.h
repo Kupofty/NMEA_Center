@@ -27,6 +27,9 @@ class OutputWriter : public QObject
         void updateOutputGLL(bool check);
         void updateOutputGSA(bool check);
         void updateOutputVTG(bool check);
+        void updateOutputHDT(bool check);
+        void updateOutputDBT(bool check);
+        void updateOutputVHW(bool check);
         void updateOutputOthers(bool check);
 
     public slots:
@@ -36,6 +39,9 @@ class OutputWriter : public QObject
         void publishGLL(const QString &line);
         void publishGSA(const QString &line);
         void publishVTG(const QString &line);
+        void publishHDT(const QString &line);
+        void publishDBT(const QString &line);
+        void publishVHW(const QString &line);
         void publishOthers(const QString &line);
 
     private:
@@ -47,6 +53,9 @@ class OutputWriter : public QObject
         bool outputGLL = 0;
         bool outputGSA = 0;
         bool outputVTG = 0;
+        bool outputHDT = 0;
+        bool outputDBT = 0;
+        bool outputVHW = 0;
         bool outputOthers = 0;
 };
 

@@ -58,16 +58,22 @@ void Interface::connectSignalSlot()
     QObject::connect(nmea_handler, &NMEA_Handler::newGLLSentence, udp_writer, &UdpWriter::publishGLL);
     QObject::connect(nmea_handler, &NMEA_Handler::newGSASentence, udp_writer, &UdpWriter::publishGSA);
     QObject::connect(nmea_handler, &NMEA_Handler::newVTGSentence, udp_writer, &UdpWriter::publishVTG);
+    QObject::connect(nmea_handler, &NMEA_Handler::newHDTSentence, udp_writer, &UdpWriter::publishHDT);
+    QObject::connect(nmea_handler, &NMEA_Handler::newDBTSentence, udp_writer, &UdpWriter::publishDBT);
+    QObject::connect(nmea_handler, &NMEA_Handler::newVHWSentence, udp_writer, &UdpWriter::publishVHW);
     QObject::connect(nmea_handler, &NMEA_Handler::newOtherSentence, udp_writer, &UdpWriter::publishOthers);
 
     //Send raw NMEA to serial publisher
-    QObject::connect(nmea_handler, &NMEA_Handler::newGGASentence, serial_writer, &UdpWriter::publishGGA);
-    QObject::connect(nmea_handler, &NMEA_Handler::newRMCSentence, serial_writer, &UdpWriter::publishRMC);
-    QObject::connect(nmea_handler, &NMEA_Handler::newGSVSentence, serial_writer, &UdpWriter::publishGSV);
-    QObject::connect(nmea_handler, &NMEA_Handler::newGLLSentence, serial_writer, &UdpWriter::publishGLL);
-    QObject::connect(nmea_handler, &NMEA_Handler::newGSASentence, serial_writer, &UdpWriter::publishGSA);
-    QObject::connect(nmea_handler, &NMEA_Handler::newVTGSentence, serial_writer, &UdpWriter::publishVTG);
-    QObject::connect(nmea_handler, &NMEA_Handler::newOtherSentence, serial_writer, &UdpWriter::publishOthers);
+    QObject::connect(nmea_handler, &NMEA_Handler::newGGASentence, serial_writer, &SerialWriter::publishGGA);
+    QObject::connect(nmea_handler, &NMEA_Handler::newRMCSentence, serial_writer, &SerialWriter::publishRMC);
+    QObject::connect(nmea_handler, &NMEA_Handler::newGSVSentence, serial_writer, &SerialWriter::publishGSV);
+    QObject::connect(nmea_handler, &NMEA_Handler::newGLLSentence, serial_writer, &SerialWriter::publishGLL);
+    QObject::connect(nmea_handler, &NMEA_Handler::newGSASentence, serial_writer, &SerialWriter::publishGSA);
+    QObject::connect(nmea_handler, &NMEA_Handler::newVTGSentence, serial_writer, &SerialWriter::publishVTG);
+    QObject::connect(nmea_handler, &NMEA_Handler::newHDTSentence, serial_writer, &SerialWriter::publishHDT);
+    QObject::connect(nmea_handler, &NMEA_Handler::newDBTSentence, serial_writer, &SerialWriter::publishDBT);
+    QObject::connect(nmea_handler, &NMEA_Handler::newVHWSentence, serial_writer, &SerialWriter::publishVHW);
+    QObject::connect(nmea_handler, &NMEA_Handler::newOtherSentence, serial_writer, &SerialWriter::publishOthers);
 
 
     //// DISPLAY /////
@@ -81,11 +87,14 @@ void Interface::connectSignalSlot()
     QObject::connect(nmea_handler, &NMEA_Handler::newDecodedVTG, this, &Interface::updateDataVTG);
     QObject::connect(nmea_handler, &NMEA_Handler::newDecodedGSA, this, &Interface::updateDataGSA);
     QObject::connect(nmea_handler, &NMEA_Handler::newDecodedRMC, this, &Interface::updateDataRMC);
-
-
-
-
-
+    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedHDT, this, &Interface::updateDataHDT);
+    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedDBT, this, &Interface::updateDataDBT);
+    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedVHW, this, &Interface::updateDataVHW);
+    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedZDA, this, &Interface::updateDataZDA);
+    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedDPT, this, &Interface::updateDataDPT);
+    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedMWD, this, &Interface::updateDataMWD);
+    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedMTW, this, &Interface::updateDataMTW);
+    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedMWV, this, &Interface::updateDataMWV);
 
     //Timers
     fileRecordingSizeTimer = new QTimer(this);
@@ -116,7 +125,6 @@ void Interface::closeInputSerial()
     {
         serial_reader->closeSerialDevice();
         ui->plainTextEdit_connection_status->setPlainText(serial_reader->getPortName()+" closed");
-        autoClearDecodedDataScreens();
     }
     else
         ui->plainTextEdit_connection_status->setPlainText("Connection not opened");
@@ -154,6 +162,7 @@ void Interface::updateGuiAfterSerialConnection(bool connectSuccess)
     ui->horizontalFrame_serial_input_connection->setEnabled(!connectSuccess);
     ui->pushButton_connect_serial_input->setEnabled(!connectSuccess);
     ui->pushButton_disconnect_serial_input->setEnabled(connectSuccess);
+    clearDecodedDataScreens();
 }
 
 //COM ports
@@ -217,7 +226,7 @@ void Interface::updateGuiAfterUdpConnection(bool connectSuccess)
     ui->pushButton_connect_udp_input->setEnabled(!connectSuccess);
     ui->pushButton_disconnect_udp_input->setEnabled(connectSuccess);
     ui->plainTextEdit_udp_sender_details->clear();
-    autoClearDecodedDataScreens();
+    clearDecodedDataScreens();
 }
 
 void Interface::updateUdpSenderDetails()
@@ -234,7 +243,8 @@ void Interface::updateUdpSenderDetails()
 //Display On Screens
 void Interface::displayRawNmeaSentence(const QString &type, const QString &nmeaText)
 {
-    static const QMap<QString, QPlainTextEdit*> sentenceMap = {
+    static const QMap<QString, QPlainTextEdit*> sentenceMap =
+    {
         { "TXT",   ui->plainTextEdit_txt },
         { "GGA",   ui->plainTextEdit_gga },
         { "RMC",   ui->plainTextEdit_rmc },
@@ -242,6 +252,14 @@ void Interface::displayRawNmeaSentence(const QString &type, const QString &nmeaT
         { "GLL",   ui->plainTextEdit_gll },
         { "GSA",   ui->plainTextEdit_gsa },
         { "VTG",   ui->plainTextEdit_vtg },
+        { "HDT",   ui->plainTextEdit_hdt },
+        { "DBT",   ui->plainTextEdit_dbt },
+        { "VHW",   ui->plainTextEdit_vhw },
+        { "ZDA",   ui->plainTextEdit_zda },
+        { "DPT",   ui->plainTextEdit_dpt },
+        { "MWD",   ui->plainTextEdit_mwd },
+        { "MTW",   ui->plainTextEdit_mtw },
+        { "MWV",   ui->plainTextEdit_mwv },
         { "OTHER", ui->plainTextEdit_others }
     };
 
@@ -347,13 +365,74 @@ void Interface::updateDataRMC(QString utcDate, QString utcTime, double latitude,
 
 }
 
-//Clear
-void Interface::autoClearDecodedDataScreens()
+void Interface::updateDataHDT(double heading, double freqHz)
 {
-    if(!ui->pushButton_disconnect_serial_input->isEnabled() && !ui->pushButton_disconnect_udp_input->isEnabled())
-        clearDecodedDataScreens();
+    ui->lcdNumber_heading_hdt->display(heading);
+    ui->lcdNumber_frequency_hdt->display(freqHz);
 }
 
+void Interface::updateDataDBT(double depthFeet, double depthMeters, double depthFathom, double freqHz)
+{
+    ui->lcdNumber_depth_feet_dbt->display(depthFeet);
+    ui->lcdNumber_depth_meter_dbt->display(depthMeters);
+    ui->lcdNumber_depth_fathom_dbt->display(depthFathom);
+    ui->lcdNumber_frequency_dbt->display(freqHz);
+}
+
+void Interface::updateDataVHW(double headingTrue, double headingMag, double speedKnots, double speedKmh, double freqHz)
+{
+    ui->lcdNumber_heading_true_vhw->display(headingTrue);
+    ui->lcdNumber_heading_mag_vhw->display(headingMag);
+    ui->lcdNumber_speed_knot_vhw->display(speedKnots);
+    ui->lcdNumber_speed_kmh_vhw->display(speedKmh);
+    ui->lcdNumber_frequency_vhw->display(freqHz);
+}
+
+void Interface::updateDataZDA(QString date, QString time, QString offsetTime, double freqHz)
+{
+    ui->label_date_zda->setText(date);
+    ui->label_utcTime_zda->setText(time);
+    ui->label_localZone_zda->setText(offsetTime);
+    ui->lcdNumber_frequency_zda->display(freqHz);
+}
+
+void Interface::updateDataDPT(double depth, double offset, double freqHz)
+{
+    ui->lcdNumber_depth_dpt->display(depth);
+    ui->lcdNumber_depth_offset_dpt->display(offset);
+    ui->lcdNumber_frequency_dpt->display(freqHz);
+}
+
+void Interface::updateDataMWD(double dir1, QString dir1Unit, double dir2, QString dir2Unit, double speed1, QString speed1Unit, double speed2, QString speed2Unit, double freqHz)
+{
+    ui->lcdNumber_windDirection_mwd->display(dir1);
+    ui->label_windDirectionUnit_mwd->setText("Wind Direction (" + dir1Unit + ") :" );
+    ui->lcdNumber_windDirection_mwd_2->display(dir2);
+    ui->label_windDirectionUnit_mwd_2->setText("Wind Direction (" + dir2Unit + ") :" );
+    ui->lcdNumber_windSpeed_mwd->display(speed1);
+    ui->label_windSpeedUnit_mwd->setText("Wind Speed (" + speed1Unit + ") :" );
+    ui->lcdNumber_windSpeed_mwd_2->display(speed2);
+    ui->label_windSpeedUnit_mwd_2->setText("Wind Speed (" + speed2Unit + ") :" );
+    ui->lcdNumber_frequency_mwd->display(freqHz);
+}
+
+void Interface::updateDataMTW(double temp, QString tempUnit, double freqHz)
+{
+    ui->lcdNumber_waterTemp_mtw->display(temp);
+    ui->label_waterTempUnit_mtw->setText("Water Temp. (°" + tempUnit + ") :");
+    ui->lcdNumber_frequency_mtw->display(freqHz);
+}
+
+void Interface::updateDataMWV(double angle, QString ref, double speed, QString unit, double freqHz)
+{
+    ui->lcdNumber_windAngle_mwv->display(angle);
+    ui->label_windAngleUnit_mwv->setText("Wing Angle (" + ref + ") :" );
+    ui->lcdNumber_windSpeed_mwv->display(speed);
+    ui->label_windSpeedUnit_mwv->setText("Wing Speed (" + unit + ") :" );
+    ui->lcdNumber_frequency_mwv->display(freqHz);
+}
+
+//Clear
 void Interface::clearDecodedDataScreens()
 {
     //RMC
@@ -398,6 +477,23 @@ void Interface::clearDecodedDataScreens()
     ui->lcdNumber_speed_kmh_vtg->display(0);
     ui->lcdNumber_speed_knot_vtg->display(0);
     ui->lcdNumber_frequency_vtg->display(0);
+
+    //HDT
+    ui->lcdNumber_heading_hdt->display(0);
+    ui->lcdNumber_frequency_hdt->display(0);
+
+    //DBT
+    ui->lcdNumber_depth_feet_dbt->display(0);
+    ui->lcdNumber_depth_meter_dbt->display(0);
+    ui->lcdNumber_depth_fathom_dbt->display(0);
+    ui->lcdNumber_frequency_dbt->display(0);
+
+    //VHW
+    ui->lcdNumber_heading_true_vhw->display(0);
+    ui->lcdNumber_heading_mag_vhw->display(0);
+    ui->lcdNumber_speed_knot_vhw->display(0);
+    ui->lcdNumber_speed_kmh_vhw->display(0);
+    ui->lcdNumber_frequency_vhw->display(0);
 }
 
 
@@ -507,6 +603,21 @@ void Interface::on_checkBox_serial_output_vtg_toggled(bool checked)
     serial_writer->updateOutputVTG(checked);
 }
 
+void Interface::on_checkBox_serial_output_hdt_toggled(bool checked)
+{
+    serial_writer->updateOutputHDT(checked);
+}
+
+void Interface::on_checkBox_serial_output_dbt_toggled(bool checked)
+{
+    serial_writer->updateOutputDBT(checked);
+}
+
+void Interface::on_checkBox_serial_output_vhw_toggled(bool checked)
+{
+    serial_writer->updateOutputVHW(checked);
+}
+
 void Interface::on_checkBox_serial_output_others_toggled(bool checked)
 {
     serial_writer->updateOutputOthers(checked);
@@ -520,10 +631,13 @@ void Interface::on_pushButton_check_all_serial_output_clicked()
     ui->checkBox_serial_output_gll->setChecked(true);
     ui->checkBox_serial_output_gsa->setChecked(true);
     ui->checkBox_serial_output_vtg->setChecked(true);
+    ui->checkBox_serial_output_hdt->setChecked(true);
+    ui->checkBox_serial_output_dbt->setChecked(true);
+    ui->checkBox_serial_output_vhw->setChecked(true);
     ui->checkBox_serial_output_others->setChecked(true);
 }
 
-void Interface::on_pushButtonuncheck_all_serial_output_clicked()
+void Interface::on_pushButton_uncheck_all_serial_output_clicked()
 {
     ui->checkBox_serial_output_gga->setChecked(false);
     ui->checkBox_serial_output_rmc->setChecked(false);
@@ -531,6 +645,9 @@ void Interface::on_pushButtonuncheck_all_serial_output_clicked()
     ui->checkBox_serial_output_gll->setChecked(false);
     ui->checkBox_serial_output_gsa->setChecked(false);
     ui->checkBox_serial_output_vtg->setChecked(false);
+    ui->checkBox_serial_output_hdt->setChecked(false);
+    ui->checkBox_serial_output_dbt->setChecked(false);
+    ui->checkBox_serial_output_vhw->setChecked(false);
     ui->checkBox_serial_output_others->setChecked(false);
 }
 
@@ -544,18 +661,8 @@ void Interface::on_pushButtonuncheck_all_serial_output_clicked()
 //UDP Settings
 void Interface::on_spinBox_update_udp_port_output_valueChanged(int udp_port)
 {
-    int inputPort = ui->spinBox_port_input_udp->value();
-
-        //Check if port already used by UDP input
-    if (udp_reader->isBounded() && udp_port == inputPort)
-    {
-        QMessageBox::warning(this, "UDP Port Error",
-                             "Output UDP port conflicts with input UDP port.\nPlease choose a different port.");
-        ui->spinBox_update_udp_port_output->setValue(ui->spinBox_update_udp_port_output->value() + 1);
-        return;
-    }
-
-    udp_writer->updateUdpPort(udp_port);
+    if(checkUdpOutputPortIsFree())
+        udp_writer->updateUdpPort(udp_port);
 }
 
 void Interface::on_comboBox_udp_host_address_currentTextChanged(const QString &udpMethod)
@@ -577,11 +684,29 @@ void Interface::on_lineEdit_udp_ip_address_editingFinished()
     udp_writer->updateUdpMethod(QHostAddress(ui->lineEdit_udp_ip_address->text()));
 }
 
+bool Interface::checkUdpOutputPortIsFree()
+{
+    int udp_input_port = ui->spinBox_port_input_udp->value();
+    int udp_output_port = ui->spinBox_update_udp_port_output->value();
+
+    //Check if port already used by UDP input
+    if (udp_reader->isBounded() && (udp_output_port == udp_input_port) )
+    {
+        QMessageBox::warning(this, "UDP Port Error", "Output UDP port conflicts with input UDP port.\nPlease choose a different port.");
+        ui->pushButton_activate_udp_output->setChecked(false);
+        return false;
+    }
+    else
+        return true;
+}
+
 
 //Check data to outpout
 void Interface::on_pushButton_activate_udp_output_toggled(bool checked)
 {
-    udp_writer->updateOutputNMEA(checked);
+    if(checked)
+        if(checkUdpOutputPortIsFree())
+            udp_writer->updateOutputNMEA(checked);
 }
 
 void Interface::on_checkBox_udp_output_gga_toggled(bool checked)
@@ -614,6 +739,21 @@ void Interface::on_checkBox_udp_output_vtg_toggled(bool checked)
     udp_writer->updateOutputVTG(checked);
 }
 
+void Interface::on_checkBox_udp_output_hdt_toggled(bool checked)
+{
+    udp_writer->updateOutputHDT(checked);
+}
+
+void Interface::on_checkBox_udp_output_dbt_toggled(bool checked)
+{
+    udp_writer->updateOutputDBT(checked);
+}
+
+void Interface::on_checkBox_udp_output_vhw_toggled(bool checked)
+{
+    udp_writer->updateOutputVHW(checked);
+}
+
 void Interface::on_checkBox_udp_output_others_toggled(bool checked)
 {
     udp_writer->updateOutputOthers(checked);
@@ -627,10 +767,13 @@ void Interface::on_pushButton_check_all_udp_output_clicked()
     ui->checkBox_udp_output_gll->setChecked(true);
     ui->checkBox_udp_output_gsa->setChecked(true);
     ui->checkBox_udp_output_vtg->setChecked(true);
+    ui->checkBox_udp_output_hdt->setChecked(true);
+    ui->checkBox_udp_output_dbt->setChecked(true);
+    ui->checkBox_udp_output_vhw->setChecked(true);
     ui->checkBox_udp_output_others->setChecked(true);
 }
 
-void Interface::on_pushButtonuncheck_all_udp_output_clicked()
+void Interface::on_pushButton_uncheck_all_udp_output_clicked()
 {
     ui->checkBox_udp_output_gga->setChecked(false);
     ui->checkBox_udp_output_rmc->setChecked(false);
@@ -638,6 +781,9 @@ void Interface::on_pushButtonuncheck_all_udp_output_clicked()
     ui->checkBox_udp_output_gll->setChecked(false);
     ui->checkBox_udp_output_gsa->setChecked(false);
     ui->checkBox_udp_output_vtg->setChecked(false);
+    ui->checkBox_udp_output_hdt->setChecked(false);
+    ui->checkBox_udp_output_dbt->setChecked(false);
+    ui->checkBox_udp_output_vhw->setChecked(false);
     ui->checkBox_udp_output_others->setChecked(false);
 }
 
@@ -725,6 +871,9 @@ QString Interface::getRecordingFilePath()
 
     return fullPath;
 }
+
+
+
 
 
 

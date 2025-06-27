@@ -41,9 +41,9 @@ class Interface : public QMainWindow
         TextFileWritter *text_file_writer;
         QTimer *fileRecordingSizeTimer;
 
+
     private:
         void clearDecodedDataScreens();
-        void autoClearDecodedDataScreens();
         void CloseInputUdp();
         void updateGuiAfterUdpConnection(bool connectSuccess);
         void closeInputSerial();
@@ -55,6 +55,7 @@ class Interface : public QMainWindow
         void updateGuiAfterSerialConnection(bool connectSuccess);
         void updateFileSize();
         QString getRecordingFilePath();
+        bool checkUdpOutputPortIsFree();
 
     private slots:
         void on_pushButton_clear_raw_sentences_screens_clicked();
@@ -73,7 +74,7 @@ class Interface : public QMainWindow
         void on_checkBox_udp_output_others_toggled(bool checked);
 
         void on_pushButton_check_all_udp_output_clicked();
-        void on_pushButtonuncheck_all_udp_output_clicked();
+        void on_pushButton_uncheck_all_udp_output_clicked();
 
         void on_comboBox_udp_host_address_currentTextChanged(const QString &hostAddress);
         void on_lineEdit_udp_ip_address_editingFinished();
@@ -97,10 +98,17 @@ class Interface : public QMainWindow
         void on_checkBox_serial_output_vtg_toggled(bool checked);
         void on_checkBox_serial_output_others_toggled(bool checked);
         void on_pushButton_check_all_serial_output_clicked();
-        void on_pushButtonuncheck_all_serial_output_clicked();
+        void on_pushButton_uncheck_all_serial_output_clicked();
 
         void on_pushButton_connect_udp_input_clicked();
         void on_pushButton_disconnect_udp_input_clicked();
+
+        void on_checkBox_serial_output_hdt_toggled(bool checked);
+        void on_checkBox_serial_output_dbt_toggled(bool checked);
+        void on_checkBox_serial_output_vhw_toggled(bool checked);
+        void on_checkBox_udp_output_hdt_toggled(bool checked);
+        void on_checkBox_udp_output_dbt_toggled(bool checked);
+        void on_checkBox_udp_output_vhw_toggled(bool checked);
 
     public slots:
         void displayRawNmeaSentence(const QString &type, const QString &line);
@@ -111,6 +119,14 @@ class Interface : public QMainWindow
         void updateDataVTG(double track_true, double track_mag, double speed_knot, double speedKmh, double frequency);
         void updateDataGSA(double pdop, double hdop, double vdop, double freqHz);
         void updateDataRMC(QString utcDate, QString utcTime, double latitude, double longitude, double speedMps, double course, double magVar, double freqHz);
+        void updateDataHDT(double heading, double freqHz);
+        void updateDataDBT(double depthFeet, double depthMeters, double depthFathom, double freqHz);
+        void updateDataVHW(double headingTrue, double headingMag, double speedKnots, double speedKmh, double freqHz);
+        void updateDataZDA(QString dateStr, QString timeStr, QString offsetStr, double freqHz);
+        void updateDataDPT(double depth, double offset, double freqHz);
+        void updateDataMWD(double dir1, QString dir1Unit, double dir2, QString dir2Unit, double speed1, QString speed1Unit, double speed2, QString speed2Unit, double freqHz);
+        void updateDataMTW(double temp, QString tempUnit, double freqHz);
+        void updateDataMWV(double angle, QString ref, double speed, QString unit, double freqHz);
 };
 
 #endif // INTERFACE_H

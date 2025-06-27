@@ -75,6 +75,21 @@ void OutputWriter::updateOutputVTG(bool check)
     outputVTG = check;
 }
 
+void OutputWriter::updateOutputHDT(bool check)
+{
+    outputHDT = check;
+}
+
+void OutputWriter::updateOutputDBT(bool check)
+{
+    outputDBT = check;
+}
+
+void OutputWriter::updateOutputVHW(bool check)
+{
+    outputVHW = check;
+}
+
 void OutputWriter::updateOutputOthers(bool check)
 {
     outputOthers = check;
@@ -118,6 +133,24 @@ void OutputWriter::publishGSA(const QString &line)
 void OutputWriter::publishVTG(const QString &line)
 {
     if(outputVTG)
+        sendData(line);
+}
+
+void OutputWriter::publishHDT(const QString &line)
+{
+    if(outputHDT)
+        sendData(line);
+}
+
+void OutputWriter::publishDBT(const QString &line)
+{
+    if(outputDBT)
+        sendData(line);
+}
+
+void OutputWriter::publishVHW(const QString &line)
+{
+    if(outputVHW)
         sendData(line);
 }
 
