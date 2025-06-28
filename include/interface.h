@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QStandardPaths>
 #include <QTimer>
+#include <QScrollBar>
 
 #include "ui_interface.h"
 
@@ -43,6 +44,8 @@ class Interface : public QMainWindow
 
 
     private:
+        QMap<QString, QPlainTextEdit*> getSentenceMap() const;
+        QList<QPlainTextEdit*> getPlainTextEditors() const;
         void clearDecodedDataScreens();
         void CloseInputUdp();
         void updateGuiAfterUdpConnection(bool connectSuccess);
@@ -110,9 +113,12 @@ class Interface : public QMainWindow
         void on_checkBox_udp_output_dbt_toggled(bool checked);
         void on_checkBox_udp_output_vhw_toggled(bool checked);
 
+    private slots:
+        void scrollDownPlainText(int index);
+        void updateUdpSenderDetails();
+
     public slots:
         void displayRawNmeaSentence(const QString &type, const QString &line);
-        void updateUdpSenderDetails();
         void updateDataGSV(int totalSatellites, double freq);
         void updateDataGGA(QString time, double latitude, double longitude, int fixQuality, int numSatellites, double hdop, double altitude, double freqHz);
         void updateDataGLL(QString utc, double latitude, double longitude,  double freqHz);

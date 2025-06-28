@@ -77,6 +77,10 @@ void Interface::connectSignalSlot()
 
 
     //// DISPLAY /////
+
+    //GUI
+    connect(ui->tabWidget, &QTabWidget::currentChanged, this, &Interface::scrollDownPlainText);
+
     //Display raw NMEA from nmea_handler
     QObject::connect(nmea_handler, &NMEA_Handler::newNMEASentence, this, &Interface::displayRawNmeaSentence);
 
@@ -165,6 +169,7 @@ void Interface::updateGuiAfterSerialConnection(bool connectSuccess)
     clearDecodedDataScreens();
 }
 
+
 //COM ports
 void Interface::listAvailablePorts(QComboBox *comboBox)
 {
@@ -243,54 +248,43 @@ void Interface::updateUdpSenderDetails()
 //Display On Screens
 void Interface::displayRawNmeaSentence(const QString &type, const QString &nmeaText)
 {
-    static const QMap<QString, QPlainTextEdit*> sentenceMap =
-    {
-        { "TXT",   ui->plainTextEdit_txt },
-        { "GGA",   ui->plainTextEdit_gga },
-        { "RMC",   ui->plainTextEdit_rmc },
-        { "GSV",   ui->plainTextEdit_gsv },
-        { "GLL",   ui->plainTextEdit_gll },
-        { "GSA",   ui->plainTextEdit_gsa },
-        { "VTG",   ui->plainTextEdit_vtg },
-        { "HDT",   ui->plainTextEdit_hdt },
-        { "DBT",   ui->plainTextEdit_dbt },
-        { "VHW",   ui->plainTextEdit_vhw },
-        { "ZDA",   ui->plainTextEdit_zda },
-        { "DPT",   ui->plainTextEdit_dpt },
-        { "MWD",   ui->plainTextEdit_mwd },
-        { "MTW",   ui->plainTextEdit_mtw },
-        { "MWV",   ui->plainTextEdit_mwv },
-        { "OTHER", ui->plainTextEdit_others }
-    };
+    //Link NMEA to plainText screens
+    QMap<QString, QPlainTextEdit*> nmeaSentenceMap = getSentenceMap();
 
     // Always show TXT regardless of freeze
     if (type == "TXT")
         ui->plainTextEdit_txt->appendPlainText(nmeaText);
 
-    // Don't update rest if freeze is checked
+    // Don't display sentences if freeze button is checked
     if (ui->pushButton_freeze_raw_sentences_screens->isChecked())
         return;
 
-    if (type != "TXT" && sentenceMap.contains(type))
-        sentenceMap[type]->appendPlainText(nmeaText);
+    if (type != "TXT" && nmeaSentenceMap.contains(type))
+        nmeaSentenceMap[type]->appendPlainText(nmeaText);
 }
+
+QMap<QString, QPlainTextEdit*> Interface::getSentenceMap() const
+{
+    static const QStringList keys = {
+        "OTHER", "GGA", "RMC", "GSV", "GLL",
+        "GSA", "VTG", "DBT", "VHW", "HDT",
+        "DPT", "MWD", "ZDA", "MTW", "MWV"
+    };
+
+    QList<QPlainTextEdit*> editors = getPlainTextEditors();
+    QMap<QString, QPlainTextEdit*> map;
+
+    for (int i = 0; i < keys.size() && i < editors.size(); ++i)
+        map.insert(keys[i], editors[i]);
+
+    return map;
+}
+
 
 //Clear Screens
 void Interface::clearRawSentencesScreens()
 {
-    QList<QPlainTextEdit*> editors = {
-        ui->plainTextEdit_gga,
-        ui->plainTextEdit_rmc,
-        ui->plainTextEdit_gsv,
-        ui->plainTextEdit_gll,
-        ui->plainTextEdit_gsa,
-        ui->plainTextEdit_vtg,
-        ui->plainTextEdit_dbt,
-        ui->plainTextEdit_others,
-        ui->plainTextEdit_vhw,
-        ui->plainTextEdit_vtg,
-        ui->plainTextEdit_hdt
-    };
+    const QList<QPlainTextEdit*> &editors = getPlainTextEditors();
 
     for (QPlainTextEdit* editor : editors)
         editor->clear();
@@ -301,6 +295,43 @@ void Interface::on_pushButton_clear_raw_sentences_screens_clicked()
     clearRawSentencesScreens();
 }
 
+
+// Scroll screens
+void Interface::scrollDownPlainText(int index)
+{
+    //Scroll down all the screens when changing to the raw data tab
+    if(index == ui->tabWidget->indexOf(ui->tab_gps_raw_data))
+    {
+        const QList<QPlainTextEdit*> &editors = getPlainTextEditors();
+
+        for (QPlainTextEdit* editor : editors)
+            editor->verticalScrollBar()->setValue(editor->verticalScrollBar()->maximum());
+    }
+}
+
+
+//Get list of plainTexts
+QList<QPlainTextEdit*> Interface::getPlainTextEditors() const
+{
+    return
+    {
+        ui->plainTextEdit_others,
+        ui->plainTextEdit_gga,
+        ui->plainTextEdit_rmc,
+        ui->plainTextEdit_gsv,
+        ui->plainTextEdit_gll,
+        ui->plainTextEdit_gsa,
+        ui->plainTextEdit_vtg,
+        ui->plainTextEdit_dbt,
+        ui->plainTextEdit_vhw,
+        ui->plainTextEdit_hdt,
+        ui->plainTextEdit_dpt,
+        ui->plainTextEdit_mwd,
+        ui->plainTextEdit_zda,
+        ui->plainTextEdit_mtw,
+        ui->plainTextEdit_mwv
+    };
+}
 
 
 
@@ -431,6 +462,7 @@ void Interface::updateDataMWV(double angle, QString ref, double speed, QString u
     ui->label_windSpeedUnit_mwv->setText("Wing Speed (" + unit + ") :" );
     ui->lcdNumber_frequency_mwv->display(freqHz);
 }
+
 
 //Clear
 void Interface::clearDecodedDataScreens()
@@ -871,9 +903,3 @@ QString Interface::getRecordingFilePath()
 
     return fullPath;
 }
-
-
-
-
-
-
