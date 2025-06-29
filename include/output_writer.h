@@ -17,46 +17,18 @@ class OutputWriter : public QObject
         virtual void sendData(const QString &line) = 0;
 
         //Get
-        bool getOutputNMEA();
+        bool getSocketOutputActivated();
 
         //Update authorized outputs
-        void updateOutputNMEA(bool check);
-        void updateOutputGGA(bool check);
-        void updateOutputRMC(bool check);
-        void updateOutputGSV(bool check);
-        void updateOutputGLL(bool check);
-        void updateOutputGSA(bool check);
-        void updateOutputVTG(bool check);
-        void updateOutputHDT(bool check);
-        void updateOutputDBT(bool check);
-        void updateOutputVHW(bool check);
-        void updateOutputOthers(bool check);
+        void updateSocketOutputActivated(bool check); //global on/off
+        void updateOutputNMEA(const QString &type, bool check); //nmea specific
 
     public slots:
-        void publishGGA(const QString &line);
-        void publishRMC(const QString &line);
-        void publishGSV(const QString &line);
-        void publishGLL(const QString &line);
-        void publishGSA(const QString &line);
-        void publishVTG(const QString &line);
-        void publishHDT(const QString &line);
-        void publishDBT(const QString &line);
-        void publishVHW(const QString &line);
-        void publishOthers(const QString &line);
+        void publishNMEA(const QString &type, const QString &nmeaText);
 
     private:
-        //Allowed output sentences
-        bool outputNMEA = 0;
-        bool outputGGA = 0;
-        bool outputRMC = 0;
-        bool outputGSV = 0;
-        bool outputGLL = 0;
-        bool outputGSA = 0;
-        bool outputVTG = 0;
-        bool outputHDT = 0;
-        bool outputDBT = 0;
-        bool outputVHW = 0;
-        bool outputOthers = 0;
+        bool socketOutputActivated = 0;
+        QMap<QString, bool> outputFlags;
 };
 
 #endif // OUTPUT_WRITER_H

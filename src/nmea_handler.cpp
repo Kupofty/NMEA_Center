@@ -35,75 +35,33 @@ void NMEA_Handler::handleRawSentences(const QByteArray &line)
     emit newNMEASentence(nmeaFormat, nmeaText);
 
     if(nmeaFormat == "GGA")
-    {
         handleGGA(fields);
-        emit newGGASentence(nmeaText);
-    }
     else if (nmeaFormat == "RMC")
-    {
         handleRMC(fields);
-        emit newRMCSentence(nmeaText);
-    }
     else if (nmeaFormat == "GSV")
-    {
         handleGSV(fields);
-        emit newGSVSentence(nmeaText);
-    }
     else if (nmeaFormat == "GLL")
-    {
         handleGLL(fields);
-        emit newGLLSentence(nmeaText);
-    }
     else if (nmeaFormat == "GSA")
-    {
         handleGSA(fields);
-        emit newGSASentence(nmeaText);
-    }
     else if (nmeaFormat == "VTG")
-    {
         handleVTG(fields);
-        emit newVTGSentence(nmeaText);
-    }
     else if (nmeaFormat == "HDT")
-    {
         handleHDT(fields);
-        emit newHDTSentence(nmeaText);
-    }
     else if (nmeaFormat == "DBT")
-    {
         handleDBT(fields);
-        emit newDBTSentence(nmeaText);
-    }
     else if (nmeaFormat == "VHW")
-    {
         handleVHW(fields);
-        emit newVHWSentence(nmeaText);
-    }
     else if (nmeaFormat == "ZDA")
-    {
         handleZDA(fields);
-        emit newZDASentence(nmeaText);
-    }
     else if (nmeaFormat == "DPT")
-    {
         handleDPT(fields);
-        emit newDPTSentence(nmeaText);
-    }
     else if (nmeaFormat == "MWD")
-    {
         handleMWD(fields);
-        emit newMWDSentence(nmeaText);
-    }
     else if (nmeaFormat == "MWV")
-    {
         handleMWV(fields);
-        emit newMWVSentence(nmeaText);
-    }
     else if (nmeaFormat == "MTW")
-    {
         handleMTW(fields);
-        emit newMTWSentence(nmeaText);
-    }
 }
 
 
@@ -115,30 +73,32 @@ void NMEA_Handler::handleRawSentences(const QByteArray &line)
 void NMEA_Handler::handleGGA(const QList<QByteArray> &fields)
 {
     //Check size
-    checkMinimumLineSize(fields, 6);
+    checkMinimumLineSize(fields, 9);
 
-    // Parse UTC time (field 1)
+    // Parse UTC time
     QString timeStr = fields[1];
     QTime utcTime = QTime::fromString(timeStr.left(6), "hhmmss");
 
-    // Parse position (fields 2, 3, 4, 10)
-    QString latStr = fields[2]; QString latDir = fields[3];
-    QString lonStr = fields[4]; QString lonDir = fields[5];
-    double latitude = calculateCoordinates(latStr, latDir);
+    // Parse position
+    QString latStr   = fields[2];
+    QString latDir   = fields[3];
+    QString lonStr   = fields[4];
+    QString lonDir   = fields[5];
+    double latitude  = calculateCoordinates(latStr, latDir);
     double longitude = calculateCoordinates(lonStr, lonDir);
     if (std::isnan(latitude) || std::isnan(longitude))
         return;
 
-    // Parse fix quality (field 6)
+    // Parse fix quality
     int fixQuality = fields[6].toInt();
 
-    // Parse number of satellites (field 7)
+    // Parse number of satellites
     int numSatellites = fields[7].toInt();
 
-    // Parse HDOP (field 8)
+    // Parse HDOP
     double hdop = fields[8].toDouble();
 
-    // Parse altitude and units (fields 9s)
+    // Parse altitude and units
     double altitude = fields[9].toDouble();
 
     //Calculate frequency
@@ -149,15 +109,15 @@ void NMEA_Handler::handleGGA(const QList<QByteArray> &fields)
 
 void NMEA_Handler::handleRMC(const QList<QByteArray> &fields)
 {
-    checkMinimumLineSize(fields, 12);
+    checkMinimumLineSize(fields, 11);
 
     // Parse time
     QString timeStr = fields[1];
     QTime utcTime = QTime::fromString(timeStr.left(6), "hhmmss");
 
     // Status: A=active, V=void
-    QChar status = fields[2][0];
-    if (status != 'A')
+    QString status = fields[2];
+    if (status != "A")
         return;
 
     // Parse latitude
@@ -175,7 +135,8 @@ void NMEA_Handler::handleRMC(const QList<QByteArray> &fields)
     // Parse date
     QString dateStr = fields[9];
     QDate utcDate = QDate::fromString(dateStr, "ddMMyy");
-    if (utcDate.isValid()) {
+    if (utcDate.isValid())
+    {
         int year = utcDate.year();
         if (year < 2000)
             utcDate = utcDate.addYears(100);
@@ -186,8 +147,8 @@ void NMEA_Handler::handleRMC(const QList<QByteArray> &fields)
     double magVar = fields[10].toDouble();
     if (!fields[11].isEmpty())
     {
-        QChar varDir = fields[11][0];
-        if (varDir == 'W')
+        QString varDir = fields[11];
+        if (varDir == "W")
             magVar = -magVar;
     }
 
@@ -204,7 +165,7 @@ void NMEA_Handler::handleGSV(const QList<QByteArray> &fields)
     checkMinimumLineSize(fields, 4);
 
     // Parse GSV
-    int sentenceNumber = fields[2].toInt();
+    int sentenceNumber  = fields[2].toInt();
     int totalSatellites = fields[3].toInt();
 
     //GSV is composed of multiples sub-messages
@@ -218,12 +179,14 @@ void NMEA_Handler::handleGSV(const QList<QByteArray> &fields)
 void NMEA_Handler::handleGLL(const QList<QByteArray> &fields)
 {
     //Check size
-    checkMinimumLineSize(fields, 7);
+    checkMinimumLineSize(fields, 6);
 
     // Parse position
-    QString latStr = fields[1]; QString latDir = fields[2];
-    QString lonStr = fields[3]; QString lonDir = fields[4];
-    double latitude = calculateCoordinates(latStr, latDir);
+    QString latStr   = fields[1];
+    QString latDir   = fields[2];
+    QString lonStr   = fields[3];
+    QString lonDir   = fields[4];
+    double latitude  = calculateCoordinates(latStr, latDir);
     double longitude = calculateCoordinates(lonStr, lonDir);
     if (std::isnan(latitude) || std::isnan(longitude))
         return;
@@ -233,44 +196,39 @@ void NMEA_Handler::handleGLL(const QList<QByteArray> &fields)
     QTime utcTime = QTime::fromString(timeStr.left(6), "hhmmss");
 
     // Status and mode
-    QChar status = fields[6][0];
-    //QChar mode = fields.size() > 7 ? fields[7][0] : QChar('N');
+    QString status = fields[6];
 
     //Calculate frequency
     double freqHz = calculateFrequency(timer_gll, lastUpdateTimeGLL);
 
-    if (status == 'A')
-        emit newDecodedGLL(utcTime.toString(), latitude, longitude, freqHz);
+    if (status != "A")
+        latitude = longitude = 0;
+
+    emit newDecodedGLL(utcTime.toString(), latitude, longitude, freqHz);
+
 }
 
 void NMEA_Handler::handleGSA(const QList<QByteArray> &fields)
 {
-    checkMinimumLineSize(fields, 18);
+    checkMinimumLineSize(fields, 17);
 
     double pdop = fields[15].toDouble();
     double hdop = fields[16].toDouble();
     double vdop = removeAsterisk(fields[17]).toDouble();
 
     double freqHz = calculateFrequency(timer_gsa, lastUpdateTimeGSA);
+
     emit newDecodedGSA(pdop, hdop, vdop, freqHz);
 }
 
 void NMEA_Handler::handleVTG(const QList<QByteArray> &fields)
 {
-    checkMinimumLineSize(fields, 10);
+    checkMinimumLineSize(fields, 8);
 
-    // Track True
-    double trackTrue = fields[1].toDouble();
-
-    // Track Magnetic
-    double trackMag = fields[3].toDouble();
-
-    // Speed Knots
-    QByteArray speedKnotsStr = fields[5];
-    double speedKnots = speedKnotsStr.toDouble();
-
-    // Parse Speed Km/h
-    double speedKmh = fields[7].toDouble();
+    double trackTrue  = fields[1].toDouble();
+    double trackMag   = fields[3].toDouble();
+    double speedKnots = fields[5].toDouble();
+    double speedKmh   = fields[7].toDouble();
 
     //Calculate frequency
     double freqHz = calculateFrequency(timer_vtg, lastUpdateTimeVTG);
@@ -280,14 +238,14 @@ void NMEA_Handler::handleVTG(const QList<QByteArray> &fields)
 
 void NMEA_Handler::handleHDT(const QList<QByteArray> &fields)
 {
-    checkMinimumLineSize(fields, 3);
+    checkMinimumLineSize(fields, 2);
+
+    double heading      = fields[1].toDouble();
+    QString headingUnit = removeAsterisk(fields[2]);
 
     // Validate that the unit is 'T' (true heading)
-    QString headingUnit = removeAsterisk(fields[2]);
     if (headingUnit != "T")
         return;
-
-    double heading = fields[1].toDouble();
 
     //Calculate frequency
     double freqHz = calculateFrequency(timer_hdt, lastUpdateTimeHDT);
@@ -300,7 +258,7 @@ void NMEA_Handler::handleDBT(const QList<QByteArray> &fields)
     checkMinimumLineSize(fields, 6);
 
     //Extract data
-    double depthFeet= fields[1].toDouble();
+    double depthFeet   = fields[1].toDouble();
     double depthMeters = fields[3].toDouble();
     double depthFathom = fields[5].toDouble();
 
@@ -327,7 +285,7 @@ void NMEA_Handler::handleVHW(const QList<QByteArray> &fields)
 
 void NMEA_Handler::handleZDA(const QList<QByteArray> &fields)
 {
-    checkMinimumLineSize(fields, 5);
+    checkMinimumLineSize(fields, 6);
 
     QString utcTime   = fields[1];
     QString day       = fields[2];
@@ -373,7 +331,7 @@ void NMEA_Handler::handleDPT(const QList<QByteArray> &fields)
 
 void NMEA_Handler::handleMWD(const QList<QByteArray> &fields)
 {
-    checkMinimumLineSize(fields, 9);
+    checkMinimumLineSize(fields, 8);
 
     double dir1        = fields[1].toDouble();
     QString dir1Unit   = fields[2];
@@ -383,7 +341,6 @@ void NMEA_Handler::handleMWD(const QList<QByteArray> &fields)
     QString speed1Unit = fields[6];
     double speed2      = fields[7].toDouble();
     QString speed2Unit = removeAsterisk(fields[8]);
-
 
     double freqHz = calculateFrequency(timer_mwd, lastUpdateTimeMWD);
 
@@ -404,14 +361,17 @@ void NMEA_Handler::handleMTW(const QList<QByteArray> &fields)
 
 void NMEA_Handler::handleMWV(const QList<QByteArray> &fields)
 {
-    checkMinimumLineSize(fields, 4);
+    checkMinimumLineSize(fields, 5);
 
-    double angle = fields[1].toDouble();
-    QString ref  = fields[2]; // R=relative, T=true
-    double speed = fields[3].toDouble();
-    QString unit = fields[4]; // N=knots, M=m/s, K=km/h
-
+    double angle  = fields[1].toDouble();
+    QString ref   = fields[2]; // R=relative, T=true
+    double speed  = fields[3].toDouble();
+    QString unit  = fields[4]; // N=knots, M=m/s, K=km/h
+    QString valid = fields[5]; //A:valid / V=invalid
     double freqHz = calculateFrequency(timer_mwv, lastUpdateTimeMWV);
+
+    if(valid != "A")
+        angle = speed = 0;
 
     emit newDecodedMWV(angle, ref, speed, unit, freqHz);
 }
@@ -469,5 +429,11 @@ QByteArray NMEA_Handler::removeAsterisk(const QByteArray lastField)
 void NMEA_Handler::checkMinimumLineSize(const QList<QByteArray> &fields, int minSize)
 {
     if (fields.size() < minSize)
+        return;
+}
+
+void NMEA_Handler::checkEqualLineSize(const QList<QByteArray> &fields, int minSize)
+{
+    if (fields.size() == minSize)
         return;
 }

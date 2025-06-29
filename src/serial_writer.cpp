@@ -20,7 +20,7 @@ SerialWriter::~SerialWriter()
 /////////////////
 void SerialWriter::sendData(const QString &line)
 {
-    if(getOutputNMEA())
+    if(getSocketOutputActivated())
     {
         QByteArray data = line.toUtf8() + "\r\n";
         serial.write(data);

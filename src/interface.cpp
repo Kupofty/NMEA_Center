@@ -26,12 +26,13 @@ Interface::Interface(QWidget *parent) : QMainWindow(parent),
     //Qt connects
     connectSignalSlot();
 
+    //Create lists (NMEA, UI elements, etc)
+    initializeLists();
 }
 
 Interface::~Interface()
 {
     delete fileRecordingSizeTimer;
-
     delete serial_reader;
     delete nmea_handler;
     delete udp_writer;
@@ -42,63 +43,34 @@ Interface::~Interface()
 void Interface::connectSignalSlot()
 {
     //// INPUT /////
-    //Serial data
-    QObject::connect(serial_reader, &SerialReader::newLineReceived, nmea_handler, &NMEA_Handler::handleRawSentences);
-    QObject::connect(serial_reader, &SerialReader::newLineReceived, text_file_writer, &TextFileWritter::writeRawSentences);
-
-    //UDP data
-    QObject::connect(udp_reader, &UdpReader::newLineReceived, nmea_handler, &NMEA_Handler::handleRawSentences);
-    QObject::connect(udp_reader, &UdpReader::newSenderDetails, this, &Interface::updateUdpSenderDetails);
+    connect(serial_reader, &SerialReader::newLineReceived, nmea_handler, &NMEA_Handler::handleRawSentences);
+    connect(udp_reader, &UdpReader::newLineReceived, nmea_handler, &NMEA_Handler::handleRawSentences);
 
     //// OUTPUT /////
-    //Send raw NMEA to UDP publisher
-    QObject::connect(nmea_handler, &NMEA_Handler::newGGASentence, udp_writer, &UdpWriter::publishGGA);
-    QObject::connect(nmea_handler, &NMEA_Handler::newRMCSentence, udp_writer, &UdpWriter::publishRMC);
-    QObject::connect(nmea_handler, &NMEA_Handler::newGSVSentence, udp_writer, &UdpWriter::publishGSV);
-    QObject::connect(nmea_handler, &NMEA_Handler::newGLLSentence, udp_writer, &UdpWriter::publishGLL);
-    QObject::connect(nmea_handler, &NMEA_Handler::newGSASentence, udp_writer, &UdpWriter::publishGSA);
-    QObject::connect(nmea_handler, &NMEA_Handler::newVTGSentence, udp_writer, &UdpWriter::publishVTG);
-    QObject::connect(nmea_handler, &NMEA_Handler::newHDTSentence, udp_writer, &UdpWriter::publishHDT);
-    QObject::connect(nmea_handler, &NMEA_Handler::newDBTSentence, udp_writer, &UdpWriter::publishDBT);
-    QObject::connect(nmea_handler, &NMEA_Handler::newVHWSentence, udp_writer, &UdpWriter::publishVHW);
-    QObject::connect(nmea_handler, &NMEA_Handler::newOtherSentence, udp_writer, &UdpWriter::publishOthers);
-
-    //Send raw NMEA to serial publisher
-    QObject::connect(nmea_handler, &NMEA_Handler::newGGASentence, serial_writer, &SerialWriter::publishGGA);
-    QObject::connect(nmea_handler, &NMEA_Handler::newRMCSentence, serial_writer, &SerialWriter::publishRMC);
-    QObject::connect(nmea_handler, &NMEA_Handler::newGSVSentence, serial_writer, &SerialWriter::publishGSV);
-    QObject::connect(nmea_handler, &NMEA_Handler::newGLLSentence, serial_writer, &SerialWriter::publishGLL);
-    QObject::connect(nmea_handler, &NMEA_Handler::newGSASentence, serial_writer, &SerialWriter::publishGSA);
-    QObject::connect(nmea_handler, &NMEA_Handler::newVTGSentence, serial_writer, &SerialWriter::publishVTG);
-    QObject::connect(nmea_handler, &NMEA_Handler::newHDTSentence, serial_writer, &SerialWriter::publishHDT);
-    QObject::connect(nmea_handler, &NMEA_Handler::newDBTSentence, serial_writer, &SerialWriter::publishDBT);
-    QObject::connect(nmea_handler, &NMEA_Handler::newVHWSentence, serial_writer, &SerialWriter::publishVHW);
-    QObject::connect(nmea_handler, &NMEA_Handler::newOtherSentence, serial_writer, &SerialWriter::publishOthers);
-
+    connect(nmea_handler, &NMEA_Handler::newNMEASentence, udp_writer, &UdpWriter::publishNMEA);
+    connect(nmea_handler, &NMEA_Handler::newNMEASentence, serial_writer, &SerialWriter::publishNMEA);
+    connect(nmea_handler, &NMEA_Handler::newNMEASentence, text_file_writer, &TextFileWritter::writeRawSentences);
 
     //// DISPLAY /////
-
-    //GUI
     connect(ui->tabWidget, &QTabWidget::currentChanged, this, &Interface::scrollDownPlainText);
-
-    //Display raw NMEA from nmea_handler
-    QObject::connect(nmea_handler, &NMEA_Handler::newNMEASentence, this, &Interface::displayRawNmeaSentence);
+    connect(nmea_handler, &NMEA_Handler::newNMEASentence, this, &Interface::displayRawNmeaSentence);
+    connect(udp_reader, &UdpReader::newSenderDetails, this, &Interface::updateUdpSenderDetails);
 
     //Display decoded NMEA data
-    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedGGA, this, &Interface::updateDataGGA);
-    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedGLL, this, &Interface::updateDataGLL);
-    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedGSV, this, &Interface::updateDataGSV);
-    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedVTG, this, &Interface::updateDataVTG);
-    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedGSA, this, &Interface::updateDataGSA);
-    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedRMC, this, &Interface::updateDataRMC);
-    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedHDT, this, &Interface::updateDataHDT);
-    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedDBT, this, &Interface::updateDataDBT);
-    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedVHW, this, &Interface::updateDataVHW);
-    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedZDA, this, &Interface::updateDataZDA);
-    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedDPT, this, &Interface::updateDataDPT);
-    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedMWD, this, &Interface::updateDataMWD);
-    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedMTW, this, &Interface::updateDataMTW);
-    QObject::connect(nmea_handler, &NMEA_Handler::newDecodedMWV, this, &Interface::updateDataMWV);
+    connect(nmea_handler, &NMEA_Handler::newDecodedGGA, this, &Interface::updateDataGGA);
+    connect(nmea_handler, &NMEA_Handler::newDecodedGLL, this, &Interface::updateDataGLL);
+    connect(nmea_handler, &NMEA_Handler::newDecodedGSV, this, &Interface::updateDataGSV);
+    connect(nmea_handler, &NMEA_Handler::newDecodedVTG, this, &Interface::updateDataVTG);
+    connect(nmea_handler, &NMEA_Handler::newDecodedGSA, this, &Interface::updateDataGSA);
+    connect(nmea_handler, &NMEA_Handler::newDecodedRMC, this, &Interface::updateDataRMC);
+    connect(nmea_handler, &NMEA_Handler::newDecodedHDT, this, &Interface::updateDataHDT);
+    connect(nmea_handler, &NMEA_Handler::newDecodedDBT, this, &Interface::updateDataDBT);
+    connect(nmea_handler, &NMEA_Handler::newDecodedVHW, this, &Interface::updateDataVHW);
+    connect(nmea_handler, &NMEA_Handler::newDecodedZDA, this, &Interface::updateDataZDA);
+    connect(nmea_handler, &NMEA_Handler::newDecodedDPT, this, &Interface::updateDataDPT);
+    connect(nmea_handler, &NMEA_Handler::newDecodedMWD, this, &Interface::updateDataMWD);
+    connect(nmea_handler, &NMEA_Handler::newDecodedMTW, this, &Interface::updateDataMTW);
+    connect(nmea_handler, &NMEA_Handler::newDecodedMWV, this, &Interface::updateDataMWV);
 
     //Timers
     fileRecordingSizeTimer = new QTimer(this);
@@ -110,6 +82,51 @@ void Interface::connectSignalSlot()
 ///////////
 /// GUI ///
 ///////////
+void Interface::initializeLists()
+{
+    acceptedNmeaList = {
+        "OTHER", "GGA", "RMC", "GSV", "GLL",
+        "GSA", "VTG", "DBT", "VHW", "HDT",
+        "DPT", "MWD", "ZDA", "MTW", "MWV"
+    };
+
+    checkboxOutputUDP = {
+        ui->checkBox_udp_output_gga,
+        ui->checkBox_udp_output_rmc,
+        ui->checkBox_udp_output_gsv,
+        ui->checkBox_udp_output_gll,
+        ui->checkBox_udp_output_gsa,
+        ui->checkBox_udp_output_vtg,
+        ui->checkBox_udp_output_hdt,
+        ui->checkBox_udp_output_dbt,
+        ui->checkBox_udp_output_vhw,
+        ui->checkBox_udp_output_zda,
+        ui->checkBox_udp_output_dpt,
+        ui->checkBox_udp_output_mwd,
+        ui->checkBox_udp_output_mwv,
+        ui->checkBox_udp_output_mtw,
+        ui->checkBox_udp_output_others
+    };
+
+    checkboxOutputSerial = {
+        ui->checkBox_serial_output_gga,
+        ui->checkBox_serial_output_rmc,
+        ui->checkBox_serial_output_gsv,
+        ui->checkBox_serial_output_gll,
+        ui->checkBox_serial_output_gsa,
+        ui->checkBox_serial_output_vtg,
+        ui->checkBox_serial_output_hdt,
+        ui->checkBox_serial_output_dbt,
+        ui->checkBox_serial_output_vhw,
+        ui->checkBox_serial_output_zda,
+        ui->checkBox_serial_output_dpt,
+        ui->checkBox_serial_output_mwd,
+        ui->checkBox_serial_output_mwv,
+        ui->checkBox_serial_output_mtw,
+        ui->checkBox_serial_output_others
+    };
+}
+
 void Interface::hideGUI()
 {
     ui->horizontalFrame_udp_ip_address->hide();
@@ -251,7 +268,7 @@ void Interface::displayRawNmeaSentence(const QString &type, const QString &nmeaT
     //Link NMEA to plainText screens
     QMap<QString, QPlainTextEdit*> nmeaSentenceMap = getSentenceMap();
 
-    // Always show TXT regardless of freeze
+    // Always show TXT (gps internal data) regardless of freeze
     if (type == "TXT")
         ui->plainTextEdit_txt->appendPlainText(nmeaText);
 
@@ -265,17 +282,11 @@ void Interface::displayRawNmeaSentence(const QString &type, const QString &nmeaT
 
 QMap<QString, QPlainTextEdit*> Interface::getSentenceMap() const
 {
-    static const QStringList keys = {
-        "OTHER", "GGA", "RMC", "GSV", "GLL",
-        "GSA", "VTG", "DBT", "VHW", "HDT",
-        "DPT", "MWD", "ZDA", "MTW", "MWV"
-    };
-
     QList<QPlainTextEdit*> editors = getPlainTextEditors();
     QMap<QString, QPlainTextEdit*> map;
 
-    for (int i = 0; i < keys.size() && i < editors.size(); ++i)
-        map.insert(keys[i], editors[i]);
+    for (int i = 0; i < acceptedNmeaList.size() && i < editors.size(); ++i)
+        map.insert(acceptedNmeaList[i], editors[i]);
 
     return map;
 }
@@ -588,13 +599,13 @@ void Interface::on_pushButton_activate_serial_output_toggled(bool checked)
 {
     if (!checked)
     {
-        serial_writer->updateOutputNMEA(false);
+        serial_writer->updateSocketOutputActivated(false);
         return;
     }
 
     if (serial_writer->isSerialOpen())
     {
-        serial_writer->updateOutputNMEA(true);
+        serial_writer->updateSocketOutputActivated(true);
     }
     else
     {
@@ -607,82 +618,95 @@ void Interface::on_pushButton_activate_serial_output_toggled(bool checked)
 
 void Interface::on_checkBox_serial_output_gga_toggled(bool checked)
 {
-    serial_writer->updateOutputGGA(checked);
+    serial_writer->updateOutputNMEA("GGA", checked);
 }
 
 void Interface::on_checkBox_serial_output_gsv_toggled(bool checked)
 {
-    serial_writer->updateOutputGSV(checked);
+    serial_writer->updateOutputNMEA("GSV", checked);
 }
 
 void Interface::on_checkBox_serial_output_rmc_toggled(bool checked)
 {
-    serial_writer->updateOutputRMC(checked);
+    serial_writer->updateOutputNMEA("RMC", checked);
 }
 
 void Interface::on_checkBox_serial_output_gsa_toggled(bool checked)
 {
-    serial_writer->updateOutputGSA(checked);
+    serial_writer->updateOutputNMEA("GSA", checked);
 }
 
 void Interface::on_checkBox_serial_output_gll_toggled(bool checked)
 {
-    serial_writer->updateOutputGLL(checked);
+    serial_writer->updateOutputNMEA("GLL", checked);
 }
 
 void Interface::on_checkBox_serial_output_vtg_toggled(bool checked)
 {
-    serial_writer->updateOutputVTG(checked);
+    serial_writer->updateOutputNMEA("VTG", checked);
 }
 
 void Interface::on_checkBox_serial_output_hdt_toggled(bool checked)
 {
-    serial_writer->updateOutputHDT(checked);
+    serial_writer->updateOutputNMEA("HDT", checked);
 }
 
 void Interface::on_checkBox_serial_output_dbt_toggled(bool checked)
 {
-    serial_writer->updateOutputDBT(checked);
+    serial_writer->updateOutputNMEA("DBT", checked);
 }
 
 void Interface::on_checkBox_serial_output_vhw_toggled(bool checked)
 {
-    serial_writer->updateOutputVHW(checked);
+    serial_writer->updateOutputNMEA("VHW", checked);
+}
+
+void Interface::on_checkBox_serial_output_zda_toggled(bool checked)
+{
+    serial_writer->updateOutputNMEA("ZDA", checked);
+}
+
+void Interface::on_checkBox_serial_output_dpt_toggled(bool checked)
+{
+    serial_writer->updateOutputNMEA("DPT", checked);
+}
+
+void Interface::on_checkBox_serial_output_mtw_toggled(bool checked)
+{
+    serial_writer->updateOutputNMEA("MTW", checked);
+}
+
+void Interface::on_checkBox_serial_output_mwv_toggled(bool checked)
+{
+    serial_writer->updateOutputNMEA("MWV", checked);
+}
+
+void Interface::on_checkBox_serial_output_mwd_toggled(bool checked)
+{
+    serial_writer->updateOutputNMEA("MWD", checked);
 }
 
 void Interface::on_checkBox_serial_output_others_toggled(bool checked)
 {
-    serial_writer->updateOutputOthers(checked);
+    serial_writer->updateOutputNMEA("OTHER", checked);
 }
 
 void Interface::on_pushButton_check_all_serial_output_clicked()
 {
-    ui->checkBox_serial_output_gga->setChecked(true);
-    ui->checkBox_serial_output_rmc->setChecked(true);
-    ui->checkBox_serial_output_gsv->setChecked(true);
-    ui->checkBox_serial_output_gll->setChecked(true);
-    ui->checkBox_serial_output_gsa->setChecked(true);
-    ui->checkBox_serial_output_vtg->setChecked(true);
-    ui->checkBox_serial_output_hdt->setChecked(true);
-    ui->checkBox_serial_output_dbt->setChecked(true);
-    ui->checkBox_serial_output_vhw->setChecked(true);
-    ui->checkBox_serial_output_others->setChecked(true);
+    updateCheckBoxSerialOutput(true);
 }
 
 void Interface::on_pushButton_uncheck_all_serial_output_clicked()
 {
-    ui->checkBox_serial_output_gga->setChecked(false);
-    ui->checkBox_serial_output_rmc->setChecked(false);
-    ui->checkBox_serial_output_gsv->setChecked(false);
-    ui->checkBox_serial_output_gll->setChecked(false);
-    ui->checkBox_serial_output_gsa->setChecked(false);
-    ui->checkBox_serial_output_vtg->setChecked(false);
-    ui->checkBox_serial_output_hdt->setChecked(false);
-    ui->checkBox_serial_output_dbt->setChecked(false);
-    ui->checkBox_serial_output_vhw->setChecked(false);
-    ui->checkBox_serial_output_others->setChecked(false);
+    updateCheckBoxSerialOutput(false);
 }
 
+void Interface::updateCheckBoxSerialOutput(bool check)
+{
+    const auto& boxes = checkboxOutputSerial;
+    for (QCheckBox* box : boxes)
+        box->setChecked(check);
+}
 
 
 
@@ -736,88 +760,104 @@ bool Interface::checkUdpOutputPortIsFree()
 //Check data to outpout
 void Interface::on_pushButton_activate_udp_output_toggled(bool checked)
 {
-    if(checked)
-        if(checkUdpOutputPortIsFree())
-            udp_writer->updateOutputNMEA(checked);
+    if(checked && checkUdpOutputPortIsFree())
+        udp_writer->updateSocketOutputActivated(true);
+    else if(!checked)
+        udp_writer->updateSocketOutputActivated(false);
 }
 
 void Interface::on_checkBox_udp_output_gga_toggled(bool checked)
 {
-    udp_writer->updateOutputGGA(checked);
+    udp_writer->updateOutputNMEA("GGA", checked);
 }
 
 void Interface::on_checkBox_udp_output_rmc_toggled(bool checked)
 {
-    udp_writer->updateOutputRMC(checked);
+    udp_writer->updateOutputNMEA("RMC", checked);
 }
 
 void Interface::on_checkBox_udp_output_gsv_toggled(bool checked)
 {
-    udp_writer->updateOutputGSV(checked);
+    udp_writer->updateOutputNMEA("GSV", checked);
 }
 
 void Interface::on_checkBox_udp_output_gll_toggled(bool checked)
 {
-    udp_writer->updateOutputGLL(checked);
+    udp_writer->updateOutputNMEA("GLL", checked);
 }
 
 void Interface::on_checkBox_udp_output_gsa_toggled(bool checked)
 {
-    udp_writer->updateOutputGSA(checked);
+    udp_writer->updateOutputNMEA("GSA", checked);
 }
 
 void Interface::on_checkBox_udp_output_vtg_toggled(bool checked)
 {
-    udp_writer->updateOutputVTG(checked);
+    udp_writer->updateOutputNMEA("VTG", checked);
 }
 
 void Interface::on_checkBox_udp_output_hdt_toggled(bool checked)
 {
-    udp_writer->updateOutputHDT(checked);
+    udp_writer->updateOutputNMEA("HDT", checked);
 }
 
 void Interface::on_checkBox_udp_output_dbt_toggled(bool checked)
 {
-    udp_writer->updateOutputDBT(checked);
+    udp_writer->updateOutputNMEA("DBT", checked);
 }
 
 void Interface::on_checkBox_udp_output_vhw_toggled(bool checked)
 {
-    udp_writer->updateOutputVHW(checked);
+    udp_writer->updateOutputNMEA("VHW", checked);
+}
+
+void Interface::on_checkBox_udp_output_zda_toggled(bool checked)
+{
+udp_writer->updateOutputNMEA("ZDA", checked);
+}
+
+void Interface::on_checkBox_udp_output_dpt_toggled(bool checked)
+{
+    udp_writer->updateOutputNMEA("DPT", checked);
+}
+
+void Interface::on_checkBox_udp_output_mtw_toggled(bool checked)
+{
+    udp_writer->updateOutputNMEA("MTW", checked);
+}
+
+void Interface::on_checkBox_udp_output_mwv_toggled(bool checked)
+{
+    udp_writer->updateOutputNMEA("MWV", checked);
+}
+
+void Interface::on_checkBox_udp_output_mwd_toggled(bool checked)
+{
+    udp_writer->updateOutputNMEA("MWD", checked);
 }
 
 void Interface::on_checkBox_udp_output_others_toggled(bool checked)
 {
-    udp_writer->updateOutputOthers(checked);
+    udp_writer->updateOutputNMEA("OTHER", checked);
 }
 
 void Interface::on_pushButton_check_all_udp_output_clicked()
 {
-    ui->checkBox_udp_output_gga->setChecked(true);
-    ui->checkBox_udp_output_rmc->setChecked(true);
-    ui->checkBox_udp_output_gsv->setChecked(true);
-    ui->checkBox_udp_output_gll->setChecked(true);
-    ui->checkBox_udp_output_gsa->setChecked(true);
-    ui->checkBox_udp_output_vtg->setChecked(true);
-    ui->checkBox_udp_output_hdt->setChecked(true);
-    ui->checkBox_udp_output_dbt->setChecked(true);
-    ui->checkBox_udp_output_vhw->setChecked(true);
-    ui->checkBox_udp_output_others->setChecked(true);
+    updateCheckBoxUdpOutput(true);
 }
 
 void Interface::on_pushButton_uncheck_all_udp_output_clicked()
 {
-    ui->checkBox_udp_output_gga->setChecked(false);
-    ui->checkBox_udp_output_rmc->setChecked(false);
-    ui->checkBox_udp_output_gsv->setChecked(false);
-    ui->checkBox_udp_output_gll->setChecked(false);
-    ui->checkBox_udp_output_gsa->setChecked(false);
-    ui->checkBox_udp_output_vtg->setChecked(false);
-    ui->checkBox_udp_output_hdt->setChecked(false);
-    ui->checkBox_udp_output_dbt->setChecked(false);
-    ui->checkBox_udp_output_vhw->setChecked(false);
-    ui->checkBox_udp_output_others->setChecked(false);
+    updateCheckBoxUdpOutput(false);
 }
+
+void Interface::updateCheckBoxUdpOutput(bool check)
+{
+    const auto& boxes = checkboxOutputUDP;
+    for (QCheckBox* box : boxes)
+        box->setChecked(check);
+}
+
 
 
 

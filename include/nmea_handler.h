@@ -21,6 +21,7 @@ class NMEA_Handler : public QObject
         //Frequency timers
         QElapsedTimer timer_gsv, timer_gga, timer_vtg, timer_gll, timer_gsa, timer_rmc, timer_hdt, timer_dbt, timer_vhw,
                       timer_zda, timer_dpt, timer_mwd, timer_mwv, timer_mtw;
+
         qint64 lastUpdateTimeGGA = -1, lastUpdateTimeGSV = -1, lastUpdateTimeRMC = -1, lastUpdateTimeVTG = -1,
                lastUpdateTimeGLL = -1, lastUpdateTimeGSA = -1, lastUpdateTimeHDT = -1, lastUpdateTimeDBT = -1,
                lastUpdateTimeVHW = -1, lastUpdateTimeDPT = -1, lastUpdateTimeZDA = -1, lastUpdateTimeMWD = -1,
@@ -49,25 +50,10 @@ class NMEA_Handler : public QObject
         double calculateFrequency(QElapsedTimer &timer, qint64 &lastTime);
         QByteArray removeAsterisk(const QByteArray lastField);
         void checkMinimumLineSize(const QList<QByteArray> &fields, int minSize);
+        void checkEqualLineSize(const QList<QByteArray> &fields, int size);
 
     signals:
         void newNMEASentence(const QString &type, const QString &nmeaText);
-        void newTXTSentence(const QString &nmeaText);
-        void newGGASentence(const QString &nmeaText);
-        void newRMCSentence(const QString &nmeaText);
-        void newGSVSentence(const QString &nmeaText);
-        void newGLLSentence(const QString &nmeaText);
-        void newGSASentence(const QString &nmeaText);
-        void newVTGSentence(const QString &nmeaText);
-        void newHDTSentence(const QString &nmeaText);
-        void newDBTSentence(const QString &nmeaText);
-        void newVHWSentence(const QString &nmeaText);
-        void newZDASentence(const QString &nmeaText);
-        void newDPTSentence(const QString &nmeaText);
-        void newMWDSentence(const QString &nmeaText);
-        void newMWVSentence(const QString &nmeaText);
-        void newMTWSentence(const QString &nmeaText);
-        void newOtherSentence(const QString &nmeaText);
 
         void newDecodedGSA(double pdop, double hdop, double vdop, double freqHz);
         void newDecodedGSV(int totalSatellites, double freqHz);

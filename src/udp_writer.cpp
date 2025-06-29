@@ -20,7 +20,7 @@ UdpWriter::~UdpWriter()
 /////////////////
 void UdpWriter::sendData(const QString &line)
 {
-    if(getOutputNMEA())
+    if(getSocketOutputActivated())
     {
         QByteArray data = line.toUtf8();
         udpSocket.writeDatagram(data, udpAddress, udpPort);

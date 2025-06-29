@@ -7,7 +7,24 @@
 
 OutputWriter::OutputWriter(QObject *parent) : QObject{parent}
 {
-
+    outputFlags =
+    {
+        { "GGA",    false },
+        { "RMC",    false },
+        { "GSV",    false },
+        { "GLL",    false },
+        { "GSA",    false },
+        { "VTG",    false },
+        { "HDT",    false },
+        { "DBT",    false },
+        { "VHW",    false },
+        { "ZDA",    false },
+        { "DPT",    false },
+        { "MTW",    false },
+        { "MWD",    false },
+        { "MWV",    false },
+        { "OTHER", false }
+    };
 }
 
 OutputWriter::~OutputWriter()
@@ -22,6 +39,7 @@ OutputWriter::~OutputWriter()
 /////////////////
 void OutputWriter::sendData(const QString &line)
 {
+    //virtual function
     Q_UNUSED(line);
 }
 
@@ -30,9 +48,9 @@ void OutputWriter::sendData(const QString &line)
 ////////////////
 /// Get data ///
 ////////////////
-bool OutputWriter::getOutputNMEA()
+bool OutputWriter::getSocketOutputActivated()
 {
-    return outputNMEA;
+    return socketOutputActivated;
 }
 
 
@@ -40,59 +58,17 @@ bool OutputWriter::getOutputNMEA()
 //////////////////////
 /// Update outputs ///
 //////////////////////
-void OutputWriter::updateOutputNMEA(bool check)
+void OutputWriter::updateSocketOutputActivated(bool check)
 {
-    outputNMEA = check;
+    socketOutputActivated = check;
 }
 
-void OutputWriter::updateOutputGGA(bool check)
+void OutputWriter::updateOutputNMEA(const QString &type, bool check)
 {
-    outputGGA = check;
-}
-
-void OutputWriter::updateOutputRMC(bool check)
-{
-    outputRMC = check;
-}
-
-void OutputWriter::updateOutputGSV(bool check)
-{
-    outputGSV = check;
-}
-
-void OutputWriter::updateOutputGLL(bool check)
-{
-    outputGLL = check;
-}
-
-void OutputWriter::updateOutputGSA(bool check)
-{
-    outputGSA = check;
-}
-
-void OutputWriter::updateOutputVTG(bool check)
-{
-    outputVTG = check;
-}
-
-void OutputWriter::updateOutputHDT(bool check)
-{
-    outputHDT = check;
-}
-
-void OutputWriter::updateOutputDBT(bool check)
-{
-    outputDBT = check;
-}
-
-void OutputWriter::updateOutputVHW(bool check)
-{
-    outputVHW = check;
-}
-
-void OutputWriter::updateOutputOthers(bool check)
-{
-    outputOthers = check;
+    if (outputFlags.contains(type))
+        outputFlags[type] = check;
+    else
+        qDebug() << "Unknown type";
 }
 
 
@@ -100,63 +76,10 @@ void OutputWriter::updateOutputOthers(bool check)
 ////////////////////
 /// Public slots ///
 ////////////////////
-void OutputWriter::publishGGA(const QString &line)
+void OutputWriter::publishNMEA(const QString &type, const QString &nmeaText)
 {
-    if(outputGGA)
-        sendData(line);
+    if (outputFlags[type])
+        sendData(nmeaText);
 }
 
-void OutputWriter::publishRMC(const QString &line)
-{
-    if(outputRMC)
-        sendData(line);
-}
-
-void OutputWriter::publishGSV(const QString &line)
-{
-    if(outputGSV)
-        sendData(line);
-}
-
-void OutputWriter::publishGLL(const QString &line)
-{
-    if(outputGLL)
-        sendData(line);
-}
-
-void OutputWriter::publishGSA(const QString &line)
-{
-    if(outputGSA)
-        sendData(line);
-}
-
-void OutputWriter::publishVTG(const QString &line)
-{
-    if(outputVTG)
-        sendData(line);
-}
-
-void OutputWriter::publishHDT(const QString &line)
-{
-    if(outputHDT)
-        sendData(line);
-}
-
-void OutputWriter::publishDBT(const QString &line)
-{
-    if(outputDBT)
-        sendData(line);
-}
-
-void OutputWriter::publishVHW(const QString &line)
-{
-    if(outputVHW)
-        sendData(line);
-}
-
-void OutputWriter::publishOthers(const QString &line)
-{
-    if(outputOthers)
-        sendData(line);
-}
 

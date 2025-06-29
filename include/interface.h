@@ -41,7 +41,9 @@ class Interface : public QMainWindow
         UdpWriter *udp_writer;
         TextFileWritter *text_file_writer;
         QTimer *fileRecordingSizeTimer;
-
+        QStringList acceptedNmeaList;
+        QList<QCheckBox*> checkboxOutputSerial;
+        QList<QCheckBox*> checkboxOutputUDP;
 
     private:
         QMap<QString, QPlainTextEdit*> getSentenceMap() const;
@@ -59,6 +61,9 @@ class Interface : public QMainWindow
         void updateFileSize();
         QString getRecordingFilePath();
         bool checkUdpOutputPortIsFree();
+        void updateCheckBoxSerialOutput(bool check);
+        void updateCheckBoxUdpOutput(bool check);
+        void initializeLists();
 
     private slots:
         void on_pushButton_clear_raw_sentences_screens_clicked();
@@ -73,9 +78,16 @@ class Interface : public QMainWindow
         void on_checkBox_udp_output_gll_toggled(bool checked);
         void on_checkBox_udp_output_gsa_toggled(bool checked);
         void on_checkBox_udp_output_vtg_toggled(bool checked);
+        void on_checkBox_udp_output_zda_toggled(bool checked);
+        void on_checkBox_udp_output_dpt_toggled(bool checked);
+        void on_checkBox_udp_output_mtw_toggled(bool checked);
+        void on_checkBox_udp_output_mwv_toggled(bool checked);
+        void on_checkBox_udp_output_mwd_toggled(bool checked);
+        void on_checkBox_udp_output_hdt_toggled(bool checked);
+        void on_checkBox_udp_output_dbt_toggled(bool checked);
+        void on_checkBox_udp_output_vhw_toggled(bool checked);
         void on_pushButton_activate_udp_output_toggled(bool checked);
         void on_checkBox_udp_output_others_toggled(bool checked);
-
         void on_pushButton_check_all_udp_output_clicked();
         void on_pushButton_uncheck_all_udp_output_clicked();
 
@@ -100,18 +112,19 @@ class Interface : public QMainWindow
         void on_checkBox_serial_output_gll_toggled(bool checked);
         void on_checkBox_serial_output_vtg_toggled(bool checked);
         void on_checkBox_serial_output_others_toggled(bool checked);
+        void on_checkBox_serial_output_zda_toggled(bool checked);
+        void on_checkBox_serial_output_dpt_toggled(bool checked);
+        void on_checkBox_serial_output_mtw_toggled(bool checked);
+        void on_checkBox_serial_output_mwv_toggled(bool checked);
+        void on_checkBox_serial_output_mwd_toggled(bool checked);
+        void on_checkBox_serial_output_hdt_toggled(bool checked);
+        void on_checkBox_serial_output_dbt_toggled(bool checked);
+        void on_checkBox_serial_output_vhw_toggled(bool checked);
         void on_pushButton_check_all_serial_output_clicked();
         void on_pushButton_uncheck_all_serial_output_clicked();
 
         void on_pushButton_connect_udp_input_clicked();
         void on_pushButton_disconnect_udp_input_clicked();
-
-        void on_checkBox_serial_output_hdt_toggled(bool checked);
-        void on_checkBox_serial_output_dbt_toggled(bool checked);
-        void on_checkBox_serial_output_vhw_toggled(bool checked);
-        void on_checkBox_udp_output_hdt_toggled(bool checked);
-        void on_checkBox_udp_output_dbt_toggled(bool checked);
-        void on_checkBox_udp_output_vhw_toggled(bool checked);
 
     private slots:
         void scrollDownPlainText(int index);

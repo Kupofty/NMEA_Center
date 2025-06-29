@@ -35,12 +35,14 @@ void TextFileWritter::closeFile()
         file.close();
 }
 
-void TextFileWritter::writeRawSentences(const QByteArray &line)
+void TextFileWritter::writeRawSentences(const QString &type, const QString &nmeaText)
 {
-    if(file.isOpen())
+    Q_UNUSED(type);
+
+    if (file.isOpen())
     {
         QTextStream out(&file);
-        out << line << '\n';
+        out << nmeaText << '\n';
         out.flush();
     }
 }

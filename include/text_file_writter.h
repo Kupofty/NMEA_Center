@@ -21,7 +21,8 @@ class TextFileWritter : public QObject
         QFile file;
 
     public slots:
-        void writeRawSentences(const QByteArray &line);
+        void writeRawSentences(const QString &type, const QString &nmeaText);
+
 
 
 };
