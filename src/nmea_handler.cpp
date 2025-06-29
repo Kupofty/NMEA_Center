@@ -29,7 +29,7 @@ void NMEA_Handler::handleRawSentences(const QByteArray &line)
     QList<QByteArray> fields = line.split(',');
     QString nmeaFormat = QString::fromUtf8(line.mid(3, 3));
 
-    if (!supportedFormats.contains(nmeaFormat))
+    if (!acceptedNmeaList.contains(nmeaFormat))
         nmeaFormat ="OTHER";
 
     emit newNMEASentence(nmeaFormat, nmeaText);
@@ -196,7 +196,7 @@ void NMEA_Handler::handleGLL(const QList<QByteArray> &fields)
     QTime utcTime = QTime::fromString(timeStr.left(6), "hhmmss");
 
     // Status and mode
-    QString status = fields[6];
+    QString status = removeAsterisk(fields[6]);
 
     //Calculate frequency
     double freqHz = calculateFrequency(timer_gll, lastUpdateTimeGLL);
@@ -205,7 +205,6 @@ void NMEA_Handler::handleGLL(const QList<QByteArray> &fields)
         latitude = longitude = 0;
 
     emit newDecodedGLL(utcTime.toString(), latitude, longitude, freqHz);
-
 }
 
 void NMEA_Handler::handleGSA(const QList<QByteArray> &fields)

@@ -16,6 +16,7 @@
 #include "udp_reader.h"
 #include "udp_writer.h"
 #include "text_file_writter.h"
+#include "nmea_list.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui
@@ -41,7 +42,7 @@ class Interface : public QMainWindow
         UdpWriter *udp_writer;
         TextFileWritter *text_file_writer;
         QTimer *fileRecordingSizeTimer;
-        QStringList acceptedNmeaList;
+        QMap<QString, QPlainTextEdit*> nmeaSentenceMap;
         QList<QCheckBox*> checkboxOutputSerial;
         QList<QCheckBox*> checkboxOutputUDP;
 

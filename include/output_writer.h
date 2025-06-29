@@ -6,6 +6,8 @@
 #include <QDebug>
 #include <QString>
 
+#include "nmea_list.h"
+
 class OutputWriter : public QObject
 {
     Q_OBJECT
@@ -16,12 +18,12 @@ class OutputWriter : public QObject
 
         virtual void sendData(const QString &line) = 0;
 
-        //Get
+        // Get
         bool getSocketOutputActivated();
 
-        //Update authorized outputs
-        void updateSocketOutputActivated(bool check); //global on/off
-        void updateOutputNMEA(const QString &type, bool check); //nmea specific
+        // Update authorized outputs
+        void updateSocketOutputActivated(bool check);
+        void updateOutputNMEA(const QString &type, bool check);
 
     public slots:
         void publishNMEA(const QString &type, const QString &nmeaText);

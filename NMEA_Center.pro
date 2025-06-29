@@ -20,6 +20,7 @@ SOURCES += \
 
 HEADERS += \
     include/interface.h \
+    include/nmea_list.h \
     include/output_writer.h \
     include/serial_reader.h \
     include/nmea_handler.h \

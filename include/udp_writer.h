@@ -10,21 +10,21 @@ class UdpWriter : public OutputWriter
 {
     Q_OBJECT
 
-public:
-    explicit UdpWriter(QObject *parent = nullptr);
-    ~UdpWriter();
+    public:
+        explicit UdpWriter(QObject *parent = nullptr);
+        ~UdpWriter();
 
-    //Specific to UDP
-    void sendData(const QString &data) override;
+        //Specific to UDP
+        void sendData(const QString &data) override;
 
-    // UDP-specific config
-    void updateUdpPort(int port);
-    void updateUdpMethod(const QHostAddress &udpAddress);
+        // UDP-specific config
+        void updateUdpPort(int port);
+        void updateUdpMethod(const QHostAddress &udpAddress);
 
-private:
-    QUdpSocket udpSocket;
-    QHostAddress udpAddress = QHostAddress::Broadcast;
-    int udpPort = 1024;
+    private:
+        QUdpSocket udpSocket;
+        QHostAddress udpAddress = QHostAddress::Broadcast;
+        int udpPort = 1024;
 };
 
 #endif // UDP_WRITER_H

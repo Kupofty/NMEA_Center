@@ -7,24 +7,10 @@
 
 OutputWriter::OutputWriter(QObject *parent) : QObject{parent}
 {
-    outputFlags =
-    {
-        { "GGA",    false },
-        { "RMC",    false },
-        { "GSV",    false },
-        { "GLL",    false },
-        { "GSA",    false },
-        { "VTG",    false },
-        { "HDT",    false },
-        { "DBT",    false },
-        { "VHW",    false },
-        { "ZDA",    false },
-        { "DPT",    false },
-        { "MTW",    false },
-        { "MWD",    false },
-        { "MWV",    false },
-        { "OTHER", false }
-    };
+    //Define outputFlags map
+    for (const QString &type : acceptedNmeaList) {
+        outputFlags[type] = false;
+    }
 }
 
 OutputWriter::~OutputWriter()

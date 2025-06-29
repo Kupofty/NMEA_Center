@@ -84,12 +84,6 @@ void Interface::connectSignalSlot()
 ///////////
 void Interface::initializeLists()
 {
-    acceptedNmeaList = {
-        "OTHER", "GGA", "RMC", "GSV", "GLL",
-        "GSA", "VTG", "DBT", "VHW", "HDT",
-        "DPT", "MWD", "ZDA", "MTW", "MWV"
-    };
-
     checkboxOutputUDP = {
         ui->checkBox_udp_output_gga,
         ui->checkBox_udp_output_rmc,
@@ -125,6 +119,9 @@ void Interface::initializeLists()
         ui->checkBox_serial_output_mtw,
         ui->checkBox_serial_output_others
     };
+
+    nmeaSentenceMap = getSentenceMap();
+
 }
 
 void Interface::hideGUI()
@@ -265,18 +262,11 @@ void Interface::updateUdpSenderDetails()
 //Display On Screens
 void Interface::displayRawNmeaSentence(const QString &type, const QString &nmeaText)
 {
-    //Link NMEA to plainText screens
-    QMap<QString, QPlainTextEdit*> nmeaSentenceMap = getSentenceMap();
-
-    // Always show TXT (gps internal data) regardless of freeze
-    if (type == "TXT")
-        ui->plainTextEdit_txt->appendPlainText(nmeaText);
-
     // Don't display sentences if freeze button is checked
     if (ui->pushButton_freeze_raw_sentences_screens->isChecked())
         return;
 
-    if (type != "TXT" && nmeaSentenceMap.contains(type))
+    if(nmeaSentenceMap.contains(type))
         nmeaSentenceMap[type]->appendPlainText(nmeaText);
 }
 
@@ -326,21 +316,22 @@ QList<QPlainTextEdit*> Interface::getPlainTextEditors() const
 {
     return
     {
-        ui->plainTextEdit_others,
+        ui->plainTextEdit_dbt,
+        ui->plainTextEdit_dpt,
         ui->plainTextEdit_gga,
-        ui->plainTextEdit_rmc,
-        ui->plainTextEdit_gsv,
         ui->plainTextEdit_gll,
         ui->plainTextEdit_gsa,
-        ui->plainTextEdit_vtg,
-        ui->plainTextEdit_dbt,
-        ui->plainTextEdit_vhw,
+        ui->plainTextEdit_gsv,
         ui->plainTextEdit_hdt,
-        ui->plainTextEdit_dpt,
-        ui->plainTextEdit_mwd,
-        ui->plainTextEdit_zda,
         ui->plainTextEdit_mtw,
-        ui->plainTextEdit_mwv
+        ui->plainTextEdit_mwd,
+        ui->plainTextEdit_mwv,
+        ui->plainTextEdit_others,
+        ui->plainTextEdit_rmc,
+        ui->plainTextEdit_txt,
+        ui->plainTextEdit_vhw,
+        ui->plainTextEdit_vtg,
+        ui->plainTextEdit_zda
     };
 }
 

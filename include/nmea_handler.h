@@ -6,6 +6,8 @@
 #include <QDebug>
 #include <QTime>
 
+#include "nmea_list.h"
+
 class NMEA_Handler : public QObject
 {
     Q_OBJECT
@@ -26,9 +28,6 @@ class NMEA_Handler : public QObject
                lastUpdateTimeGLL = -1, lastUpdateTimeGSA = -1, lastUpdateTimeHDT = -1, lastUpdateTimeDBT = -1,
                lastUpdateTimeVHW = -1, lastUpdateTimeDPT = -1, lastUpdateTimeZDA = -1, lastUpdateTimeMWD = -1,
                lastUpdateTimeMWV = -1, lastUpdateTimeMTW = -1;
-
-        QSet<QString> supportedFormats = { "GGA", "RMC", "GSV", "GLL", "GSA", "VTG", "HDT", "DBT", "VHW",
-                                           "ZDA", "DPT", "MWD", "MWV", "MTW", "TXT" };
 
     private:
         void handleGGA(const QList<QByteArray> &fields);
