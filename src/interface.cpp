@@ -17,6 +17,9 @@ Interface::Interface(QWidget *parent) : QMainWindow(parent),
     ui->tabWidget->setCurrentWidget(ui->tab_connection);
     this->showMaximized();
 
+    ui->quickWidget->setSource(QUrl(QStringLiteral("qrc:/map.qml")));
+    ui->quickWidget->show();
+
     //Hide widgets
     hideGUI();
 
