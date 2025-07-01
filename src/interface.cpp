@@ -17,9 +17,6 @@ Interface::Interface(QWidget *parent) : QMainWindow(parent),
     ui->tabWidget->setCurrentWidget(ui->tab_connection);
     this->showMaximized();
 
-    ui->quickWidget->setSource(QUrl(QStringLiteral("qrc:/map.qml")));
-    ui->quickWidget->show();
-
     //Hide widgets
     hideGUI();
 
@@ -31,6 +28,13 @@ Interface::Interface(QWidget *parent) : QMainWindow(parent),
 
     //Create lists (NMEA, UI elements, etc)
     initializeLists();
+
+    //QML Map
+    ui->quickWidget_map->setSource(QUrl(QStringLiteral("qrc:/map.qml")));
+    ui->quickWidget_map->show();
+    qmlMapObject = ui->quickWidget_map->rootObject();
+    connect(this, SIGNAL(setCenterPosition(QVariant,QVariant)), qmlMapObject, SLOT(setCenterPosition(QVariant,QVariant)));
+    connect(this, SIGNAL(setLocationMarking(QVariant,QVariant)), qmlMapObject, SLOT(setLocationMarking(QVariant,QVariant)));
 }
 
 Interface::~Interface()
@@ -937,3 +941,19 @@ QString Interface::getRecordingFilePath()
 
     return fullPath;
 }
+
+
+
+
+
+void Interface::on_pushButton_moveToCoordinates_Map_clicked()
+{
+     emit setCenterPosition(ui->doubleSpinBox_latitude_map->value(), ui->doubleSpinBox_longitude_map->value());
+}
+
+
+void Interface::on_pushButton_putMarkerOnCoordinates_Map_clicked()
+{
+    emit setLocationMarking(ui->doubleSpinBox_latitude_map->value(), ui->doubleSpinBox_longitude_map->value());
+}
+

@@ -7,6 +7,9 @@
 #include <QStandardPaths>
 #include <QTimer>
 #include <QScrollBar>
+#include <QVariant>
+#include <QtGui>
+#include <QtQuick>
 
 #include "ui_interface.h"
 
@@ -45,6 +48,7 @@ class Interface : public QMainWindow
         QMap<QString, QPlainTextEdit*> nmeaSentenceMap;
         QList<QCheckBox*> checkboxOutputSerial;
         QList<QCheckBox*> checkboxOutputUDP;
+        QQuickItem *qmlMapObject;
 
     private:
         QMap<QString, QPlainTextEdit*> getSentenceMap() const;
@@ -131,6 +135,9 @@ class Interface : public QMainWindow
         void scrollDownPlainText(int index);
         void updateUdpSenderDetails();
 
+        void on_pushButton_moveToCoordinates_Map_clicked();
+        void on_pushButton_putMarkerOnCoordinates_Map_clicked();
+
     public slots:
         void displayRawNmeaSentence(const QString &type, const QString &line);
         void updateDataGSV(int totalSatellites, double freq);
@@ -147,6 +154,10 @@ class Interface : public QMainWindow
         void updateDataMWD(double dir1, QString dir1Unit, double dir2, QString dir2Unit, double speed1, QString speed1Unit, double speed2, QString speed2Unit, double freqHz);
         void updateDataMTW(double temp, QString tempUnit, double freqHz);
         void updateDataMWV(double angle, QString ref, double speed, QString unit, double freqHz);
+
+    signals:
+        void setCenterPosition(QVariant, QVariant);
+        void setLocationMarking(QVariant, QVariant);
 };
 
 #endif // INTERFACE_H

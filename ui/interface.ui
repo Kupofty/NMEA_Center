@@ -666,12 +666,114 @@
         <string>Map</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_10">
-        <item row="0" column="0">
-         <widget class="QQuickWidget" name="quickWidget">
+        <item row="1" column="4">
+         <widget class="QDoubleSpinBox" name="doubleSpinBox_latitude_map">
+          <property name="minimum">
+           <double>-90.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>90.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>43.500000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="4">
+         <widget class="QDoubleSpinBox" name="doubleSpinBox_longitude_map">
+          <property name="minimum">
+           <double>-180.000000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>180.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>5.300000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="3">
+         <widget class="QLabel" name="label_29">
+          <property name="text">
+           <string>Latitude :</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignmentFlag::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="6">
+         <widget class="QQuickWidget" name="quickWidget_map">
           <property name="resizeMode">
            <enum>QQuickWidget::ResizeMode::SizeRootObjectToView</enum>
           </property>
          </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QPushButton" name="pushButton_putMarkerOnCoordinates_Map">
+          <property name="text">
+           <string>Put marker on coordinates</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <spacer name="horizontalSpacer_12">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="5">
+         <spacer name="horizontalSpacer_20">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="2" column="3">
+         <widget class="QLabel" name="label_87">
+          <property name="text">
+           <string>Longitude : </string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignmentFlag::AlignCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QPushButton" name="pushButton_moveToCoordinates_Map">
+          <property name="text">
+           <string>Move to coordinates</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <spacer name="horizontalSpacer_23">
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Policy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>80</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
         </item>
        </layout>
       </widget>
