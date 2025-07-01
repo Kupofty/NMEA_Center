@@ -5,11 +5,17 @@ import QtPositioning
 
 Item {
 
+    id: window
+
     //OSM Map
     Plugin {
         id: mapPlugin
         name: "osm"
         locales: "fr_FR"
+        PluginParameter {
+            name:"osm.mapping.custom.host"
+            value: "https://tile.openstreetmap.org/"
+        }
     }
 
     Map {
@@ -18,6 +24,7 @@ Item {
         plugin: mapPlugin
         center: QtPositioning.coordinate(43.5, 5.3167)
         zoomLevel: 10
+        activeMapType: map.supportedMapTypes[map.supportedMapTypes.length - 1]
 
         //Zoom
         WheelHandler {
