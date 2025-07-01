@@ -17,9 +17,38 @@ Item {
         anchors.fill: parent
         plugin: mapPlugin
         center: QtPositioning.coordinate(43.5, 5.3167)
-        zoomLevel: 14
+        zoomLevel: 10
+
+        //Zoom
+        WheelHandler {
+            id: wheelZoom
+            target: map
+
+            onActiveChanged: {
+                if (!active) return;
+
+                if (rotation > 0)
+                    map.zoomLevel = Math.min(map.maximumZoomLevel, map.zoomLevel + 0.1);
+                else if (rotation < 0)
+                    map.zoomLevel = Math.max(map.minimumZoomLevel, map.zoomLevel - 0.1);
+            }
+        }
+
     }
 
+    // Label showing zoom level
+    Label {
+        id: zoomLabel
+        anchors.top: parent.top
+        anchors.right: parent.right
+        padding: 8
+        background: Rectangle {
+            color: "lightgray"
+            radius: 4
+        }
+        font.pixelSize: 14
+        text: "Zoom Level: " + map.zoomLevel.toFixed(1)
+    }
 
     MouseArea
     {
@@ -55,12 +84,13 @@ Item {
         Label {
             anchors.left: parent.left
             anchors.top: parent.top
-            padding: 6
+            padding: 8
             background: Rectangle {
                 color: "lightgray"
                 radius: 4
             }
-            text: "Lat: %1\nLon: %2".arg(parent.coordinate.latitude.toFixed(6)).arg(parent.coordinate.longitude.toFixed(6))
+            font.pixelSize: 14
+            text: "Cursor Position\nLat: %1\nLon: %2".arg(parent.coordinate.latitude.toFixed(6)).arg(parent.coordinate.longitude.toFixed(6))
         }
 
     }
