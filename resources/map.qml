@@ -23,6 +23,9 @@ Item {
     property double boatLongitude : 0
     property double boatHeading : 0
 
+    property double zoomSpeed : 0.2
+    property double lastWheelRotation : 0
+
     property Component locationmarker: locmarker
     property Component boatMapMarker: boatmarker
 
@@ -58,14 +61,13 @@ Item {
             id: wheelZoom
             target: map
 
-            onActiveChanged: {
-                if (!active) return;
-
-                //Need to fix zoom problem, "rotation" keep last state of wheel
-                if (rotation > 0)
-                    map.zoomLevel = Math.min(map.maximumZoomLevel, map.zoomLevel + 0.1);
-                else if (rotation < 0)
-                    map.zoomLevel = Math.max(map.minimumZoomLevel, map.zoomLevel - 0.1);
+            onWheel: {
+                var wheelRotation = rotation - lastWheelRotation
+                if (wheelRotation > 0)
+                    map.zoomLevel = Math.min(map.maximumZoomLevel, map.zoomLevel + zoomSpeed);
+                else if (wheelRotation < 0)
+                    map.zoomLevel = Math.max(map.minimumZoomLevel, map.zoomLevel - zoomSpeed);
+                lastWheelRotation = rotation
             }
         }
     }
@@ -117,7 +119,7 @@ Item {
     Label {
         id: zoomLabel
         anchors.top: parent.top
-        anchors.topMargin: 90
+        anchors.topMargin: 8
         anchors.left: parent.left
         anchors.leftMargin: 8
         padding: 8
@@ -200,10 +202,10 @@ Item {
         // Label showing cursor position
         Label {
             id: cursorPosition
+            anchors.top: parent.top
+            anchors.topMargin: 50
             anchors.left: parent.left
             anchors.leftMargin: 8
-            anchors.top: parent.top
-            anchors.topMargin: 8
             padding: 8
             background: Rectangle {
                 color: "darkgrey"
