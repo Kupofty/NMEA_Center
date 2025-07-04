@@ -69,6 +69,7 @@ class Interface : public QMainWindow
         void updateCheckBoxSerialOutput(bool check);
         void updateCheckBoxUdpOutput(bool check);
         void initializeLists();
+        void displayPositionOnMap(double latitude, double longitude, double heading);
 
     private slots:
         void on_pushButton_clear_raw_sentences_screens_clicked();
@@ -137,6 +138,7 @@ class Interface : public QMainWindow
 
         void on_pushButton_moveToCoordinates_Map_clicked();
         void on_pushButton_putMarkerOnCoordinates_Map_clicked();
+        void on_pushButton_clearMarkers_clicked();
 
     public slots:
         void displayRawNmeaSentence(const QString &type, const QString &line);
@@ -158,6 +160,10 @@ class Interface : public QMainWindow
     signals:
         void setCenterPosition(QVariant, QVariant);
         void setLocationMarking(QVariant, QVariant);
+        void updateBoatOnMap();
+        void clearMapMarkers();
+        void updateBoatPositiongMap(QVariant, QVariant);
+        void updateBoatHeadingMap(QVariant);
 };
 
 #endif // INTERFACE_H

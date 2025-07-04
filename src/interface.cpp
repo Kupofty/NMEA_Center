@@ -17,6 +17,11 @@ Interface::Interface(QWidget *parent) : QMainWindow(parent),
     ui->tabWidget->setCurrentWidget(ui->tab_connection);
     this->showMaximized();
 
+    //QML Map
+    ui->quickWidget_map->setSource(QUrl(QStringLiteral("qrc:/map.qml")));
+    ui->quickWidget_map->show();
+    qmlMapObject = ui->quickWidget_map->rootObject();
+
     //Hide widgets
     hideGUI();
 
@@ -28,13 +33,6 @@ Interface::Interface(QWidget *parent) : QMainWindow(parent),
 
     //Create lists (NMEA, UI elements, etc)
     initializeLists();
-
-    //QML Map
-    ui->quickWidget_map->setSource(QUrl(QStringLiteral("qrc:/map.qml")));
-    ui->quickWidget_map->show();
-    qmlMapObject = ui->quickWidget_map->rootObject();
-    connect(this, SIGNAL(setCenterPosition(QVariant,QVariant)), qmlMapObject, SLOT(setCenterPosition(QVariant,QVariant)));
-    connect(this, SIGNAL(setLocationMarking(QVariant,QVariant)), qmlMapObject, SLOT(setLocationMarking(QVariant,QVariant)));
 }
 
 Interface::~Interface()
@@ -82,6 +80,15 @@ void Interface::connectSignalSlot()
     //Timers
     fileRecordingSizeTimer = new QTimer(this);
     connect(fileRecordingSizeTimer, &QTimer::timeout, this, &Interface::updateFileSize);
+
+    //QML Map
+    connect(this, SIGNAL(setCenterPosition(QVariant,QVariant)), qmlMapObject, SLOT(setCenterPosition(QVariant,QVariant)));
+    connect(this, SIGNAL(setLocationMarking(QVariant,QVariant)), qmlMapObject, SLOT(setLocationMarking(QVariant,QVariant)));
+    connect(this, SIGNAL(clearMapMarkers()), qmlMapObject, SLOT(clearMarkers()));
+    connect(this, SIGNAL(updateBoatPositiongMap(QVariant,QVariant)), qmlMapObject, SLOT(updateBoatPositiong(QVariant,QVariant)));
+    connect(this, SIGNAL(updateBoatHeadingMap(QVariant)), qmlMapObject, SLOT(updateBoatHeading(QVariant)));
+    connect(this, SIGNAL(updateBoatOnMap()), qmlMapObject, SLOT(updateBoatMap()));
+
 }
 
 
@@ -134,6 +141,8 @@ void Interface::initializeLists()
 void Interface::hideGUI()
 {
     ui->horizontalFrame_udp_ip_address->hide();
+
+    ui->gridFrame_buttons_map->hide();
 }
 
 
@@ -394,6 +403,8 @@ void Interface::updateDataGSA(double pdop, double hdop, double vdop, double freq
 
 void Interface::updateDataRMC(QString utcDate, QString utcTime, double latitude, double longitude, double speedMps, double course, double magVar, double freqHz)
 {
+    displayPositionOnMap(latitude, longitude, course);
+
     ui->label_date_rmc->setText(utcDate);
     ui->label_utcTime_rmc->setText(utcTime);
     ui->lcdNumber_latitude_rmc->display(latitude);
@@ -944,16 +955,29 @@ QString Interface::getRecordingFilePath()
 
 
 
-
+///////////////
+/// QML Map ///
+///////////////
 
 void Interface::on_pushButton_moveToCoordinates_Map_clicked()
 {
      emit setCenterPosition(ui->doubleSpinBox_latitude_map->value(), ui->doubleSpinBox_longitude_map->value());
 }
 
-
 void Interface::on_pushButton_putMarkerOnCoordinates_Map_clicked()
 {
     emit setLocationMarking(ui->doubleSpinBox_latitude_map->value(), ui->doubleSpinBox_longitude_map->value());
 }
 
+void Interface::on_pushButton_clearMarkers_clicked()
+{
+    emit clearMapMarkers();
+}
+
+void Interface::displayPositionOnMap(double latitude, double longitude, double heading)
+{
+    emit clearMapMarkers();
+    emit updateBoatPositiongMap(latitude, longitude);
+    emit updateBoatHeadingMap(heading);
+    emit updateBoatOnMap();
+}
