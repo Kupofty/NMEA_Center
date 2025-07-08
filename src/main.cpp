@@ -7,7 +7,7 @@ int main(int argc, char *argv[])
     Interface gui;
 
     //Icon & Name
-    QIcon appIcon(":/icons/icons/nmea_icon.ico");
+    QIcon appIcon(":/icons/pictures/icons/nmea_icon.ico");
     app.setWindowIcon(appIcon);
     gui.setWindowTitle("NMEA Center");
 

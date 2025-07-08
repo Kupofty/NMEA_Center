@@ -88,7 +88,7 @@ Item {
                 id: image
                 width: 20
                 height: 20
-                source: "https://www.pngarts.com/files/3/Map-Marker-Pin-PNG-Image-Background.png" //blue marker
+                source: "qrc:/markers/blueMarker"
             }
         }
     }
@@ -102,9 +102,9 @@ Item {
             coordinate: position
             sourceItem: Image {
                 id: image
-                width: 35
-                height: 45
-                source: "https://static.vecteezy.com/system/resources/previews/008/501/633/non_2x/wooden-boat-clip-art-free-png.png" //wooden boat
+                width: 20
+                height: 60
+                source: "qrc:/boats/boat1"
             }
         }
     }
@@ -241,7 +241,7 @@ Item {
     function updateBoatMap() {
         var item = boatMapMarker.createObject(window, {
             coordinate: QtPositioning.coordinate(boatLatitude, boatLongitude),
-            rotation: boatHeading+180 //boat png is upside down
+            rotation: boatHeading
         });
         map.addMapItem(item)
     }

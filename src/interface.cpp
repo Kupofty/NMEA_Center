@@ -18,7 +18,7 @@ Interface::Interface(QWidget *parent) : QMainWindow(parent),
     this->showMaximized();
 
     //QML Map
-    ui->quickWidget_map->setSource(QUrl(QStringLiteral("qrc:/map.qml")));
+    ui->quickWidget_map->setSource(QUrl(QStringLiteral("qrc:/mainMap.qml")));
     ui->quickWidget_map->show();
     qmlMapObject = ui->quickWidget_map->rootObject();
 
