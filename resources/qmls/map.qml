@@ -81,9 +81,10 @@ Item {
         id: locmarker
         MapQuickItem {
             id: markerImg
-            anchorPoint.x: image.width/4
-            anchorPoint.y: image.height
+            anchorPoint.x: image.width / 2
+            anchorPoint.y: image.height / 2
             coordinate: position
+
             sourceItem: Image {
                 id: image
                 width: 20
@@ -97,9 +98,10 @@ Item {
         id: boatmarker
         MapQuickItem {
             id: boatMarkerImg
-            anchorPoint.x: image.width/4
-            anchorPoint.y: image.height
+            anchorPoint.x: image.width / 2
+            anchorPoint.y: image.height / 2
             coordinate: position
+
             sourceItem: Image {
                 id: image
                 width: 20
