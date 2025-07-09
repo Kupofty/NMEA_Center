@@ -85,9 +85,15 @@ void Interface::connectSignalSlot()
     connect(this, SIGNAL(setCenterPosition(QVariant,QVariant)), qmlMapObject, SLOT(setCenterPosition(QVariant,QVariant)));
     connect(this, SIGNAL(setLocationMarking(QVariant,QVariant)), qmlMapObject, SLOT(setLocationMarking(QVariant,QVariant)));
     connect(this, SIGNAL(clearMapMarkers()), qmlMapObject, SLOT(clearMarkers()));
+    connect(this, SIGNAL(updateBoatOnMap()), qmlMapObject, SLOT(updateBoatMap()));
     connect(this, SIGNAL(updateBoatPositiongMap(QVariant,QVariant)), qmlMapObject, SLOT(updateBoatPositiong(QVariant,QVariant)));
     connect(this, SIGNAL(updateBoatHeadingMap(QVariant)), qmlMapObject, SLOT(updateBoatHeading(QVariant)));
-    connect(this, SIGNAL(updateBoatOnMap()), qmlMapObject, SLOT(updateBoatMap()));
+    connect(this, SIGNAL(updateBoatDepthMap(QVariant)), qmlMapObject, SLOT(updateBoatDepth(QVariant)));
+    connect(this, SIGNAL(updateBoatSpeedMap(QVariant)), qmlMapObject, SLOT(updateBoatSpeed(QVariant)));
+    connect(this, SIGNAL(updateBoatCourseMap(QVariant)), qmlMapObject, SLOT(updateBoatCourse(QVariant)));
+    connect(this, SIGNAL(updateBoatWaterTemperatureMap(QVariant)), qmlMapObject, SLOT(updateBoatWaterTemperature(QVariant)));
+    connect(this, SIGNAL(updateBoatDateMap(QVariant)), qmlMapObject, SLOT(updateBoatDate(QVariant)));
+    connect(this, SIGNAL(updateBoatTimeMap(QVariant)), qmlMapObject, SLOT(updateBoatTime(QVariant)));
 
 }
 
@@ -368,6 +374,9 @@ void Interface::updateDataGGA(QString time, double latitude, double longitude, i
     ui->lcdNumber_hdop_gga->display(hdop);
     ui->lcdNumber_altitude_gga->display(altitude);
     ui->lcdNumber_frequency_gga->display(freqHz);
+
+    displayPositionOnMap(latitude, longitude);
+    emit updateBoatTimeMap(time);
 }
 
 void Interface::updateDataGLL(QString utc, double latitude, double longitude, double freqHz)
@@ -376,6 +385,9 @@ void Interface::updateDataGLL(QString utc, double latitude, double longitude, do
     ui->lcdNumber_latitude_gll->display(latitude);
     ui->lcdNumber_longitude_gll->display(longitude);
     ui->lcdNumber_frequency_gll->display(freqHz);
+
+    displayPositionOnMap(latitude, longitude);
+    emit updateBoatTimeMap(utc);
 }
 
 void Interface::updateDataGSV(int satellitesInView, double frequency)
@@ -391,6 +403,9 @@ void Interface::updateDataVTG(double track_true, double track_mag, double speed_
     ui->lcdNumber_speed_knot_vtg->display(speed_knot);
     ui->lcdNumber_speed_kmh_vtg->display(speedKmh);
     ui->lcdNumber_frequency_vtg->display(frequency);
+
+    emit updateBoatHeadingMap(track_true);
+    emit updateBoatSpeedMap(speed_knot);
 }
 
 void Interface::updateDataGSA(double pdop, double hdop, double vdop, double freqHz)
@@ -403,8 +418,6 @@ void Interface::updateDataGSA(double pdop, double hdop, double vdop, double freq
 
 void Interface::updateDataRMC(QString utcDate, QString utcTime, double latitude, double longitude, double speedMps, double course, double magVar, double freqHz)
 {
-    displayPositionOnMap(latitude, longitude, course);
-
     ui->label_date_rmc->setText(utcDate);
     ui->label_utcTime_rmc->setText(utcTime);
     ui->lcdNumber_latitude_rmc->display(latitude);
@@ -414,12 +427,18 @@ void Interface::updateDataRMC(QString utcDate, QString utcTime, double latitude,
     ui->lcdNumber_magVar_rmc->display(magVar);
     ui->lcdNumber_frequency_rmc->display(freqHz);
 
+    displayPositionOnMap(latitude, longitude);
+    emit updateBoatCourseMap(course);
+    emit updateBoatDateMap(utcDate);
+    emit updateBoatTimeMap(utcTime);
 }
 
 void Interface::updateDataHDT(double heading, double freqHz)
 {
     ui->lcdNumber_heading_hdt->display(heading);
     ui->lcdNumber_frequency_hdt->display(freqHz);
+
+    emit updateBoatHeadingMap(heading);
 }
 
 void Interface::updateDataDBT(double depthFeet, double depthMeters, double depthFathom, double freqHz)
@@ -428,6 +447,8 @@ void Interface::updateDataDBT(double depthFeet, double depthMeters, double depth
     ui->lcdNumber_depth_meter_dbt->display(depthMeters);
     ui->lcdNumber_depth_fathom_dbt->display(depthFathom);
     ui->lcdNumber_frequency_dbt->display(freqHz);
+
+    emit updateBoatDepthMap(depthMeters);
 }
 
 void Interface::updateDataVHW(double headingTrue, double headingMag, double speedKnots, double speedKmh, double freqHz)
@@ -437,6 +458,9 @@ void Interface::updateDataVHW(double headingTrue, double headingMag, double spee
     ui->lcdNumber_speed_knot_vhw->display(speedKnots);
     ui->lcdNumber_speed_kmh_vhw->display(speedKmh);
     ui->lcdNumber_frequency_vhw->display(freqHz);
+
+    emit updateBoatHeadingMap(headingTrue);
+    emit updateBoatSpeedMap(speedKnots);
 }
 
 void Interface::updateDataZDA(QString date, QString time, QString offsetTime, double freqHz)
@@ -445,6 +469,9 @@ void Interface::updateDataZDA(QString date, QString time, QString offsetTime, do
     ui->label_utcTime_zda->setText(time);
     ui->label_localZone_zda->setText(offsetTime);
     ui->lcdNumber_frequency_zda->display(freqHz);
+
+    emit updateBoatDateMap(date);
+    emit updateBoatTimeMap(time);
 }
 
 void Interface::updateDataDPT(double depth, double offset, double freqHz)
@@ -452,6 +479,8 @@ void Interface::updateDataDPT(double depth, double offset, double freqHz)
     ui->lcdNumber_depth_dpt->display(depth);
     ui->lcdNumber_depth_offset_dpt->display(offset);
     ui->lcdNumber_frequency_dpt->display(freqHz);
+
+    emit updateBoatDepthMap(depth);
 }
 
 void Interface::updateDataMWD(double dir1, QString dir1Unit, double dir2, QString dir2Unit, double speed1, QString speed1Unit, double speed2, QString speed2Unit, double freqHz)
@@ -472,6 +501,8 @@ void Interface::updateDataMTW(double temp, QString tempUnit, double freqHz)
     ui->lcdNumber_waterTemp_mtw->display(temp);
     ui->label_waterTempUnit_mtw->setText("Water Temp. (°" + tempUnit + ") :");
     ui->lcdNumber_frequency_mtw->display(freqHz);
+
+    emit updateBoatWaterTemperatureMap(temp);
 }
 
 void Interface::updateDataMWV(double angle, QString ref, double speed, QString unit, double freqHz)
@@ -974,10 +1005,9 @@ void Interface::on_pushButton_clearMarkers_clicked()
     emit clearMapMarkers();
 }
 
-void Interface::displayPositionOnMap(double latitude, double longitude, double heading)
+void Interface::displayPositionOnMap(double latitude, double longitude)
 {
     emit clearMapMarkers();
     emit updateBoatPositiongMap(latitude, longitude);
-    emit updateBoatHeadingMap(heading);
     emit updateBoatOnMap();
 }

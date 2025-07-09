@@ -69,7 +69,7 @@ class Interface : public QMainWindow
         void updateCheckBoxSerialOutput(bool check);
         void updateCheckBoxUdpOutput(bool check);
         void initializeLists();
-        void displayPositionOnMap(double latitude, double longitude, double heading);
+        void displayPositionOnMap(double latitude, double longitude);
 
     private slots:
         void on_pushButton_clear_raw_sentences_screens_clicked();
@@ -164,6 +164,12 @@ class Interface : public QMainWindow
         void clearMapMarkers();
         void updateBoatPositiongMap(QVariant, QVariant);
         void updateBoatHeadingMap(QVariant);
+        void updateBoatDepthMap(QVariant);
+        void updateBoatSpeedMap(QVariant);
+        void updateBoatCourseMap(QVariant);
+        void updateBoatWaterTemperatureMap(QVariant);
+        void updateBoatDateMap(QVariant);
+        void updateBoatTimeMap(QVariant);
 };
 
 #endif // INTERFACE_H

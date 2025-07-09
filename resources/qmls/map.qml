@@ -16,16 +16,41 @@ Item {
     ////////////////////////
     /// Global variables ///
     ////////////////////////
+    //Position
     property double latitude : 43.5
     property double longitude : 5.3
 
+    //Cursor
+    property double cursorLatitude : NaN
+    property double cursorLongitude: NaN
+
+    //Boat data
+    property string boatDate: "00/00/0000"
+    property string boatTime: "00:00:00"
     property double boatLatitude : 0
     property double boatLongitude : 0
     property double boatHeading : 0
+    property double boatDepth : 0
+    property double boatSpeed: 0
+    property double boatCourse : 0
+    property double boatWaterTemperature : 0
 
+    //Labels
+    property int labelRightSideWidth : 130
+    property int labelLeftSideWidth : 130
+    property int labelPadding : 8
+    property int labelLateralMargin : 8
+    property int labelVerticalMargin : 8
+    property int labelFontSize : 14
+    property int labelBackgroundRadius : 4
+    property string labelColor : "grey"
+
+    //Zoom
+    property double mapZoomLevel : 8
     property double zoomSpeed : 0.2
     property double lastWheelRotation : 0
 
+    //Markers
     property Component locationmarker: locmarker
     property Component boatMapMarker: boatmarker
 
@@ -53,7 +78,7 @@ Item {
         anchors.fill: parent
         plugin: osmView
         center: QtPositioning.coordinate(latitude, longitude)
-        zoomLevel: 10
+        zoomLevel: mapZoomLevel
         activeMapType: map.supportedMapTypes[map.supportedMapTypes.length - 1]
 
         //Zoom
@@ -68,6 +93,7 @@ Item {
                 else if (wheelRotation < 0)
                     map.zoomLevel = Math.max(map.minimumZoomLevel, map.zoomLevel - zoomSpeed);
                 lastWheelRotation = rotation
+                mapZoomLevel = map.zoomLevel
             }
         }
     }
@@ -113,59 +139,225 @@ Item {
 
 
 
-    ///////////////////
-    /// Data Labels ///
-    ///////////////////
+    ///////////////////////////////
+    /// Data Labels / Left Side ///
+    ///////////////////////////////
+    // Label map type
+    Label {
+        id: mapLabel
+        width: labelLeftSideWidth
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        anchors.top: parent.top
+        anchors.topMargin: labelVerticalMargin * 2
+        anchors.left: parent.left
+        anchors.leftMargin: labelLateralMargin
+        padding: labelPadding
+        background: Rectangle {
+            color: labelColor
+            radius :  labelBackgroundRadius
+        }
+        font.pixelSize: 14
+        text: "Chart: OSM "
+    }
 
     // Label showing zoom level
     Label {
         id: zoomLabel
-        anchors.top: parent.top
-        anchors.topMargin: 8
+        width: labelLeftSideWidth
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        anchors.top: mapLabel.bottom
+        anchors.topMargin: labelVerticalMargin
         anchors.left: parent.left
-        anchors.leftMargin: 8
-        padding: 8
+        anchors.leftMargin: labelLateralMargin
+        padding: labelPadding
         background: Rectangle {
-            color: "darkgrey"
-            radius: 4
+            color: labelColor
+            radius :  labelBackgroundRadius
         }
         font.pixelSize: 14
-        text: "Zoom Level: " + map.zoomLevel.toFixed(1)
+        text: "Zoom Level: " + mapZoomLevel.toFixed(1)
+    }
+
+    // Label showing cursor position
+    Label {
+        id: cursorPosition
+        width: labelLeftSideWidth
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        anchors.top: zoomLabel.bottom
+        anchors.topMargin: labelVerticalMargin
+        anchors.left: parent.left
+        anchors.leftMargin: labelLateralMargin
+        padding: labelPadding
+        background: Rectangle {
+            color: labelColor
+            radius :  labelBackgroundRadius
+        }
+        font.pixelSize: 14
+        text: "Cursor Position\nLat: " + cursorLatitude.toFixed(6) + "\nLon: " + cursorLongitude.toFixed(6)
+    }
+
+
+
+    ////////////////////////////////
+    /// Data Labels / Right Side ///
+    ////////////////////////////////
+
+    // Boat Date Label
+    Label {
+        id: dateLabel
+        width: labelRightSideWidth
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        anchors.top: parent.top
+        anchors.topMargin: labelVerticalMargin * 2
+        anchors.right: parent.right
+        anchors.rightMargin: labelLateralMargin
+        padding: labelPadding
+        background: Rectangle {
+            color: labelColor
+            radius :  labelBackgroundRadius
+        }
+        font.pixelSize: labelFontSize
+        text: "Date: " + boatDate
+    }
+
+    // Boat Time Label
+    Label {
+        id: timeLabel
+        width: labelRightSideWidth
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        anchors.top: dateLabel.bottom
+        anchors.topMargin: labelVerticalMargin
+        anchors.right: parent.right
+        anchors.rightMargin: labelLateralMargin
+        padding: labelPadding
+        background: Rectangle {
+            color: labelColor
+            radius :  labelBackgroundRadius
+        }
+        font.pixelSize: labelFontSize
+        text: "Time: " + boatTime
     }
 
     // Boat Position Label
     Label {
         id: positionLabel
-        anchors.top: parent.top
-        anchors.topMargin: 8
+        width: labelRightSideWidth
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        anchors.top: timeLabel.bottom
+        anchors.topMargin: labelVerticalMargin
         anchors.right: parent.right
-        anchors.rightMargin: 8
-        padding: 8
+        anchors.rightMargin: labelLateralMargin
+        padding: labelPadding
         background: Rectangle {
-            color: "darkgrey"
-            radius: 4
+            color: labelColor
+            radius :  labelBackgroundRadius
         }
-        font.pixelSize: 14
-        text: "Boat Position\nLat: " + boatLatitude.toFixed(5) + "\nLon: " + boatLongitude.toFixed(5)
+        font.pixelSize: labelFontSize
+        text: "Boat Position\nLat: " + boatLatitude.toFixed(6) + "\nLon: " + boatLongitude.toFixed(6)
     }
 
     // Heading Label
     Label {
         id: headingLabel
+        width: labelRightSideWidth
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
         anchors.top: positionLabel.bottom
-        anchors.topMargin: 8
+        anchors.topMargin: labelVerticalMargin
         anchors.right: parent.right
-                anchors.rightMargin: 8
-        padding: 8
+        anchors.rightMargin: labelLateralMargin
+        padding: labelPadding
         background: Rectangle {
-            color: "darkgrey"
-            radius: 4
+            color: labelColor
+            radius :  labelBackgroundRadius
         }
-        font.pixelSize: 14
+        font.pixelSize: labelFontSize
         text: "Heading: " + (boatHeading).toFixed(1) + "°"
     }
 
-    // Add labels for SOG, COG, Depth, Wind speed & Dir, water temp, utc time
+    // Depth Label
+    Label {
+        id: depthLabel
+        width: labelRightSideWidth
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        anchors.top: headingLabel.bottom
+        anchors.topMargin: labelVerticalMargin
+        anchors.right: parent.right
+        anchors.rightMargin: labelLateralMargin
+        padding: labelPadding
+        background: Rectangle {
+            color: labelColor
+            radius :  labelBackgroundRadius
+        }
+        font.pixelSize: labelFontSize
+        text: "Depth: " + (boatDepth).toFixed(1) + "m"
+    }
+
+    // Speed Label
+    Label {
+        id: speedLabel
+        width: labelRightSideWidth
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        anchors.top: depthLabel.bottom
+        anchors.topMargin: labelVerticalMargin
+        anchors.right: parent.right
+        anchors.rightMargin: labelLateralMargin
+        padding: labelPadding
+        background: Rectangle {
+            color: labelColor
+            radius :  labelBackgroundRadius
+        }
+        font.pixelSize: labelFontSize
+        text: "Speed: " + (boatSpeed).toFixed(1) + "kts"
+    }
+
+    // Course Label
+    Label {
+        id: courseLabel
+        width: labelRightSideWidth
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        anchors.top: speedLabel.bottom
+        anchors.topMargin: labelVerticalMargin
+        anchors.right: parent.right
+        anchors.rightMargin: labelLateralMargin
+        padding: labelPadding
+        background: Rectangle {
+            color: labelColor
+            radius :  labelBackgroundRadius
+        }
+        font.pixelSize: labelFontSize
+        text: "Course: " + (boatCourse).toFixed(1) + "°"
+    }
+
+    // WaterTemperature Label
+    Label {
+        id: waterTemperatureLabel
+        width: labelRightSideWidth
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        anchors.top: courseLabel.bottom
+        anchors.topMargin: labelVerticalMargin
+        anchors.right: parent.right
+        anchors.rightMargin: labelLateralMargin
+        padding: labelPadding
+        background: Rectangle {
+            color: labelColor
+            radius :  labelBackgroundRadius
+        }
+        font.pixelSize: labelFontSize
+        text: "Water Temp: " + (boatWaterTemperature).toFixed(1) + "°C"
+    }
+
+    // Add labels for Wind speed & Dir, water temp, utc time, etc
 
 
     //////////////////
@@ -199,31 +391,17 @@ Item {
             }
             else
                 lastCoord = map.toCoordinate(Qt.point(mouseX, mouseY))
-        }
 
-        // Label showing cursor position
-        Label {
-            id: cursorPosition
-            anchors.top: parent.top
-            anchors.topMargin: 50
-            anchors.left: parent.left
-            anchors.leftMargin: 8
-            padding: 8
-            background: Rectangle {
-                color: "darkgrey"
-                radius: 4
-            }
-            font.pixelSize: 14
-            text: "Cursor Position\nLat: %1\nLon: %2".arg(parent.coordinate.latitude.toFixed(6)).arg(parent.coordinate.longitude.toFixed(6))
+            cursorLatitude = coordinate.latitude
+            cursorLongitude = coordinate.longitude
         }
-
     }
 
 
 
-    ////////////////////////
-    /// Functions / SLOT ///
-    ////////////////////////
+    //////////////////////////////
+    /// Functions / Update Map ///
+    //////////////////////////////
     //Go To New Position
     function setCenterPosition(lat, lon) {
         map.pan(latitude - lat, longitude - lon) //add dx dy
@@ -253,7 +431,23 @@ Item {
         map.clearMapItems()
     }
 
-    //Update boat positoin
+
+
+
+    ///////////////////////////////
+    /// Functions / Update Data ///
+    ///////////////////////////////
+    //Update boat UTC time
+    function updateBoatTime(time) {
+        boatTime = time
+    }
+
+    //Update boat UTC Date
+    function updateBoatDate(date) {
+        boatDate = date
+    }
+
+    //Update boat position
     function updateBoatPositiong(lat, lon) {
         boatLatitude = lat
         boatLongitude = lon
@@ -264,4 +458,23 @@ Item {
         boatHeading = head
     }
 
+    // Update boat depth
+    function updateBoatDepth(depth) {
+        boatDepth = depth
+    }
+
+    // Update boat speed
+    function updateBoatSpeed(speed) {
+        boatSpeed = speed
+    }
+
+    // Update boat course
+    function updateBoatCourse(course) {
+        boatCourse = course
+    }
+
+    // Update boat water temperature
+    function updateBoatWaterTemperature(temp) {
+        boatWaterTemperature = temp
+    }
 }
