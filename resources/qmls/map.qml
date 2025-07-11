@@ -61,6 +61,14 @@ Item {
     property bool headingUpView: false
     property real mapRotation: headingUpView ? boatHeading : 0
 
+    //Timer Position Update
+    property int timeBeforePositionLost: 60
+    property double timeLastPosition: 0
+    property double elapsedSec: 0
+    property string textTimerPositionUpdate: "No Position Data"
+
+
+
     //////////////
     /// Plugin ///
     //////////////
@@ -75,6 +83,7 @@ Item {
     }
 
 
+
     ///////////
     /// Map ///
     ///////////
@@ -87,6 +96,7 @@ Item {
         activeMapType: map.supportedMapTypes[map.supportedMapTypes.length - 1]
         bearing: mapRotation
     }
+
 
 
     ////////////
@@ -106,6 +116,7 @@ Item {
             mapZoomLevel = map.zoomLevel
         }
     }
+
 
 
     //////////////////
@@ -153,6 +164,8 @@ Item {
              }
          }
     }
+
+
 
     ////////////////////////
     /// Right-click Menu ///
@@ -247,6 +260,29 @@ Item {
     }
 
 
+    //////////////
+    /// Timers ///
+    //////////////
+    Timer {
+        id: updateTimer
+        interval: 1000
+        running: true
+        repeat: true
+        onTriggered: {
+            if (timeLastPosition === 0) {
+                return
+            }
+
+            elapsedSec = Math.ceil((Date.now() - timeLastPosition) / 1000)
+
+            if(elapsedSec <= timeBeforePositionLost)
+                textTimerPositionUpdate = "Position Update\n"+ elapsedSec + "s ago"
+            else
+                textTimerPositionUpdate = "Position Lost"
+        }
+    }
+
+
 
     ///////////////////////////////
     /// Data Labels / Left Side ///
@@ -325,6 +361,25 @@ Item {
         }
         font.pixelSize: 14
         text: headingUpView ? "Heading Up" : "North Up"
+    }
+
+    // Label Timer Last Position Update
+    Label {
+        id: elapsedLabel
+        width: labelLeftSideWidth
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        anchors.top: mapViewMode.bottom
+        anchors.topMargin: labelVerticalMargin
+        anchors.left: parent.left
+        anchors.leftMargin: labelLateralMargin
+        padding: labelPadding
+        background: Rectangle {
+            color: labelColor
+            radius :  labelBackgroundRadius
+        }
+        font.pixelSize: 14
+        text: textTimerPositionUpdate
     }
 
 
@@ -487,6 +542,7 @@ Item {
     // Add labels for Wind speed & Dir, water temp, utc time, etc
 
 
+
     //////////////////
     /// Update Map ///
     //////////////////
@@ -538,6 +594,7 @@ Item {
     }
 
 
+
     ///////////////////
     /// Update Data ///
     ///////////////////
@@ -555,6 +612,8 @@ Item {
     function updateBoatPositiong(lat, lon) {
         boatLatitude = lat
         boatLongitude = lon
+
+        timeLastPosition = Date.now()
     }
 
     // Update boat heading
