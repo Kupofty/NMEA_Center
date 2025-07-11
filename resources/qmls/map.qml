@@ -56,6 +56,10 @@ Item {
     //Right-click Menu
     property int rightClickMenuWidth: 150
 
+    //Map
+    property bool zoomedIn : false
+    property bool headingUpView: false
+    property real mapRotation: headingUpView ? boatHeading : 0
 
     //////////////
     /// Plugin ///
@@ -81,6 +85,7 @@ Item {
         center: QtPositioning.coordinate(latitude, longitude)
         zoomLevel: mapZoomLevel
         activeMapType: map.supportedMapTypes[map.supportedMapTypes.length - 1]
+        bearing: mapRotation
     }
 
 
@@ -158,22 +163,15 @@ Item {
 
         MenuItem {
             contentItem: Label {
-                text: "Zoom To Z16"
+                text: zoomedIn ? "Large View" : "Close View"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 width: parent.width
             }
-            onTriggered: goToZoomLevelMap(16)
-        }
-
-        MenuItem {
-            contentItem: Label {
-                text: "Zoom To Z10"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                width: parent.width
+            onTriggered:{
+                goToZoomLevelMap(zoomedIn ? 12 : 17)
+                zoomedIn = !zoomedIn
             }
-            onTriggered: goToZoomLevelMap(10)
         }
 
         MenuItem {
@@ -184,6 +182,18 @@ Item {
                 width: parent.width
             }
             onTriggered: setCenterPositionOnBoat()
+        }
+
+        MenuItem {
+            contentItem: Label {
+                text: headingUpView ? "North Up" : "Heading Up"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+            onTriggered: {
+                headingUpView = !headingUpView
+            }
         }
 
         MenuItem {
@@ -298,6 +308,25 @@ Item {
         text: "Cursor Position\nLat: " + cursorLatitude.toFixed(6) + "\nLon: " + cursorLongitude.toFixed(6)
     }
 
+    // Label Map View Mode
+    Label {
+        id: mapViewMode
+        width: labelLeftSideWidth
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        anchors.top: cursorPosition.bottom
+        anchors.topMargin: labelVerticalMargin
+        anchors.left: parent.left
+        anchors.leftMargin: labelLateralMargin
+        padding: labelPadding
+        background: Rectangle {
+            color: labelColor
+            radius :  labelBackgroundRadius
+        }
+        font.pixelSize: 14
+        text: headingUpView ? "Heading Up" : "North Up"
+    }
+
 
 
     ////////////////////////////////
@@ -379,9 +408,9 @@ Item {
         text: "Heading: " + (boatHeading).toFixed(1) + "°"
     }
 
-    // Depth Label
+    // Course Label
     Label {
-        id: depthLabel
+        id: courseLabel
         width: labelRightSideWidth
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
@@ -395,7 +424,7 @@ Item {
             radius :  labelBackgroundRadius
         }
         font.pixelSize: labelFontSize
-        text: "Depth: " + (boatDepth).toFixed(1) + "m"
+        text: "Course: " + (boatCourse).toFixed(1) + "°"
     }
 
     // Speed Label
@@ -404,7 +433,7 @@ Item {
         width: labelRightSideWidth
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-        anchors.top: depthLabel.bottom
+        anchors.top: courseLabel.bottom
         anchors.topMargin: labelVerticalMargin
         anchors.right: parent.right
         anchors.rightMargin: labelLateralMargin
@@ -417,9 +446,9 @@ Item {
         text: "Speed: " + (boatSpeed).toFixed(1) + "kts"
     }
 
-    // Course Label
+    // Depth Label
     Label {
-        id: courseLabel
+        id: depthLabel
         width: labelRightSideWidth
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
@@ -433,7 +462,7 @@ Item {
             radius :  labelBackgroundRadius
         }
         font.pixelSize: labelFontSize
-        text: "Course: " + (boatCourse).toFixed(1) + "°"
+        text: "Depth: " + (boatDepth).toFixed(1) + "m"
     }
 
     // WaterTemperature Label
@@ -442,7 +471,7 @@ Item {
         width: labelRightSideWidth
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
-        anchors.top: courseLabel.bottom
+        anchors.top: depthLabel.bottom
         anchors.topMargin: labelVerticalMargin
         anchors.right: parent.right
         anchors.rightMargin: labelLateralMargin
@@ -483,7 +512,7 @@ Item {
     function updateBoatMap() {
         var item = boatMapMarker.createObject(window, {
             coordinate: QtPositioning.coordinate(boatLatitude, boatLongitude),
-            rotation: boatHeading
+            rotation: boatHeading - mapRotation
         });
         map.addMapItem(item)
     }

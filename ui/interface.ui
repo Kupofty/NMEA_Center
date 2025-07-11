@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1217</width>
+    <width>1415</width>
     <height>941</height>
    </rect>
   </property>
@@ -984,6 +984,19 @@
              </property>
             </spacer>
            </item>
+           <item row="0" column="3">
+            <spacer name="horizontalSpacer_30">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
            <item row="0" column="8">
             <spacer name="horizontalSpacer_24">
              <property name="orientation">
@@ -1072,19 +1085,6 @@
               </widget>
              </item>
             </layout>
-           </item>
-           <item row="0" column="3">
-            <spacer name="horizontalSpacer_30">
-             <property name="orientation">
-              <enum>Qt::Orientation::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
            </item>
           </layout>
          </widget>
