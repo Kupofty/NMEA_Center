@@ -25,7 +25,7 @@ Record data to a local file in multiple formats (txt, csv, nmea, log)
 
 ## Copyright and licensing
 
-This software is Copyright (c) Kupofty 2025. 
-This project is licensed under the Apache 2.0 License. 
-You are free to use, modify, and distribute this software, provided you include proper attribution and comply with the terms of the license.
-See the LICENSE file for details.
+This software is Copyright (c) Kupofty 2025.  
+This project is licensed under the Apache 2.0 License.  
+You are free to use, modify, and distribute this software, provided you include proper attribution and comply with the terms of the license.  
+See the LICENSE file for more details.  
