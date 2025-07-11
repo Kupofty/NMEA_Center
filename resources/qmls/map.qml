@@ -10,7 +10,6 @@ import QtPositioning
 
 
 Item {
-
     id: window
 
     ////////////////////////
@@ -55,6 +54,7 @@ Item {
     property Component boatMapMarker: boatmarker
 
 
+
     //////////////
     /// Plugin ///
     //////////////
@@ -69,7 +69,6 @@ Item {
     }
 
 
-
     ///////////
     /// Map ///
     ///////////
@@ -81,23 +80,67 @@ Item {
         zoomLevel: mapZoomLevel
         activeMapType: map.supportedMapTypes[map.supportedMapTypes.length - 1]
 
-        //Zoom
-        WheelHandler {
-            id: wheelZoom
-            target: map
 
-            onWheel: {
-                var wheelRotation = rotation - lastWheelRotation
-                if (wheelRotation > 0)
-                    map.zoomLevel = Math.min(map.maximumZoomLevel, map.zoomLevel + zoomSpeed);
-                else if (wheelRotation < 0)
-                    map.zoomLevel = Math.max(map.minimumZoomLevel, map.zoomLevel - zoomSpeed);
-                lastWheelRotation = rotation
-                mapZoomLevel = map.zoomLevel
-            }
+
+
+    }
+
+
+    ///////////
+    /// Zoom ///
+    ///////////
+    WheelHandler {
+        id: wheelZoom
+        target: map
+
+        onWheel: {
+            var wheelRotation = rotation - lastWheelRotation
+            if (wheelRotation > 0)
+                map.zoomLevel = Math.min(map.maximumZoomLevel, map.zoomLevel + zoomSpeed);
+            else if (wheelRotation < 0)
+                map.zoomLevel = Math.max(map.minimumZoomLevel, map.zoomLevel - zoomSpeed);
+            lastWheelRotation = rotation
+            mapZoomLevel = map.zoomLevel
         }
     }
 
+
+    //////////////////
+    /// Mouse Area ///
+    //////////////////
+    MouseArea
+    {
+        id: mouseArea
+        anchors.fill: map
+        hoverEnabled: true
+        property var lastCoord
+        property bool dragging: false
+
+        property var coordinate: map.toCoordinate(Qt.point(mouseX, mouseY))
+
+        onPressed: {
+            lastCoord = map.toCoordinate(Qt.point(mouseX, mouseY))
+            dragging = true
+        }
+
+        onReleased: dragging = false
+
+        onPositionChanged: {
+            if (dragging)
+            {
+                var currentCoord = map.toCoordinate(Qt.point(mouseX, mouseY))
+                var dx = lastCoord.longitude - currentCoord.longitude
+                var dy = lastCoord.latitude - currentCoord.latitude
+                map.center = QtPositioning.coordinate(map.center.latitude + dy, map.center.longitude + dx)
+                lastCoord = map.toCoordinate(Qt.point(mouseX, mouseY))
+            }
+            else
+                lastCoord = map.toCoordinate(Qt.point(mouseX, mouseY))
+
+            cursorLatitude = coordinate.latitude
+            cursorLongitude = coordinate.longitude
+        }
+    }
 
 
     ////////////////////////
@@ -204,7 +247,6 @@ Item {
     ////////////////////////////////
     /// Data Labels / Right Side ///
     ////////////////////////////////
-
     // Boat Date Label
     Label {
         id: dateLabel
@@ -360,42 +402,9 @@ Item {
     // Add labels for Wind speed & Dir, water temp, utc time, etc
 
 
-    //////////////////
-    /// Mouse Area ///
-    //////////////////
-    MouseArea
-    {
-        id: mouseArea
-        anchors.fill: map
-        hoverEnabled: true
-        property var lastCoord
-        property bool dragging: false
 
-        property var coordinate: map.toCoordinate(Qt.point(mouseX, mouseY))
 
-        onPressed: {
-            lastCoord = map.toCoordinate(Qt.point(mouseX, mouseY))
-            dragging = true
-        }
 
-        onReleased: dragging = false
-
-        onPositionChanged: {
-            if (dragging)
-            {
-                var currentCoord = map.toCoordinate(Qt.point(mouseX, mouseY))
-                var dx = lastCoord.longitude - currentCoord.longitude
-                var dy = lastCoord.latitude - currentCoord.latitude
-                map.center = QtPositioning.coordinate(map.center.latitude + dy, map.center.longitude + dx)
-                lastCoord = map.toCoordinate(Qt.point(mouseX, mouseY))
-            }
-            else
-                lastCoord = map.toCoordinate(Qt.point(mouseX, mouseY))
-
-            cursorLatitude = coordinate.latitude
-            cursorLongitude = coordinate.longitude
-        }
-    }
 
 
 
@@ -434,6 +443,14 @@ Item {
         map.clearMapItems()
     }
 
+    // Update Map Zoom
+    function updateZoomMap(dz) {
+        if (dz > 0)
+            map.zoomLevel = Math.min(map.maximumZoomLevel, map.zoomLevel + dz);
+        else if (dz < 0)
+            map.zoomLevel = Math.max(map.minimumZoomLevel, map.zoomLevel + dz);
+        mapZoomLevel = map.zoomLevel
+    }
 
 
 
@@ -480,4 +497,6 @@ Item {
     function updateBoatWaterTemperature(temp) {
         boatWaterTemperature = temp
     }
+
+
 }

@@ -99,6 +99,8 @@ void Interface::connectSignalSlot()
     timerUpdateCenterMapOnBoat = new QTimer(this);
     connect(timerUpdateCenterMapOnBoat, SIGNAL(timeout()), qmlMapObject, SLOT(setCenterPositionOnBoat()));
 
+    connect(this, SIGNAL(updateZoomMap(QVariant)), qmlMapObject, SLOT(updateZoomMap(QVariant)));
+
 }
 
 
@@ -1024,9 +1026,23 @@ void Interface::on_pushButton_centerMapOnBoat_clicked()
 void Interface::on_checkBox_followBoat_Map_toggled(bool checked)
 {
     if(checked)
+    {
+        emit setCenterPositionOnBoat();
         timerUpdateCenterMapOnBoat->start(1000);
+    }
     else
         timerUpdateCenterMapOnBoat->stop();
-    qDebug() << "ddddddddddddd";
+}
+
+
+void Interface::on_pushButton_unzoomMap_clicked()
+{
+    emit updateZoomMap(-1);
+}
+
+
+void Interface::on_pushButton_zoomMap_clicked()
+{
+    emit updateZoomMap(+1);
 }
 

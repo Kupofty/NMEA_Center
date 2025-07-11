@@ -145,6 +145,10 @@ class Interface : public QMainWindow
 
         void on_checkBox_followBoat_Map_toggled(bool checked);
 
+        void on_pushButton_unzoomMap_clicked();
+
+        void on_pushButton_zoomMap_clicked();
+
     public slots:
         void displayRawNmeaSentence(const QString &type, const QString &line);
         void updateDataGSV(int totalSatellites, double freq);
@@ -176,6 +180,7 @@ class Interface : public QMainWindow
         void updateBoatWaterTemperatureMap(QVariant);
         void updateBoatDateMap(QVariant);
         void updateBoatTimeMap(QVariant);
+        void updateZoomMap(QVariant);
 };
 
 #endif // INTERFACE_H
