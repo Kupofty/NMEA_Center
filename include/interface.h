@@ -180,7 +180,7 @@ class Interface : public QMainWindow
         void updateBoatWaterTemperatureMap(QVariant);
         void updateBoatDateMap(QVariant);
         void updateBoatTimeMap(QVariant);
-        void updateZoomMap(QVariant);
+        void incrementZoomMap(QVariant);
 };
 
 #endif // INTERFACE_H

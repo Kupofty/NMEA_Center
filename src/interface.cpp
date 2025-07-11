@@ -99,7 +99,7 @@ void Interface::connectSignalSlot()
     timerUpdateCenterMapOnBoat = new QTimer(this);
     connect(timerUpdateCenterMapOnBoat, SIGNAL(timeout()), qmlMapObject, SLOT(setCenterPositionOnBoat()));
 
-    connect(this, SIGNAL(updateZoomMap(QVariant)), qmlMapObject, SLOT(updateZoomMap(QVariant)));
+    connect(this, SIGNAL(incrementZoomMap(QVariant)), qmlMapObject, SLOT(incrementZoomMap(QVariant)));
 
 }
 
@@ -994,12 +994,7 @@ QString Interface::getRecordingFilePath()
 /// QML Map ///
 ///////////////
 
-void Interface::on_pushButton_moveToCoordinates_Map_clicked()
-{
-    emit setCenterPosition(ui->doubleSpinBox_latitude_map->value(), ui->doubleSpinBox_longitude_map->value());
-    ui->checkBox_followBoat_Map->setChecked(false);
-}
-
+//Markers
 void Interface::on_pushButton_putMarkerOnCoordinates_Map_clicked()
 {
     emit setLocationMarking(ui->doubleSpinBox_latitude_map->value(), ui->doubleSpinBox_longitude_map->value());
@@ -1017,11 +1012,18 @@ void Interface::displayPositionOnMap(double latitude, double longitude)
     emit updateBoatOnMap();
 }
 
+
+//Center Map
+void Interface::on_pushButton_moveToCoordinates_Map_clicked()
+{
+    emit setCenterPosition(ui->doubleSpinBox_latitude_map->value(), ui->doubleSpinBox_longitude_map->value());
+    ui->checkBox_followBoat_Map->setChecked(false);
+}
+
 void Interface::on_pushButton_centerMapOnBoat_clicked()
 {
     emit setCenterPositionOnBoat();
 }
-
 
 void Interface::on_checkBox_followBoat_Map_toggled(bool checked)
 {
@@ -1035,14 +1037,14 @@ void Interface::on_checkBox_followBoat_Map_toggled(bool checked)
 }
 
 
+//Zoom
 void Interface::on_pushButton_unzoomMap_clicked()
 {
-    emit updateZoomMap(-1);
+    emit incrementZoomMap(-1);
 }
-
 
 void Interface::on_pushButton_zoomMap_clicked()
 {
-    emit updateZoomMap(+1);
+    emit incrementZoomMap(+1);
 }
 

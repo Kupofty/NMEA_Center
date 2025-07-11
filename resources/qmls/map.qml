@@ -53,6 +53,8 @@ Item {
     property Component locationmarker: locmarker
     property Component boatMapMarker: boatmarker
 
+    //Right-click Menu
+    property int rightClickMenuWidth: 150
 
 
     //////////////
@@ -113,11 +115,13 @@ Item {
         id: mouseArea
         anchors.fill: map
         hoverEnabled: true
+        acceptedButtons: Qt.RightButton | Qt.LeftButton
+
         property var lastCoord
         property bool dragging: false
-
         property var coordinate: map.toCoordinate(Qt.point(mouseX, mouseY))
 
+        //Dragging map
         onPressed: {
             lastCoord = map.toCoordinate(Qt.point(mouseX, mouseY))
             dragging = true
@@ -140,7 +144,63 @@ Item {
             cursorLatitude = coordinate.latitude
             cursorLongitude = coordinate.longitude
         }
+
+        // Right-click menu
+        onClicked: {
+             if (mouse.button === Qt.RightButton) {
+                 contextMenu.popup()
+             }
+         }
     }
+
+    ///////////////////////
+    /// Right-clik Menu ///
+    ///////////////////////
+    Menu {
+        id: contextMenu
+        width: rightClickMenuWidth
+
+        MenuItem {
+            contentItem: Label {
+                text: "Zoom To Z16"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+            onTriggered: goToZoomLevelMap(16)
+        }
+
+        MenuItem {
+            contentItem: Label {
+                text: "Zoom To Z10"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+            onTriggered: goToZoomLevelMap(10)
+        }
+
+        MenuItem {
+            contentItem: Label {
+                text: "Center Map On Boat"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+            onTriggered: setCenterPositionOnBoat()
+        }
+
+        MenuItem {
+            contentItem: Label {
+                text: "Clear Map"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+            onTriggered: clearMarkers()
+        }
+    }
+
 
 
     ////////////////////////
@@ -402,12 +462,6 @@ Item {
     // Add labels for Wind speed & Dir, water temp, utc time, etc
 
 
-
-
-
-
-
-
     //////////////////////////////
     /// Functions / Update Map ///
     //////////////////////////////
@@ -443,8 +497,8 @@ Item {
         map.clearMapItems()
     }
 
-    // Update Map Zoom
-    function updateZoomMap(dz) {
+    // Increment Map Zoom
+    function incrementZoomMap(dz) {
         if (dz > 0)
             map.zoomLevel = Math.min(map.maximumZoomLevel, map.zoomLevel + dz);
         else if (dz < 0)
@@ -452,6 +506,11 @@ Item {
         mapZoomLevel = map.zoomLevel
     }
 
+    // Go To Zoom Level Map
+    function goToZoomLevelMap(zoomLevel) {
+        map.zoomLevel = zoomLevel;
+        mapZoomLevel = map.zoomLevel
+    }
 
 
     ///////////////////////////////
