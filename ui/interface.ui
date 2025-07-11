@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1160</width>
-    <height>1038</height>
+    <height>941</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -690,13 +690,6 @@
         <property name="bottomMargin">
          <number>0</number>
         </property>
-        <item row="0" column="0" colspan="9">
-         <widget class="QQuickWidget" name="quickWidget_map">
-          <property name="resizeMode">
-           <enum>QQuickWidget::ResizeMode::SizeRootObjectToView</enum>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="0" colspan="9">
          <widget class="QFrame" name="gridFrame_buttons_map">
           <property name="sizePolicy">
@@ -705,21 +698,161 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="autoFillBackground">
+           <bool>false</bool>
+          </property>
           <layout class="QGridLayout" name="gridLayout_11">
-           <property name="topMargin">
-            <number>1</number>
+           <property name="leftMargin">
+            <number>5</number>
            </property>
-           <item row="0" column="1">
-            <widget class="QPushButton" name="pushButton_moveToCoordinates_Map">
-             <property name="enabled">
-              <bool>false</bool>
+           <property name="topMargin">
+            <number>5</number>
+           </property>
+           <property name="rightMargin">
+            <number>5</number>
+           </property>
+           <property name="bottomMargin">
+            <number>5</number>
+           </property>
+           <item row="0" column="12">
+            <spacer name="horizontalSpacer_28">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
              </property>
-             <property name="text">
-              <string>Move to coordinates</string>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
              </property>
-            </widget>
+            </spacer>
            </item>
            <item row="0" column="3">
+            <layout class="QHBoxLayout" name="horizontalLayout_69">
+             <item>
+              <widget class="QLabel" name="label_87">
+               <property name="text">
+                <string>Longitude : </string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_longitude_map">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="decimals">
+                <number>5</number>
+               </property>
+               <property name="minimum">
+                <double>-180.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>180.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.500000000000000</double>
+               </property>
+               <property name="value">
+                <double>0.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="0" column="2">
+            <layout class="QHBoxLayout" name="horizontalLayout_22">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QLabel" name="label_29">
+               <property name="text">
+                <string>Latitude :</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignmentFlag::AlignCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QDoubleSpinBox" name="doubleSpinBox_latitude_map">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="minimumSize">
+                <size>
+                 <width>0</width>
+                 <height>0</height>
+                </size>
+               </property>
+               <property name="decimals">
+                <number>6</number>
+               </property>
+               <property name="minimum">
+                <double>-90.000000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>90.000000000000000</double>
+               </property>
+               <property name="singleStep">
+                <double>0.500000000000000</double>
+               </property>
+               <property name="value">
+                <double>0.000000000000000</double>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="0" column="18">
+            <spacer name="horizontalSpacer_20">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="0" column="6">
+            <spacer name="horizontalSpacer_25">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="0" column="10">
             <spacer name="horizontalSpacer_23">
              <property name="orientation">
               <enum>Qt::Orientation::Horizontal</enum>
@@ -729,61 +862,84 @@
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>80</width>
+               <width>10</width>
                <height>20</height>
               </size>
              </property>
             </spacer>
            </item>
-           <item row="0" column="2">
+           <item row="0" column="15">
             <widget class="QPushButton" name="pushButton_putMarkerOnCoordinates_Map">
              <property name="enabled">
               <bool>false</bool>
              </property>
              <property name="text">
-              <string>Add marker on coordinates</string>
+              <string>Add Marker</string>
              </property>
             </widget>
            </item>
-           <item row="0" column="4">
-            <widget class="QLabel" name="label_29">
-             <property name="text">
-              <string>Latitude :</string>
+           <item row="0" column="8">
+            <spacer name="horizontalSpacer_27">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
              </property>
-             <property name="alignment">
-              <set>Qt::AlignmentFlag::AlignCenter</set>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
              </property>
-            </widget>
+            </spacer>
            </item>
-           <item row="1" column="4">
-            <widget class="QLabel" name="label_87">
-             <property name="text">
-              <string>Longitude : </string>
+           <item row="0" column="14">
+            <spacer name="horizontalSpacer_26">
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
              </property>
-             <property name="alignment">
-              <set>Qt::AlignmentFlag::AlignCenter</set>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
              </property>
-            </widget>
+            </spacer>
            </item>
-           <item row="1" column="5">
-            <widget class="QDoubleSpinBox" name="doubleSpinBox_longitude_map">
+           <item row="0" column="9">
+            <widget class="QPushButton" name="pushButton_centerMapOnBoat">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
+             </property>
+             <property name="text">
+              <string>Center Map On Boat</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="5">
+            <widget class="QPushButton" name="pushButton_moveToCoordinates_Map">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
              </property>
              <property name="minimumSize">
               <size>
-               <width>100</width>
+               <width>0</width>
                <height>0</height>
               </size>
              </property>
-             <property name="minimum">
-              <double>-180.000000000000000</double>
+             <property name="text">
+              <string>Move To Coordinates</string>
              </property>
-             <property name="maximum">
-              <double>180.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>5.300000000000000</double>
+            </widget>
+           </item>
+           <item row="0" column="7">
+            <widget class="Line" name="line_3">
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
              </property>
             </widget>
            </item>
@@ -800,62 +956,70 @@
              </property>
             </spacer>
            </item>
-           <item row="0" column="5">
-            <widget class="QDoubleSpinBox" name="doubleSpinBox_latitude_map">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="minimumSize">
-              <size>
-               <width>100</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="minimum">
-              <double>-90.000000000000000</double>
-             </property>
-             <property name="maximum">
-              <double>90.000000000000000</double>
-             </property>
-             <property name="value">
-              <double>43.500000000000000</double>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="2">
+           <item row="0" column="16">
             <widget class="QPushButton" name="pushButton_clearMarkers">
              <property name="enabled">
               <bool>false</bool>
              </property>
              <property name="text">
-              <string>Clear markers</string>
+              <string>Clear Markers</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
-            <widget class="QPushButton" name="pushButton">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="text">
-              <string>Go To Boat</string>
+           <item row="0" column="13">
+            <widget class="Line" name="line_7">
+             <property name="orientation">
+              <enum>Qt::Orientation::Vertical</enum>
              </property>
             </widget>
            </item>
-           <item row="0" column="6">
-            <spacer name="horizontalSpacer_20">
+           <item row="0" column="11">
+            <layout class="QHBoxLayout" name="horizontalLayout_71">
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <item>
+              <widget class="QCheckBox" name="checkBox_followBoat_Map">
+               <property name="enabled">
+                <bool>true</bool>
+               </property>
+               <property name="autoFillBackground">
+                <bool>false</bool>
+               </property>
+               <property name="text">
+                <string>Follow Boat</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="0" column="4">
+            <spacer name="horizontalSpacer_24">
              <property name="orientation">
               <enum>Qt::Orientation::Horizontal</enum>
              </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Policy::Fixed</enum>
+             </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>40</width>
+               <width>10</width>
                <height>20</height>
               </size>
              </property>
             </spacer>
            </item>
           </layout>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="9">
+         <widget class="QQuickWidget" name="quickWidget_map">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="resizeMode">
+           <enum>QQuickWidget::ResizeMode::SizeRootObjectToView</enum>
+          </property>
          </widget>
         </item>
        </layout>

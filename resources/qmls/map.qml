@@ -403,10 +403,13 @@ Item {
     /// Functions / Update Map ///
     //////////////////////////////
     //Go To New Position
-    function setCenterPosition(lat, lon) {
-        map.pan(latitude - lat, longitude - lon) //add dx dy
-        latitude = lat
-        longitude = lon
+    function setCenterPosition(targetLat, targetLon) {
+        map.center = QtPositioning.coordinate(targetLat, targetLon)
+    }
+
+    //Go To New Position
+    function setCenterPositionOnBoat() {
+        map.center = QtPositioning.coordinate(boatLatitude, boatLongitude)
     }
 
     //Add marker

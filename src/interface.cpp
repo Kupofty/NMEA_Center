@@ -83,6 +83,7 @@ void Interface::connectSignalSlot()
 
     //QML Map
     connect(this, SIGNAL(setCenterPosition(QVariant,QVariant)), qmlMapObject, SLOT(setCenterPosition(QVariant,QVariant)));
+    connect(this, SIGNAL(setCenterPositionOnBoat()), qmlMapObject, SLOT(setCenterPositionOnBoat()));
     connect(this, SIGNAL(setLocationMarking(QVariant,QVariant)), qmlMapObject, SLOT(setLocationMarking(QVariant,QVariant)));
     connect(this, SIGNAL(clearMapMarkers()), qmlMapObject, SLOT(clearMarkers()));
     connect(this, SIGNAL(updateBoatOnMap()), qmlMapObject, SLOT(updateBoatMap()));
@@ -94,6 +95,9 @@ void Interface::connectSignalSlot()
     connect(this, SIGNAL(updateBoatWaterTemperatureMap(QVariant)), qmlMapObject, SLOT(updateBoatWaterTemperature(QVariant)));
     connect(this, SIGNAL(updateBoatDateMap(QVariant)), qmlMapObject, SLOT(updateBoatDate(QVariant)));
     connect(this, SIGNAL(updateBoatTimeMap(QVariant)), qmlMapObject, SLOT(updateBoatTime(QVariant)));
+
+    timerUpdateCenterMapOnBoat = new QTimer(this);
+    connect(timerUpdateCenterMapOnBoat, SIGNAL(timeout()), qmlMapObject, SLOT(setCenterPositionOnBoat()));
 
 }
 
@@ -147,8 +151,6 @@ void Interface::initializeLists()
 void Interface::hideGUI()
 {
     ui->horizontalFrame_udp_ip_address->hide();
-
-    ui->gridFrame_buttons_map->hide();
 }
 
 
@@ -992,7 +994,8 @@ QString Interface::getRecordingFilePath()
 
 void Interface::on_pushButton_moveToCoordinates_Map_clicked()
 {
-     emit setCenterPosition(ui->doubleSpinBox_latitude_map->value(), ui->doubleSpinBox_longitude_map->value());
+    emit setCenterPosition(ui->doubleSpinBox_latitude_map->value(), ui->doubleSpinBox_longitude_map->value());
+    ui->checkBox_followBoat_Map->setChecked(false);
 }
 
 void Interface::on_pushButton_putMarkerOnCoordinates_Map_clicked()
@@ -1011,3 +1014,19 @@ void Interface::displayPositionOnMap(double latitude, double longitude)
     emit updateBoatPositiongMap(latitude, longitude);
     emit updateBoatOnMap();
 }
+
+void Interface::on_pushButton_centerMapOnBoat_clicked()
+{
+    emit setCenterPositionOnBoat();
+}
+
+
+void Interface::on_checkBox_followBoat_Map_toggled(bool checked)
+{
+    if(checked)
+        timerUpdateCenterMapOnBoat->start(1000);
+    else
+        timerUpdateCenterMapOnBoat->stop();
+    qDebug() << "ddddddddddddd";
+}
+

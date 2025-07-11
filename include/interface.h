@@ -49,6 +49,7 @@ class Interface : public QMainWindow
         QList<QCheckBox*> checkboxOutputSerial;
         QList<QCheckBox*> checkboxOutputUDP;
         QQuickItem *qmlMapObject;
+        QTimer *timerUpdateCenterMapOnBoat;
 
     private:
         QMap<QString, QPlainTextEdit*> getSentenceMap() const;
@@ -140,6 +141,10 @@ class Interface : public QMainWindow
         void on_pushButton_putMarkerOnCoordinates_Map_clicked();
         void on_pushButton_clearMarkers_clicked();
 
+        void on_pushButton_centerMapOnBoat_clicked();
+
+        void on_checkBox_followBoat_Map_toggled(bool checked);
+
     public slots:
         void displayRawNmeaSentence(const QString &type, const QString &line);
         void updateDataGSV(int totalSatellites, double freq);
@@ -159,6 +164,7 @@ class Interface : public QMainWindow
 
     signals:
         void setCenterPosition(QVariant, QVariant);
+        void setCenterPositionOnBoat();
         void setLocationMarking(QVariant, QVariant);
         void updateBoatOnMap();
         void clearMapMarkers();
