@@ -142,11 +142,9 @@ class Interface : public QMainWindow
         void on_pushButton_clearMarkers_clicked();
 
         void on_pushButton_centerMapOnBoat_clicked();
-
         void on_checkBox_followBoat_Map_toggled(bool checked);
 
         void on_pushButton_unzoomMap_clicked();
-
         void on_pushButton_zoomMap_clicked();
 
     public slots:

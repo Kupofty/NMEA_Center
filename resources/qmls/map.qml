@@ -16,8 +16,8 @@ Item {
     /// Global variables ///
     ////////////////////////
     //Position
-    property double latitude : 43.5
-    property double longitude : 5.3
+    property double latitude : 35
+    property double longitude : 0
 
     //Cursor
     property double cursorLatitude : NaN
@@ -45,7 +45,7 @@ Item {
     property string labelColor : "grey"
 
     //Zoom
-    property double mapZoomLevel : 8
+    property double mapZoomLevel : 3
     property double zoomSpeed : 0.2
     property double lastWheelRotation : 0
 
@@ -81,16 +81,12 @@ Item {
         center: QtPositioning.coordinate(latitude, longitude)
         zoomLevel: mapZoomLevel
         activeMapType: map.supportedMapTypes[map.supportedMapTypes.length - 1]
-
-
-
-
     }
 
 
-    ///////////
+    ////////////
     /// Zoom ///
-    ///////////
+    ////////////
     WheelHandler {
         id: wheelZoom
         target: map
@@ -153,9 +149,9 @@ Item {
          }
     }
 
-    ///////////////////////
-    /// Right-clik Menu ///
-    ///////////////////////
+    ////////////////////////
+    /// Right-click Menu ///
+    ////////////////////////
     Menu {
         id: contextMenu
         width: rightClickMenuWidth
@@ -462,9 +458,9 @@ Item {
     // Add labels for Wind speed & Dir, water temp, utc time, etc
 
 
-    //////////////////////////////
-    /// Functions / Update Map ///
-    //////////////////////////////
+    //////////////////
+    /// Update Map ///
+    //////////////////
     //Go To New Position
     function setCenterPosition(targetLat, targetLon) {
         map.center = QtPositioning.coordinate(targetLat, targetLon)
@@ -513,9 +509,9 @@ Item {
     }
 
 
-    ///////////////////////////////
-    /// Functions / Update Data ///
-    ///////////////////////////////
+    ///////////////////
+    /// Update Data ///
+    ///////////////////
     //Update boat UTC time
     function updateBoatTime(time) {
         boatTime = time
