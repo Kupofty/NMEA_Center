@@ -264,6 +264,7 @@ Item {
     }
 
 
+
     //////////////
     /// Timers ///
     //////////////
@@ -378,6 +379,8 @@ Item {
         }
 
     }
+
+
 
     ////////////////////////////////
     /// Data Labels / Right Side ///
@@ -521,6 +524,88 @@ Item {
         // Add labels for Wind speed & Dir, water temp, utc time, etc
     }
 
+
+    ///////////////////
+    /// Data Canvas ///
+    ///////////////////
+    Canvas {
+        id: compassCanvas
+        width: 150
+        height: 150
+        visible: boatHeading !== -9999
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        anchors.bottomMargin: labelVerticalMargin
+        anchors.rightMargin: labelLateralMargin
+
+        property real heading: boatHeading
+        property real course: boatCourse
+
+        onPaint: {
+            var ctx = getContext("2d")
+            ctx.reset()
+            var centerX = width / 2
+            var centerY = height / 2
+            var radius = Math.min(width, height) / 2 - 10
+
+            // Draw compass circle
+            ctx.beginPath()
+            ctx.strokeStyle = "black"
+            ctx.lineWidth = 2
+            ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI)
+            ctx.stroke()
+
+            // Draw cardinal directions
+            ctx.fillStyle = "black"
+            ctx.font = "bold 14px sans-serif"
+            ctx.textAlign = "center"
+            ctx.textBaseline = "middle"
+            ctx.fillText("N",  centerX, centerY - radius + 10);
+            ctx.fillText("E",  centerX + radius - 10, centerY);
+            ctx.fillText("S",  centerX, centerY + radius - 10);
+            ctx.fillText("W",  centerX - radius + 10, centerY);
+
+            // Intercardinal directions
+            ctx.font = "10px sans-serif"
+            ctx.fillText("NE", centerX + radius * 0.55, centerY - radius * 0.55);
+            ctx.fillText("SE", centerX + radius * 0.55, centerY + radius * 0.55);
+            ctx.fillText("SW", centerX - radius * 0.55, centerY + radius * 0.55);
+            ctx.fillText("NW", centerX - radius * 0.55, centerY - radius * 0.55);
+
+            // Draw course arrow
+            ctx.save()
+            ctx.translate(centerX, centerY)
+            ctx.rotate((course - 0) * Math.PI / 180)
+            ctx.beginPath()
+            ctx.moveTo(0, -radius + 15)
+            ctx.lineTo(5, 0)
+            ctx.lineTo(-5, 0)
+            ctx.closePath()
+            ctx.fillStyle = "blue"
+            ctx.fill()
+            ctx.restore()
+
+            // Draw heading arrow
+            ctx.save()
+            ctx.translate(centerX, centerY)
+            ctx.rotate((heading - 0) * Math.PI / 180)
+            ctx.beginPath()
+            ctx.moveTo(0, -radius + 15)
+            ctx.lineTo(5, 0)
+            ctx.lineTo(-5, 0)
+            ctx.closePath()
+            ctx.fillStyle = "red"
+            ctx.fill()
+            ctx.restore()
+        }
+
+        // Redraw when heading changes
+        Connections {
+            target: compassCanvas
+            onHeadingChanged: compassCanvas.requestPaint()
+            onCourseChanged: compassCanvas.requestPaint()
+        }
+    }
 
 
     //////////////////
