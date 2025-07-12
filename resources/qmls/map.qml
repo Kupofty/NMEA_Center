@@ -27,13 +27,23 @@ Item {
     property string noData: "No Data"
     property string boatDate: ""
     property string boatTime: ""
-    property double boatLatitude: -9999
-    property double boatLongitude: -9999
-    property double boatHeading: -9999
-    property double boatDepth: -9999
-    property double boatSpeed: -9999
-    property double boatCourse: -9999
-    property double boatWaterTemperature: -9999
+    property double boatLatitude: 0
+    property double boatLongitude: 0
+    property double boatHeading: 0
+    property double boatDepth: 0
+    property double boatSpeed: 0
+    property double boatCourse: 0
+    property double boatWaterTemperature: 0
+
+    //Boat data received check
+    property bool boatDateReceived: false
+    property bool boatTimeReceived: false
+    property bool boatPositionReceived: false
+    property bool boatHeadingReceived: false
+    property bool boatCourseReceived: false
+    property bool boatDepthReceived: false
+    property bool boatSpeedReceived: false
+    property bool boatWaterTempratureReceived: false
 
     //Labels
     property int labelRightSideWidth : 140
@@ -396,7 +406,7 @@ Item {
         // Boat Date Label
         Label {
             id: dateLabel
-            visible: boatDate !== ""
+            visible: boatDateReceived
             width: labelRightSideWidth
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -406,13 +416,14 @@ Item {
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: labelFontSize
-            text: boatDate === "" ? ("Date: "+ noData) : "Date: " + boatDate
+            text: boatDateReceived ? "Date: " + boatDate
+                                   : "Date: "+ noData
         }
 
         // Boat Time Label
         Label {
             id: timeLabel
-            visible: boatTime !== ""
+            visible: boatTimeReceived
             width: labelRightSideWidth
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -422,13 +433,14 @@ Item {
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: labelFontSize
-            text: boatTime === "" ? ("Time: "+ noData): "Time: " + boatTime
+            text: boatTimeReceived ? "Time: " + boatTime
+                                   : "Time: "+ noData
         }
 
         // Boat Position Label
         Label {
             id: positionLabel
-            visible: boatLatitude !== -9999
+            visible: boatPositionReceived
             width: labelRightSideWidth
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -438,13 +450,14 @@ Item {
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: labelFontSize
-            text: boatLatitude === -9999 ? ("Boat Position\n" + noData) : "Boat Position\nLat: " + boatLatitude.toFixed(6) + "\nLon: " + boatLongitude.toFixed(6)
+            text: boatPositionReceived ? "Boat Position\nLat: " + boatLatitude.toFixed(6) + "\nLon: " + boatLongitude.toFixed(6)
+                                       : "Boat Position\n" + noData
         }
 
         // Heading Label
         Label {
             id: headingLabel
-            visible: boatHeading !== -9999
+            visible: boatHeadingReceived
             width: labelRightSideWidth
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -454,13 +467,14 @@ Item {
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: labelFontSize
-            text: boatHeading === -9999 ? ("Heading: " + noData) : "Heading: " + boatHeading.toFixed(1) + "°"
+            text: boatHeadingReceived ? "Heading: " + boatHeading.toFixed(1) + "°"
+                                      : "Heading: " + noData
         }
 
         // Course Label
         Label {
             id: courseLabel
-            visible: boatCourse !== -9999
+            visible: boatCourseReceived
             width: labelRightSideWidth
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -470,13 +484,14 @@ Item {
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: labelFontSize
-            text: boatCourse === -9999 ? ("Course: " + noData) : "Course: " + boatCourse.toFixed(1) + "°"
+            text: boatCourseReceived ? "Course: " + boatCourse.toFixed(1) + "°"
+                                     : "Course: " + noData
         }
 
         // Speed Label
         Label {
             id: speedLabel
-            visible: boatSpeed !== -9999
+            visible: boatSpeedReceived
             width: labelRightSideWidth
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -486,13 +501,14 @@ Item {
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: labelFontSize
-            text: boatSpeed === -9999 ? ("Speed: " + noData) : "Speed: " + boatSpeed.toFixed(1) + "kts"
+            text: boatSpeedReceived ? "Speed: " + boatSpeed.toFixed(1) + "kts"
+                                    : "Speed: " + noData
         }
 
         // Depth Label
         Label {
             id: depthLabel
-            visible: boatDepth !== -9999
+            visible: boatDepthReceived
             width: labelRightSideWidth
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -502,13 +518,14 @@ Item {
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: labelFontSize
-            text: boatDepth === -9999 ? ("Depth: " + noData) : "Depth: " + boatDepth.toFixed(1) + "m"
+            text: boatDepthReceived ? "Depth: " + boatDepth.toFixed(1) + "m"
+                                    : "Depth: " + noData
         }
 
         // WaterTemperature Label
         Label {
             id: waterTemperatureLabel
-            visible: boatWaterTemperature !== -9999
+            visible: boatWaterTempratureReceived
             width: labelRightSideWidth
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -518,10 +535,9 @@ Item {
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: labelFontSize
-            text: boatWaterTemperature === -9999 ? ("Water Temp: " + noData) : "Water Temp: " + boatWaterTemperature.toFixed(1) + "°C"
+            text: boatWaterTempratureReceived ? "Water Temp: " + boatWaterTemperature.toFixed(1) + "°C"
+                                              : "Water Temp: " + noData
         }
-
-        // Add labels for Wind speed & Dir, water temp, utc time, etc
     }
 
 
@@ -532,7 +548,7 @@ Item {
         id: compassCanvas
         width: 150
         height: 150
-        visible: boatHeading !== -9999
+        visible: boatHeadingReceived
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         anchors.bottomMargin: labelVerticalMargin
@@ -572,29 +588,33 @@ Item {
             ctx.fillText("SW", centerX - radius * 0.55, centerY + radius * 0.55);
             ctx.fillText("NW", centerX - radius * 0.55, centerY - radius * 0.55);
 
-            // Draw course arrow
-            ctx.save()
-            ctx.translate(centerX, centerY)
-            ctx.rotate((course - 0) * Math.PI / 180)
-            ctx.beginPath()
-            ctx.moveTo(0, -radius + 15)
-            ctx.lineTo(5, 0)
-            ctx.lineTo(-5, 0)
-            ctx.closePath()
-            ctx.fillStyle = "blue"
-            ctx.fill()
-            ctx.restore()
-
             // Draw heading arrow
             ctx.save()
             ctx.translate(centerX, centerY)
             ctx.rotate((heading - 0) * Math.PI / 180)
+
             ctx.beginPath()
-            ctx.moveTo(0, -radius + 15)
+            ctx.moveTo(0, -radius + 10)
             ctx.lineTo(5, 0)
             ctx.lineTo(-5, 0)
             ctx.closePath()
+
             ctx.fillStyle = "red"
+            ctx.fill()
+            ctx.restore()
+
+            // Draw course arrow
+            ctx.save()
+            ctx.translate(centerX, centerY)
+            ctx.rotate((course - 0) * Math.PI / 180)
+
+            ctx.beginPath()
+            ctx.moveTo(0, -radius + 15)  // same length
+            ctx.lineTo(3, 0)             // narrower base
+            ctx.lineTo(-3, 0)
+            ctx.closePath()
+
+            ctx.fillStyle = "blue"
             ctx.fill()
             ctx.restore()
         }
@@ -666,11 +686,13 @@ Item {
     //Update boat UTC time
     function updateBoatTime(time) {
         boatTime = time
+        boatTimeReceived = true
     }
 
     //Update boat UTC Date
     function updateBoatDate(date) {
         boatDate = date
+        boatDateReceived = true
     }
 
     //Update boat position
@@ -679,32 +701,38 @@ Item {
         boatLongitude = lon
 
         timeLastPosition = Date.now()
+        boatPositionReceived = true
     }
 
     // Update boat heading
     function updateBoatHeading(head) {
         boatHeading = head
+        boatHeadingReceived = true
     }
 
     // Update boat depth
     function updateBoatDepth(depth) {
         boatDepth = depth
+        boatDepthReceived = true
     }
 
     // Update boat speed
     function updateBoatSpeed(speed) {
         boatSpeed = speed
+        boatSpeedReceived = true
     }
 
     // Update boat course
     function updateBoatCourse(course) {
         boatCourse = course
+        boatCourseReceived = true
     }
 
     // Update boat water temperature
     function updateBoatWaterTemperature(temp) {
         boatWaterTemperature = temp
+        boatWaterTempratureReceived = true
     }
 
-
 }
+

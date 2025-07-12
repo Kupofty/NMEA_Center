@@ -762,10 +762,10 @@
            <item row="0" column="20">
             <widget class="QPushButton" name="pushButton_clearMarkers">
              <property name="enabled">
-              <bool>false</bool>
+              <bool>true</bool>
              </property>
              <property name="text">
-              <string>Clear Markers</string>
+              <string>Clear Map</string>
              </property>
             </widget>
            </item>
