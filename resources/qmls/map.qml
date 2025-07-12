@@ -24,18 +24,19 @@ Item {
     property double cursorLongitude: NaN
 
     //Boat data
-    property string boatDate: "00/00/0000"
-    property string boatTime: "00:00:00"
-    property double boatLatitude : 0
-    property double boatLongitude : 0
-    property double boatHeading : 0
-    property double boatDepth : 0
-    property double boatSpeed: 0
-    property double boatCourse : 0
-    property double boatWaterTemperature : 0
+    property string noData: "No Data"
+    property string boatDate: ""
+    property string boatTime: ""
+    property double boatLatitude: -9999
+    property double boatLongitude: -9999
+    property double boatHeading: -9999
+    property double boatDepth: -9999
+    property double boatSpeed: -9999
+    property double boatCourse: -9999
+    property double boatWaterTemperature: -9999
 
     //Labels
-    property int labelRightSideWidth : 130
+    property int labelRightSideWidth : 140
     property int labelLeftSideWidth : 130
     property int labelPadding : 8
     property int labelLateralMargin : 8
@@ -62,7 +63,7 @@ Item {
     property real mapRotation: headingUpView ? boatHeading : 0
 
     //Timer Position Update
-    property int timeBeforePositionLost: 60
+    property int timeBeforePositionLost: 30
     property double timeLastPosition: 0
     property double elapsedSec: 0
     property string textTimerPositionUpdate: "No Position Data"
@@ -403,7 +404,7 @@ Item {
             radius :  labelBackgroundRadius
         }
         font.pixelSize: labelFontSize
-        text: "Date: " + boatDate
+        text: boatDate === "" ? ("Date: "+ noData) : "Date: " + boatDate
     }
 
     // Boat Time Label
@@ -422,7 +423,7 @@ Item {
             radius :  labelBackgroundRadius
         }
         font.pixelSize: labelFontSize
-        text: "Time: " + boatTime
+        text: boatTime === "" ? ("Time: "+ noData): "Time: " + boatTime
     }
 
     // Boat Position Label
@@ -441,7 +442,7 @@ Item {
             radius :  labelBackgroundRadius
         }
         font.pixelSize: labelFontSize
-        text: "Boat Position\nLat: " + boatLatitude.toFixed(6) + "\nLon: " + boatLongitude.toFixed(6)
+        text: boatLatitude === -9999 ? ("Boat Position\n" + noData) : "Boat Position\nLat: " + boatLatitude.toFixed(6) + "\nLon: " + boatLongitude.toFixed(6)
     }
 
     // Heading Label
@@ -460,7 +461,7 @@ Item {
             radius :  labelBackgroundRadius
         }
         font.pixelSize: labelFontSize
-        text: "Heading: " + (boatHeading).toFixed(1) + "°"
+        text: boatHeading === -9999 ? ("Heading: " + noData) : "Heading: " + boatHeading.toFixed(1) + "°"
     }
 
     // Course Label
@@ -479,7 +480,7 @@ Item {
             radius :  labelBackgroundRadius
         }
         font.pixelSize: labelFontSize
-        text: "Course: " + (boatCourse).toFixed(1) + "°"
+        text: boatCourse === -9999 ? ("Course: " + noData) : "Course: " + boatCourse.toFixed(1) + "°"
     }
 
     // Speed Label
@@ -498,7 +499,7 @@ Item {
             radius :  labelBackgroundRadius
         }
         font.pixelSize: labelFontSize
-        text: "Speed: " + (boatSpeed).toFixed(1) + "kts"
+        text: boatSpeed === -9999 ? ("Speed: " + noData) : "Speed: " + boatSpeed.toFixed(1) + "kts"
     }
 
     // Depth Label
@@ -517,7 +518,7 @@ Item {
             radius :  labelBackgroundRadius
         }
         font.pixelSize: labelFontSize
-        text: "Depth: " + (boatDepth).toFixed(1) + "m"
+        text: boatDepth === -9999 ? ("Depth: " + noData) : "Depth: " + boatDepth.toFixed(1) + "m"
     }
 
     // WaterTemperature Label
@@ -536,7 +537,7 @@ Item {
             radius :  labelBackgroundRadius
         }
         font.pixelSize: labelFontSize
-        text: "Water Temp: " + (boatWaterTemperature).toFixed(1) + "°C"
+        text: boatWaterTemperature === -9999 ? ("Water Temp: " + noData) : "Water Temp: " + boatWaterTemperature.toFixed(1) + "°C"
     }
 
     // Add labels for Wind speed & Dir, water temp, utc time, etc
