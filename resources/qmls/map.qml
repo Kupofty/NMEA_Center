@@ -22,6 +22,8 @@ Item {
     //Cursor
     property double cursorLatitude : NaN
     property double cursorLongitude: NaN
+    property double cursorDistanceBoat : NaN
+    property double cursorBearingBoat: NaN
 
     //Boat data
     property string noData: "No Data"
@@ -168,6 +170,9 @@ Item {
 
             cursorLatitude = coordinate.latitude
             cursorLongitude = coordinate.longitude
+
+            cursorDistanceBoat = haversineDistance(boatLatitude, boatLongitude, cursorLatitude, cursorLongitude)
+            cursorBearingBoat = calculateBearing(boatLatitude, boatLongitude, cursorLatitude, cursorLongitude)
         }
 
         // Right-click menu
@@ -238,6 +243,7 @@ Item {
     ////////////////////////
     /// Marker Component ///
     ////////////////////////
+    //Markers
     Component {
         id: locmarker
         MapQuickItem {
@@ -255,6 +261,7 @@ Item {
         }
     }
 
+    //Main boat icon
     Component {
         id: boatmarker
         MapQuickItem {
@@ -313,7 +320,7 @@ Item {
         anchors.leftMargin: labelLateralMargin
         spacing: labelVerticalMargin
 
-        // Label map type
+        // Map type
         Label {
             id: mapLabel
             width: labelLeftSideWidth
@@ -328,7 +335,7 @@ Item {
             text: "Chart: OSM "
         }
 
-        // Label showing zoom level
+        // Zoom level
         Label {
             id: zoomLabel
             width: labelLeftSideWidth
@@ -343,22 +350,7 @@ Item {
             text: "Zoom Level: " + mapZoomLevel.toFixed(1)
         }
 
-        // Label showing cursor position
-        Label {
-            id: cursorPosition
-            width: labelLeftSideWidth
-            horizontalAlignment: Text.AlignHCenter
-            verticalAlignment: Text.AlignVCenter
-            padding: labelPadding
-            background: Rectangle {
-                color: labelColor
-                radius :  labelBackgroundRadius
-            }
-            font.pixelSize: 14
-            text: "Cursor Position\nLat: " + cursorLatitude.toFixed(6) + "\nLon: " + cursorLongitude.toFixed(6)
-        }
-
-        // Label Map View Mode
+        // Map View Mode
         Label {
             id: mapViewMode
             width: labelLeftSideWidth
@@ -373,7 +365,42 @@ Item {
             text: headingUpView ? "Heading Up" : "North Up"
         }
 
-        // Label Timer Last Position Update
+        // Cursor position
+        Label {
+            id: cursorPosition
+            width: labelLeftSideWidth
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            padding: labelPadding
+            background: Rectangle {
+                color: labelColor
+                radius :  labelBackgroundRadius
+            }
+            font.pixelSize: 14
+            text: "Cursor Position" + "\n" +
+                   "Lat: " + cursorLatitude.toFixed(6) + "\n" +
+                   "Lon: " + cursorLongitude.toFixed(6)
+        }
+
+        // Cursor distance and bearing from boat
+        Label {
+            id: distanceBearinFromBoat
+            width: labelLeftSideWidth
+            visible: boatPositionReceived
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            padding: labelPadding
+            background: Rectangle {
+                color: labelColor
+                radius :  labelBackgroundRadius
+            }
+            font.pixelSize: 14
+            text: "From Boat" + "\n" +
+                  "Distance: " + metersToNauticalMiles(cursorDistanceBoat).toFixed(1) + "NM"  + "\n" +
+                  "Bearing : " + cursorBearingBoat.toFixed(0) + "°"
+        }
+
+        // Last Time Position Update
         Label {
             id: elapsedLabel
             width: labelLeftSideWidth
@@ -387,7 +414,6 @@ Item {
             font.pixelSize: 14
             text: textTimerPositionUpdate
         }
-
     }
 
 
@@ -403,7 +429,7 @@ Item {
         anchors.rightMargin: labelLateralMargin
         spacing: labelVerticalMargin
 
-        // Boat Date Label
+        // Boat Date
         Label {
             id: dateLabel
             visible: boatDateReceived
@@ -420,7 +446,7 @@ Item {
                                    : "Date: "+ noData
         }
 
-        // Boat Time Label
+        // Boat Time
         Label {
             id: timeLabel
             visible: boatTimeReceived
@@ -437,7 +463,7 @@ Item {
                                    : "Time: "+ noData
         }
 
-        // Boat Position Label
+        // Boat Position
         Label {
             id: positionLabel
             visible: boatPositionReceived
@@ -454,7 +480,7 @@ Item {
                                        : "Boat Position\n" + noData
         }
 
-        // Heading Label
+        // Heading
         Label {
             id: headingLabel
             visible: boatHeadingReceived
@@ -471,7 +497,7 @@ Item {
                                       : "Heading: " + noData
         }
 
-        // Course Label
+        // Course
         Label {
             id: courseLabel
             visible: boatCourseReceived
@@ -488,7 +514,7 @@ Item {
                                      : "Course: " + noData
         }
 
-        // Speed Label
+        // Speed
         Label {
             id: speedLabel
             visible: boatSpeedReceived
@@ -505,7 +531,7 @@ Item {
                                     : "Speed: " + noData
         }
 
-        // Depth Label
+        // Depth
         Label {
             id: depthLabel
             visible: boatDepthReceived
@@ -522,7 +548,7 @@ Item {
                                     : "Depth: " + noData
         }
 
-        // WaterTemperature Label
+        // Water Temperature
         Label {
             id: waterTemperatureLabel
             visible: boatWaterTempratureReceived
@@ -734,5 +760,60 @@ Item {
         boatWaterTempratureReceived = true
     }
 
+
+
+    ///////////////////
+    /// Conversions ///
+    ///////////////////
+    function toRadians(deg) {
+        return deg * Math.PI / 180.0
+    }
+
+    function toDegrees(rad) {
+        return rad * 180.0 / Math.PI
+    }
+
+    function metersToNauticalMiles(meters) {
+        return meters / 1852.0
+    }
+
+
+    /////////////////////////
+    /// Generic Functions ///
+    /////////////////////////
+    //Distance between 2 positions
+    function haversineDistance(lat1, lon1, lat2, lon2) {
+        const R = 6378137.0; // Earth radius in meters
+
+        let dLat = toRadians(lat2 - lat1)
+        let dLon = toRadians(lon2 - lon1)
+
+        lat1 = toRadians(lat1)
+        lat2 = toRadians(lat2)
+
+        let a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1) * Math.cos(lat2) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2)
+
+        let c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+
+        return R * c // in meters
+    }
+
+    //Bearing between 2 positions
+    function calculateBearing(lat1, lon1, lat2, lon2) {
+        lat1 = toRadians(lat1)
+        lon1 = toRadians(lon1)
+        lat2 = toRadians(lat2)
+        lon2 = toRadians(lon2)
+
+        let dLon = lon2 - lon1
+        let y = Math.sin(dLon) * Math.cos(lat2)
+        let x = Math.cos(lat1) * Math.sin(lat2) -
+                Math.sin(lat1) * Math.cos(lat2) * Math.cos(dLon)
+
+        let bearing = toDegrees(Math.atan2(y, x))
+        return (bearing + 360) % 360  // Normalize to 0–359°
+    }
 }
 
