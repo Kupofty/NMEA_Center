@@ -177,6 +177,16 @@ Item {
 
         MenuItem {
             contentItem: Label {
+                text: "Center Map On Boat"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+            onTriggered: setCenterPositionOnBoat()
+        }
+
+        MenuItem {
+            contentItem: Label {
                 text: zoomedIn ? "Large View" : "Close View"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
@@ -186,16 +196,6 @@ Item {
                 goToZoomLevelMap(zoomedIn ? 12 : 17)
                 zoomedIn = !zoomedIn
             }
-        }
-
-        MenuItem {
-            contentItem: Label {
-                text: "Center Map On Boat"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                width: parent.width
-            }
-            onTriggered: setCenterPositionOnBoat()
         }
 
         MenuItem {
@@ -256,6 +256,7 @@ Item {
                 width: 20
                 height: 60
                 source: "qrc:/boats/boat1"
+                opacity: elapsedSec > timeBeforePositionLost ? 0.5 : 1.0
             }
         }
     }
@@ -274,10 +275,13 @@ Item {
                 return
             }
 
-            elapsedSec = Math.ceil((Date.now() - timeLastPosition) / 1000)
+            elapsedSec = (Date.now() - timeLastPosition) / 1000
 
             if(elapsedSec <= timeBeforePositionLost)
-                textTimerPositionUpdate = "Position Update\n"+ elapsedSec + "s ago"
+                if(elapsedSec < 1)
+                    textTimerPositionUpdate = "Position Update\n < 1s ago"
+                else
+                    textTimerPositionUpdate = "Position Update\n"+ Math.ceil(elapsedSec) + "s ago"
             else
                 textTimerPositionUpdate = "Position Lost"
         }
@@ -376,7 +380,7 @@ Item {
         anchors.leftMargin: labelLateralMargin
         padding: labelPadding
         background: Rectangle {
-            color: labelColor
+            color: elapsedSec > timeBeforePositionLost ? "indianred" : labelColor
             radius :  labelBackgroundRadius
         }
         font.pixelSize: 14
