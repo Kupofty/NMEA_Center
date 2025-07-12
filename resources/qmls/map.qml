@@ -279,9 +279,9 @@ Item {
 
             if(elapsedSec <= timeBeforePositionLost)
                 if(elapsedSec < 1)
-                    textTimerPositionUpdate = "Position Update\n < 1s ago"
+                    textTimerPositionUpdate = "Position Updated\n < 1s ago"
                 else
-                    textTimerPositionUpdate = "Position Update\n"+ Math.ceil(elapsedSec) + "s ago"
+                    textTimerPositionUpdate = "Position Updated\n"+ Math.ceil(elapsedSec) + "s ago"
             else
                 textTimerPositionUpdate = "Position Lost"
         }
@@ -292,259 +292,232 @@ Item {
     ///////////////////////////////
     /// Data Labels / Left Side ///
     ///////////////////////////////
-    // Label map type
-    Label {
-        id: mapLabel
-        width: labelLeftSideWidth
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
+    Column {
+        id: leftSideInfoColumn
         anchors.top: parent.top
         anchors.topMargin: labelVerticalMargin * 2
         anchors.left: parent.left
         anchors.leftMargin: labelLateralMargin
-        padding: labelPadding
-        background: Rectangle {
-            color: labelColor
-            radius :  labelBackgroundRadius
+        spacing: labelVerticalMargin
+
+        // Label map type
+        Label {
+            id: mapLabel
+            width: labelLeftSideWidth
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            padding: labelPadding
+            background: Rectangle {
+                color: labelColor
+                radius :  labelBackgroundRadius
+            }
+            font.pixelSize: 14
+            text: "Chart: OSM "
         }
-        font.pixelSize: 14
-        text: "Chart: OSM "
-    }
 
-    // Label showing zoom level
-    Label {
-        id: zoomLabel
-        width: labelLeftSideWidth
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        anchors.top: mapLabel.bottom
-        anchors.topMargin: labelVerticalMargin
-        anchors.left: parent.left
-        anchors.leftMargin: labelLateralMargin
-        padding: labelPadding
-        background: Rectangle {
-            color: labelColor
-            radius :  labelBackgroundRadius
+        // Label showing zoom level
+        Label {
+            id: zoomLabel
+            width: labelLeftSideWidth
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            padding: labelPadding
+            background: Rectangle {
+                color: labelColor
+                radius :  labelBackgroundRadius
+            }
+            font.pixelSize: 14
+            text: "Zoom Level: " + mapZoomLevel.toFixed(1)
         }
-        font.pixelSize: 14
-        text: "Zoom Level: " + mapZoomLevel.toFixed(1)
-    }
 
-    // Label showing cursor position
-    Label {
-        id: cursorPosition
-        width: labelLeftSideWidth
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        anchors.top: zoomLabel.bottom
-        anchors.topMargin: labelVerticalMargin
-        anchors.left: parent.left
-        anchors.leftMargin: labelLateralMargin
-        padding: labelPadding
-        background: Rectangle {
-            color: labelColor
-            radius :  labelBackgroundRadius
+        // Label showing cursor position
+        Label {
+            id: cursorPosition
+            width: labelLeftSideWidth
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            padding: labelPadding
+            background: Rectangle {
+                color: labelColor
+                radius :  labelBackgroundRadius
+            }
+            font.pixelSize: 14
+            text: "Cursor Position\nLat: " + cursorLatitude.toFixed(6) + "\nLon: " + cursorLongitude.toFixed(6)
         }
-        font.pixelSize: 14
-        text: "Cursor Position\nLat: " + cursorLatitude.toFixed(6) + "\nLon: " + cursorLongitude.toFixed(6)
-    }
 
-    // Label Map View Mode
-    Label {
-        id: mapViewMode
-        width: labelLeftSideWidth
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        anchors.top: cursorPosition.bottom
-        anchors.topMargin: labelVerticalMargin
-        anchors.left: parent.left
-        anchors.leftMargin: labelLateralMargin
-        padding: labelPadding
-        background: Rectangle {
-            color: labelColor
-            radius :  labelBackgroundRadius
+        // Label Map View Mode
+        Label {
+            id: mapViewMode
+            width: labelLeftSideWidth
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            padding: labelPadding
+            background: Rectangle {
+                color: labelColor
+                radius :  labelBackgroundRadius
+            }
+            font.pixelSize: 14
+            text: headingUpView ? "Heading Up" : "North Up"
         }
-        font.pixelSize: 14
-        text: headingUpView ? "Heading Up" : "North Up"
-    }
 
-    // Label Timer Last Position Update
-    Label {
-        id: elapsedLabel
-        width: labelLeftSideWidth
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        anchors.top: mapViewMode.bottom
-        anchors.topMargin: labelVerticalMargin
-        anchors.left: parent.left
-        anchors.leftMargin: labelLateralMargin
-        padding: labelPadding
-        background: Rectangle {
-            color: elapsedSec > timeBeforePositionLost ? "indianred" : labelColor
-            radius :  labelBackgroundRadius
+        // Label Timer Last Position Update
+        Label {
+            id: elapsedLabel
+            width: labelLeftSideWidth
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            padding: labelPadding
+            background: Rectangle {
+                color: elapsedSec > timeBeforePositionLost ? "indianred" : labelColor
+                radius :  labelBackgroundRadius
+            }
+            font.pixelSize: 14
+            text: textTimerPositionUpdate
         }
-        font.pixelSize: 14
-        text: textTimerPositionUpdate
+
     }
-
-
 
     ////////////////////////////////
     /// Data Labels / Right Side ///
     ////////////////////////////////
-    // Boat Date Label
-    Label {
-        id: dateLabel
-        width: labelRightSideWidth
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
+    Column {
+        id: rightSideInfoColumn
         anchors.top: parent.top
         anchors.topMargin: labelVerticalMargin * 2
         anchors.right: parent.right
         anchors.rightMargin: labelLateralMargin
-        padding: labelPadding
-        background: Rectangle {
-            color: labelColor
-            radius :  labelBackgroundRadius
-        }
-        font.pixelSize: labelFontSize
-        text: boatDate === "" ? ("Date: "+ noData) : "Date: " + boatDate
-    }
+        spacing: labelVerticalMargin
 
-    // Boat Time Label
-    Label {
-        id: timeLabel
-        width: labelRightSideWidth
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        anchors.top: dateLabel.bottom
-        anchors.topMargin: labelVerticalMargin
-        anchors.right: parent.right
-        anchors.rightMargin: labelLateralMargin
-        padding: labelPadding
-        background: Rectangle {
-            color: labelColor
-            radius :  labelBackgroundRadius
+        // Boat Date Label
+        Label {
+            id: dateLabel
+            visible: boatDate !== ""
+            width: labelRightSideWidth
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            padding: labelPadding
+            background: Rectangle {
+                color: labelColor
+                radius :  labelBackgroundRadius
+            }
+            font.pixelSize: labelFontSize
+            text: boatDate === "" ? ("Date: "+ noData) : "Date: " + boatDate
         }
-        font.pixelSize: labelFontSize
-        text: boatTime === "" ? ("Time: "+ noData): "Time: " + boatTime
-    }
 
-    // Boat Position Label
-    Label {
-        id: positionLabel
-        width: labelRightSideWidth
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        anchors.top: timeLabel.bottom
-        anchors.topMargin: labelVerticalMargin
-        anchors.right: parent.right
-        anchors.rightMargin: labelLateralMargin
-        padding: labelPadding
-        background: Rectangle {
-            color: labelColor
-            radius :  labelBackgroundRadius
+        // Boat Time Label
+        Label {
+            id: timeLabel
+            visible: boatTime !== ""
+            width: labelRightSideWidth
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            padding: labelPadding
+            background: Rectangle {
+                color: labelColor
+                radius :  labelBackgroundRadius
+            }
+            font.pixelSize: labelFontSize
+            text: boatTime === "" ? ("Time: "+ noData): "Time: " + boatTime
         }
-        font.pixelSize: labelFontSize
-        text: boatLatitude === -9999 ? ("Boat Position\n" + noData) : "Boat Position\nLat: " + boatLatitude.toFixed(6) + "\nLon: " + boatLongitude.toFixed(6)
-    }
 
-    // Heading Label
-    Label {
-        id: headingLabel
-        width: labelRightSideWidth
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        anchors.top: positionLabel.bottom
-        anchors.topMargin: labelVerticalMargin
-        anchors.right: parent.right
-        anchors.rightMargin: labelLateralMargin
-        padding: labelPadding
-        background: Rectangle {
-            color: labelColor
-            radius :  labelBackgroundRadius
+        // Boat Position Label
+        Label {
+            id: positionLabel
+            visible: boatLatitude !== -9999
+            width: labelRightSideWidth
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            padding: labelPadding
+            background: Rectangle {
+                color: labelColor
+                radius :  labelBackgroundRadius
+            }
+            font.pixelSize: labelFontSize
+            text: boatLatitude === -9999 ? ("Boat Position\n" + noData) : "Boat Position\nLat: " + boatLatitude.toFixed(6) + "\nLon: " + boatLongitude.toFixed(6)
         }
-        font.pixelSize: labelFontSize
-        text: boatHeading === -9999 ? ("Heading: " + noData) : "Heading: " + boatHeading.toFixed(1) + "°"
-    }
 
-    // Course Label
-    Label {
-        id: courseLabel
-        width: labelRightSideWidth
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        anchors.top: headingLabel.bottom
-        anchors.topMargin: labelVerticalMargin
-        anchors.right: parent.right
-        anchors.rightMargin: labelLateralMargin
-        padding: labelPadding
-        background: Rectangle {
-            color: labelColor
-            radius :  labelBackgroundRadius
+        // Heading Label
+        Label {
+            id: headingLabel
+            visible: boatHeading !== -9999
+            width: labelRightSideWidth
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            padding: labelPadding
+            background: Rectangle {
+                color: labelColor
+                radius :  labelBackgroundRadius
+            }
+            font.pixelSize: labelFontSize
+            text: boatHeading === -9999 ? ("Heading: " + noData) : "Heading: " + boatHeading.toFixed(1) + "°"
         }
-        font.pixelSize: labelFontSize
-        text: boatCourse === -9999 ? ("Course: " + noData) : "Course: " + boatCourse.toFixed(1) + "°"
-    }
 
-    // Speed Label
-    Label {
-        id: speedLabel
-        width: labelRightSideWidth
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        anchors.top: courseLabel.bottom
-        anchors.topMargin: labelVerticalMargin
-        anchors.right: parent.right
-        anchors.rightMargin: labelLateralMargin
-        padding: labelPadding
-        background: Rectangle {
-            color: labelColor
-            radius :  labelBackgroundRadius
+        // Course Label
+        Label {
+            id: courseLabel
+            visible: boatCourse !== -9999
+            width: labelRightSideWidth
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            padding: labelPadding
+            background: Rectangle {
+                color: labelColor
+                radius :  labelBackgroundRadius
+            }
+            font.pixelSize: labelFontSize
+            text: boatCourse === -9999 ? ("Course: " + noData) : "Course: " + boatCourse.toFixed(1) + "°"
         }
-        font.pixelSize: labelFontSize
-        text: boatSpeed === -9999 ? ("Speed: " + noData) : "Speed: " + boatSpeed.toFixed(1) + "kts"
-    }
 
-    // Depth Label
-    Label {
-        id: depthLabel
-        width: labelRightSideWidth
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        anchors.top: speedLabel.bottom
-        anchors.topMargin: labelVerticalMargin
-        anchors.right: parent.right
-        anchors.rightMargin: labelLateralMargin
-        padding: labelPadding
-        background: Rectangle {
-            color: labelColor
-            radius :  labelBackgroundRadius
+        // Speed Label
+        Label {
+            id: speedLabel
+            visible: boatSpeed !== -9999
+            width: labelRightSideWidth
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            padding: labelPadding
+            background: Rectangle {
+                color: labelColor
+                radius :  labelBackgroundRadius
+            }
+            font.pixelSize: labelFontSize
+            text: boatSpeed === -9999 ? ("Speed: " + noData) : "Speed: " + boatSpeed.toFixed(1) + "kts"
         }
-        font.pixelSize: labelFontSize
-        text: boatDepth === -9999 ? ("Depth: " + noData) : "Depth: " + boatDepth.toFixed(1) + "m"
-    }
 
-    // WaterTemperature Label
-    Label {
-        id: waterTemperatureLabel
-        width: labelRightSideWidth
-        horizontalAlignment: Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        anchors.top: depthLabel.bottom
-        anchors.topMargin: labelVerticalMargin
-        anchors.right: parent.right
-        anchors.rightMargin: labelLateralMargin
-        padding: labelPadding
-        background: Rectangle {
-            color: labelColor
-            radius :  labelBackgroundRadius
+        // Depth Label
+        Label {
+            id: depthLabel
+            visible: boatDepth !== -9999
+            width: labelRightSideWidth
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            padding: labelPadding
+            background: Rectangle {
+                color: labelColor
+                radius :  labelBackgroundRadius
+            }
+            font.pixelSize: labelFontSize
+            text: boatDepth === -9999 ? ("Depth: " + noData) : "Depth: " + boatDepth.toFixed(1) + "m"
         }
-        font.pixelSize: labelFontSize
-        text: boatWaterTemperature === -9999 ? ("Water Temp: " + noData) : "Water Temp: " + boatWaterTemperature.toFixed(1) + "°C"
-    }
 
-    // Add labels for Wind speed & Dir, water temp, utc time, etc
+        // WaterTemperature Label
+        Label {
+            id: waterTemperatureLabel
+            visible: boatWaterTemperature !== -9999
+            width: labelRightSideWidth
+            horizontalAlignment: Text.AlignHCenter
+            verticalAlignment: Text.AlignVCenter
+            padding: labelPadding
+            background: Rectangle {
+                color: labelColor
+                radius :  labelBackgroundRadius
+            }
+            font.pixelSize: labelFontSize
+            text: boatWaterTemperature === -9999 ? ("Water Temp: " + noData) : "Water Temp: " + boatWaterTemperature.toFixed(1) + "°C"
+        }
+
+        // Add labels for Wind speed & Dir, water temp, utc time, etc
+    }
 
 
 
