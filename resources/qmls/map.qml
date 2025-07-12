@@ -136,14 +136,16 @@ Item {
 
         //Dragging map
         onPressed: {
-            lastCoord = map.toCoordinate(Qt.point(mouseX, mouseY))
-            dragging = true
+            if (mouse.button === Qt.LeftButton) {
+                lastCoord = map.toCoordinate(Qt.point(mouseX, mouseY))
+                dragging = true
+            }
         }
 
         onReleased: dragging = false
 
         onPositionChanged: {
-            if (dragging)
+            if (dragging && mouse.buttons === Qt.LeftButton)
             {
                 var currentCoord = map.toCoordinate(Qt.point(mouseX, mouseY))
                 var dx = lastCoord.longitude - currentCoord.longitude
