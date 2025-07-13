@@ -82,12 +82,7 @@ void Interface::connectSignalSlot()
     connect(fileRecordingSizeTimer, &QTimer::timeout, this, &Interface::updateFileSize);
 
     //QML Map
-    connect(this, SIGNAL(setCenterPosition(QVariant,QVariant)), qmlMapObject, SLOT(setCenterPosition(QVariant,QVariant)));
-    connect(this, SIGNAL(setCenterPositionOnBoat()), qmlMapObject, SLOT(setCenterPositionOnBoat()));
-    connect(this, SIGNAL(setLocationMarking(QVariant,QVariant)), qmlMapObject, SLOT(setLocationMarking(QVariant,QVariant)));
-    connect(this, SIGNAL(clearMapMarkers()), qmlMapObject, SLOT(clearMarkers()));
-    connect(this, SIGNAL(updateBoatOnMap()), qmlMapObject, SLOT(updateBoatMap()));
-    connect(this, SIGNAL(updateBoatPositiongMap(QVariant,QVariant)), qmlMapObject, SLOT(updateBoatPositiong(QVariant,QVariant)));
+    connect(this, SIGNAL(updateBoatPositionMap(QVariant,QVariant)), qmlMapObject, SLOT(updateBoatPosition(QVariant,QVariant)));
     connect(this, SIGNAL(updateBoatHeadingMap(QVariant)), qmlMapObject, SLOT(updateBoatHeading(QVariant)));
     connect(this, SIGNAL(updateBoatDepthMap(QVariant)), qmlMapObject, SLOT(updateBoatDepth(QVariant)));
     connect(this, SIGNAL(updateBoatSpeedMap(QVariant)), qmlMapObject, SLOT(updateBoatSpeed(QVariant)));
@@ -95,11 +90,6 @@ void Interface::connectSignalSlot()
     connect(this, SIGNAL(updateBoatWaterTemperatureMap(QVariant)), qmlMapObject, SLOT(updateBoatWaterTemperature(QVariant)));
     connect(this, SIGNAL(updateBoatDateMap(QVariant)), qmlMapObject, SLOT(updateBoatDate(QVariant)));
     connect(this, SIGNAL(updateBoatTimeMap(QVariant)), qmlMapObject, SLOT(updateBoatTime(QVariant)));
-
-    timerUpdateCenterMapOnBoat = new QTimer(this);
-    connect(timerUpdateCenterMapOnBoat, SIGNAL(timeout()), qmlMapObject, SLOT(setCenterPositionOnBoat()));
-
-    connect(this, SIGNAL(incrementZoomMap(QVariant)), qmlMapObject, SLOT(incrementZoomMap(QVariant)));
 
 }
 
@@ -379,7 +369,7 @@ void Interface::updateDataGGA(QString time, double latitude, double longitude, i
     ui->lcdNumber_altitude_gga->display(altitude);
     ui->lcdNumber_frequency_gga->display(freqHz);
 
-    displayPositionOnMap(latitude, longitude);
+    emit updateBoatPositionMap(latitude, longitude);
     emit updateBoatTimeMap(time);
 }
 
@@ -390,7 +380,7 @@ void Interface::updateDataGLL(QString utc, double latitude, double longitude, do
     ui->lcdNumber_longitude_gll->display(longitude);
     ui->lcdNumber_frequency_gll->display(freqHz);
 
-    displayPositionOnMap(latitude, longitude);
+    emit updateBoatPositionMap(latitude, longitude);
     emit updateBoatTimeMap(utc);
 }
 
@@ -431,7 +421,7 @@ void Interface::updateDataRMC(QString utcDate, QString utcTime, double latitude,
     ui->lcdNumber_magVar_rmc->display(magVar);
     ui->lcdNumber_frequency_rmc->display(freqHz);
 
-    displayPositionOnMap(latitude, longitude);
+    emit updateBoatPositionMap(latitude, longitude);
     emit updateBoatCourseMap(course);
     emit updateBoatDateMap(utcDate);
     emit updateBoatTimeMap(utcTime);
@@ -990,61 +980,4 @@ QString Interface::getRecordingFilePath()
 
 
 
-///////////////
-/// QML Map ///
-///////////////
-
-//Markers
-void Interface::on_pushButton_putMarkerOnCoordinates_Map_clicked()
-{
-    emit setLocationMarking(ui->doubleSpinBox_latitude_map->value(), ui->doubleSpinBox_longitude_map->value());
-}
-
-void Interface::on_pushButton_clearMarkers_clicked()
-{
-    emit clearMapMarkers();
-}
-
-void Interface::displayPositionOnMap(double latitude, double longitude)
-{
-    emit clearMapMarkers();
-    emit updateBoatPositiongMap(latitude, longitude);
-    emit updateBoatOnMap();
-}
-
-
-//Center Map
-void Interface::on_pushButton_moveToCoordinates_Map_clicked()
-{
-    emit setCenterPosition(ui->doubleSpinBox_latitude_map->value(), ui->doubleSpinBox_longitude_map->value());
-    ui->checkBox_followBoat_Map->setChecked(false);
-}
-
-void Interface::on_pushButton_centerMapOnBoat_clicked()
-{
-    emit setCenterPositionOnBoat();
-}
-
-void Interface::on_checkBox_followBoat_Map_toggled(bool checked)
-{
-    if(checked)
-    {
-        emit setCenterPositionOnBoat();
-        timerUpdateCenterMapOnBoat->start(1000);
-    }
-    else
-        timerUpdateCenterMapOnBoat->stop();
-}
-
-
-//Zoom
-void Interface::on_pushButton_unzoomMap_clicked()
-{
-    emit incrementZoomMap(-1);
-}
-
-void Interface::on_pushButton_zoomMap_clicked()
-{
-    emit incrementZoomMap(+1);
-}
 

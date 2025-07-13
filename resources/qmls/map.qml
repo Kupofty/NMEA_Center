@@ -221,7 +221,7 @@ Item {
             onTriggered: {
                 if(boatPositionReceived){
                     setCenterPositionOnBoat()
-                    goToZoomLevelMap(17)
+                    goToZoomLevelMap(15)
                 }
             }
         }
@@ -428,8 +428,10 @@ Item {
                     textTimerPositionUpdate = "Position Updated\n < 1s ago"
                 else
                     textTimerPositionUpdate = "Position Updated\n"+ Math.ceil(elapsedSec) + "s ago"
-            else
+            else{
+                boatPositionReceived = false
                 textTimerPositionUpdate = "Position Lost"
+            }
         }
     }
 
@@ -844,6 +846,8 @@ Item {
 
     //Add boat icon
     function updateBoatMap() {
+        clearMarkers()
+
         var item = boatMapMarker.createObject(window, {
             coordinate: QtPositioning.coordinate(boatLatitude, boatLongitude),
             rotation: boatHeading - mapRotation
@@ -889,12 +893,14 @@ Item {
     }
 
     //Update boat position
-    function updateBoatPositiong(lat, lon) {
+    function updateBoatPosition(lat, lon) {
         boatLatitude = lat
         boatLongitude = lon
 
         timeLastPosition = Date.now()
         boatPositionReceived = true
+
+        updateBoatMap()
     }
 
     // Update boat heading

@@ -49,7 +49,6 @@ class Interface : public QMainWindow
         QList<QCheckBox*> checkboxOutputSerial;
         QList<QCheckBox*> checkboxOutputUDP;
         QQuickItem *qmlMapObject;
-        QTimer *timerUpdateCenterMapOnBoat;
 
     private:
         QMap<QString, QPlainTextEdit*> getSentenceMap() const;
@@ -70,7 +69,6 @@ class Interface : public QMainWindow
         void updateCheckBoxSerialOutput(bool check);
         void updateCheckBoxUdpOutput(bool check);
         void initializeLists();
-        void displayPositionOnMap(double latitude, double longitude);
 
     private slots:
         void on_pushButton_clear_raw_sentences_screens_clicked();
@@ -137,16 +135,6 @@ class Interface : public QMainWindow
         void scrollDownPlainText(int index);
         void updateUdpSenderDetails();
 
-        void on_pushButton_moveToCoordinates_Map_clicked();
-        void on_pushButton_putMarkerOnCoordinates_Map_clicked();
-        void on_pushButton_clearMarkers_clicked();
-
-        void on_pushButton_centerMapOnBoat_clicked();
-        void on_checkBox_followBoat_Map_toggled(bool checked);
-
-        void on_pushButton_unzoomMap_clicked();
-        void on_pushButton_zoomMap_clicked();
-
     public slots:
         void displayRawNmeaSentence(const QString &type, const QString &line);
         void updateDataGSV(int totalSatellites, double freq);
@@ -165,12 +153,7 @@ class Interface : public QMainWindow
         void updateDataMWV(double angle, QString ref, double speed, QString unit, double freqHz);
 
     signals:
-        void setCenterPosition(QVariant, QVariant);
-        void setCenterPositionOnBoat();
-        void setLocationMarking(QVariant, QVariant);
-        void updateBoatOnMap();
-        void clearMapMarkers();
-        void updateBoatPositiongMap(QVariant, QVariant);
+        void updateBoatPositionMap(QVariant, QVariant);
         void updateBoatHeadingMap(QVariant);
         void updateBoatDepthMap(QVariant);
         void updateBoatSpeedMap(QVariant);
@@ -178,7 +161,6 @@ class Interface : public QMainWindow
         void updateBoatWaterTemperatureMap(QVariant);
         void updateBoatDateMap(QVariant);
         void updateBoatTimeMap(QVariant);
-        void incrementZoomMap(QVariant);
 };
 
 #endif // INTERFACE_H
