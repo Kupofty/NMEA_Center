@@ -71,8 +71,8 @@ Item {
     property int rightClickMenuWidth: 150
 
     //Map
+    property bool showUI : true
     property bool followBoat : false
-    property bool zoomedIn : false
     property bool headingUpView: false
     property real mapRotation: headingUpView ? boatHeading : 0
 
@@ -219,8 +219,10 @@ Item {
                 width: parent.width
             }
             onTriggered: {
-                if(boatPositionReceived)
+                if(boatPositionReceived){
                     setCenterPositionOnBoat()
+                    goToZoomLevelMap(17)
+                }
             }
         }
 
@@ -246,14 +248,25 @@ Item {
 
         MenuItem {
             contentItem: Label {
-                text: zoomedIn ? "Zoom Out" : "Zoom In"
+                text: "Close View"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 width: parent.width
             }
             onTriggered:{
-                goToZoomLevelMap(zoomedIn ? 12 : 17)
-                zoomedIn = !zoomedIn
+                goToZoomLevelMap(17)
+            }
+        }
+
+        MenuItem {
+            contentItem: Label {
+                text: "Wide View"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+            onTriggered:{
+                goToZoomLevelMap(12)
             }
         }
 
@@ -277,6 +290,16 @@ Item {
                 width: parent.width
             }
             onTriggered: clearMarkers()
+        }
+
+        MenuItem {
+            contentItem: Label {
+                text: showUI ? "Hide UI" : "Show UI"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+            onTriggered: showUI = !showUI
         }
     }
 
@@ -429,7 +452,7 @@ Item {
     ///////////////////////////////
     Column {
         id: leftSideInfoColumn
-        visible: true
+        visible: showUI
 
         anchors.top: parent.top
         anchors.topMargin: labelVerticalMargin * 2
@@ -547,7 +570,7 @@ Item {
     ////////////////////////////////
     Column {
         id: rightSideInfoColumn
-        visible: true
+        visible: showUI
 
         anchors.top: parent.top
         anchors.topMargin: labelVerticalMargin * 2
@@ -710,7 +733,7 @@ Item {
 
         width: 150
         height: 150
-        visible: boatHeadingReceived
+        visible: (boatHeadingReceived && showUI)
 
         anchors.bottom: parent.bottom
         anchors.right: parent.right
