@@ -31,11 +31,11 @@ Item {
     property string boatTime: ""
     property double boatLatitude: 0
     property double boatLongitude: 0
-    property double boatHeading: 0
-    property double boatDepth: 0
-    property double boatSpeed: 0
-    property double boatCourse: 0
-    property double boatWaterTemperature: 0
+    property double boatHeading: 0          //°
+    property double boatCourse: 0           //°
+    property double boatDepth: 0            //meters
+    property double boatSpeed: 0            //knots
+    property double boatWaterTemperature: 0 //°C
 
     //Boat data received check
     property bool boatDateReceived: false
@@ -134,6 +134,21 @@ Item {
 
 
 
+    ////////////////
+    /// Connects ///
+    ////////////////
+    //Update mouse position from boat when boat position changes
+    Connections {
+        onBoatLatitudeChanged: {
+            updateCursorCalculations()
+        }
+        onBoatLongitudeChanged: {
+            updateCursorCalculations()
+        }
+    }
+
+
+
     //////////////////
     /// Mouse Area ///
     //////////////////
@@ -177,11 +192,13 @@ Item {
             cursorBearingBoat = calculateBearing(boatLatitude, boatLongitude, cursorLatitude, cursorLongitude)
         }
 
+
         // Right-click menu
         onClicked: {
              if (mouse.button === Qt.RightButton) {
                  contextMenu.popup()
              }
+
          }
     }
 
@@ -412,6 +429,8 @@ Item {
     ///////////////////////////////
     Column {
         id: leftSideInfoColumn
+        visible: true
+
         anchors.top: parent.top
         anchors.topMargin: labelVerticalMargin * 2
         anchors.left: parent.left
@@ -484,7 +503,7 @@ Item {
                    "Lon: " + cursorLongitude.toFixed(6)
         }
 
-        // Cursor distance and bearing from boat
+        // Cursor distance, bearing and ETA from boat
         Label {
             id: distanceBearinFromBoat
             color: labelColor
@@ -499,8 +518,9 @@ Item {
             }
             font.pixelSize: 14
             text: "From Boat" + "\n" +
-                  "Distance: " + metersToNauticalMiles(cursorDistanceBoat).toFixed(1) + "NM"  + "\n" +
-                  "Bearing : " + cursorBearingBoat.toFixed(0) + "°"
+                  "Distance: " + metersToNauticalMiles(cursorDistanceBoat).toFixed(2) + "NM"  + "\n" +
+                  "Bearing: " + cursorBearingBoat.toFixed(0) + "°" + "\n" +
+                  "ETA: " + secondsToDHMS(getETA(cursorDistanceBoat, boatSpeed))
         }
 
         // Last Time Position Update
@@ -527,6 +547,7 @@ Item {
     ////////////////////////////////
     Column {
         id: rightSideInfoColumn
+        visible: true
 
         anchors.top: parent.top
         anchors.topMargin: labelVerticalMargin * 2
@@ -686,6 +707,7 @@ Item {
     ///////////////////
     Canvas {
         id: compassCanvas
+
         width: 150
         height: 150
         visible: boatHeadingReceived
@@ -882,6 +904,16 @@ Item {
         boatWaterTempratureReceived = true
     }
 
+    // Recalculate cursor coordinate relative to mouse position
+    function updateCursorCalculations() {
+        var coord = map.toCoordinate(Qt.point(mouseArea.mouseX, mouseArea.mouseY))
+        cursorLatitude = coord.latitude
+        cursorLongitude = coord.longitude
+
+        cursorDistanceBoat = haversineDistance(boatLatitude, boatLongitude, cursorLatitude, cursorLongitude)
+        cursorBearingBoat = calculateBearing(boatLatitude, boatLongitude, cursorLatitude, cursorLongitude)
+    }
+
 
 
     ///////////////////
@@ -899,6 +931,10 @@ Item {
         return meters / 1852.0
     }
 
+    function knotsToMps(speedKnots) {
+        return speedKnots * 0.514444;
+    }
+
 
 
     /////////////////////////
@@ -911,6 +947,7 @@ Item {
 
         return lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180
     }
+
     //Distance between 2 positions
     function haversineDistance(lat1, lon1, lat2, lon2) {
         const R = 6378137.0; // Earth radius in meters
@@ -945,5 +982,38 @@ Item {
         let bearing = toDegrees(Math.atan2(y, x))
         return (bearing + 360) % 360  // Normalize to 0–359°
     }
+
+    //Get Estimated Time of Arrival
+    function getETA(distanceFromBoat, speed) {
+        if (speed === 0)
+            return NaN;
+
+        return distanceFromBoat/knotsToMps(boatSpeed) // meter / mps = seconds
+    }
+
+    //Convert seconds to hours/minutes/seconds
+    function secondsToDHMS(seconds) {
+        if (isNaN(seconds))
+            return "N/A";
+
+        var d = Math.floor(seconds / 86400);
+        var h = Math.floor((seconds % 86400) / 3600);
+        var m = Math.floor((seconds % 3600) / 60);
+        var s = Math.floor(seconds % 60);
+
+        // Show days, hours, minutes only
+        if (d > 0) {
+            return (d > 0 ? d + "d " : "") +
+                   (h > 0 ? h + "h " : "") +
+                   (m > 0 ? m + "m" : "");
+        }
+        // Show h, m, s normally
+        else {
+            return (h > 0 ? h + "h " : "") +
+                   (m > 0 ? m + "m " : "") +
+                   s + "s";
+        }
+    }
+
 }
 
