@@ -71,6 +71,7 @@ Item {
     property int rightClickMenuWidth: 150
 
     //Map
+    property bool followBoat : false
     property bool zoomedIn : false
     property bool headingUpView: false
     property real mapRotation: headingUpView ? boatHeading : 0
@@ -195,7 +196,7 @@ Item {
 
         MenuItem {
             contentItem: Label {
-                text: "Center Map On Boat"
+                text: "Center View On Boat"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 width: parent.width
@@ -208,12 +209,22 @@ Item {
 
         MenuItem {
             contentItem: Label {
-                text: "Center View"
+                text: "Center View..."
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 width: parent.width
             }
             onTriggered: centerViewDialog.open()
+        }
+
+        MenuItem {
+            contentItem: Label {
+                text: followBoat ? "Unfollow Boat" : "Follow Boat"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+            onTriggered: followBoat= !followBoat
         }
 
         MenuItem {
@@ -361,7 +372,7 @@ Item {
     /// Timers ///
     //////////////
     Timer {
-        id: updateTimer
+        id: updateLastPositionTimer
         interval: 1000
         running: true
         repeat: true
@@ -379,6 +390,18 @@ Item {
                     textTimerPositionUpdate = "Position Updated\n"+ Math.ceil(elapsedSec) + "s ago"
             else
                 textTimerPositionUpdate = "Position Lost"
+        }
+    }
+
+    Timer {
+        id: updateMapViewOnBoatTimer
+        interval: 1000
+        running: true
+        repeat: true
+        onTriggered: {
+            if (followBoat){
+                setCenterPositionOnBoat()
+            }
         }
     }
 
@@ -875,6 +898,7 @@ Item {
     function metersToNauticalMiles(meters) {
         return meters / 1852.0
     }
+
 
 
     /////////////////////////
