@@ -48,14 +48,15 @@ Item {
     property bool boatWaterTempratureReceived: false
 
     //Labels
-    property int labelRightSideWidth : 140
-    property int labelLeftSideWidth : 130
+    property int labelRightSideWidth : 135
+    property int labelLeftSideWidth : 135
     property int labelPadding : 8
     property int labelLateralMargin : 8
     property int labelVerticalMargin : 8
     property int labelFontSize : 14
     property int labelBackgroundRadius : 4
-    property string labelColor : "grey"
+    property string labelColor : "white"
+    property string labelBackgroundColor : "grey"
 
     //Zoom
     property double mapZoomLevel : 3
@@ -199,12 +200,25 @@ Item {
                 verticalAlignment: Text.AlignVCenter
                 width: parent.width
             }
-            onTriggered: setCenterPositionOnBoat()
+            onTriggered: {
+                if(boatPositionReceived)
+                    setCenterPositionOnBoat()
+            }
         }
 
         MenuItem {
             contentItem: Label {
-                text: zoomedIn ? "Large View" : "Close View"
+                text: "Center View"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+            onTriggered: centerViewDialog.open()
+        }
+
+        MenuItem {
+            contentItem: Label {
+                text: zoomedIn ? "Zoom Out" : "Zoom In"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 width: parent.width
@@ -229,12 +243,73 @@ Item {
 
         MenuItem {
             contentItem: Label {
-                text: "Clear Map"
+                text: "Clear Markers"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 width: parent.width
             }
             onTriggered: clearMarkers()
+        }
+    }
+
+
+
+    ////////////////////
+    /// Dialog boxes ///
+    ////////////////////
+    Dialog {
+        id: centerViewDialog
+        modal: false
+        closePolicy: Popup.NoAutoClose
+
+        title: "Center View On Position"
+        standardButtons: Dialog.Ok | Dialog.Cancel
+
+        x: (parent.width  - width)  / 2
+        y: (parent.height - height) / 2
+
+        background: Rectangle {
+            color: "white"
+            radius: 12
+        }
+
+        Column {
+            spacing: 10
+            padding: 20
+
+            Label { text: "Latitude:" }
+            TextField {
+                id: latInput
+                placeholderText: " "
+                inputMethodHints: Qt.ImhFormattedNumbersOnly
+            }
+
+            Label { text: "Longitude:" }
+            TextField {
+                id: lonInput
+                placeholderText: " "
+                inputMethodHints: Qt.ImhFormattedNumbersOnly
+            }
+
+            Label {
+                id: errorLabel
+                text: ""
+                color: "red"
+                visible: text !== ""
+            }
+        }
+
+        onAccepted: {
+            var lat = parseFloat(latInput.text)
+            var lon = parseFloat(lonInput.text)
+            if (isPositionValid(lat,lon)){
+                setCenterPosition(lat, lon)
+                errorLabel.text = ""
+            }
+            else{
+                errorLabel.text = "Wrong input"
+                centerViewDialog.acc
+            }
         }
     }
 
@@ -323,12 +398,13 @@ Item {
         // Map type
         Label {
             id: mapLabel
+            color: labelColor
             width: labelLeftSideWidth
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             padding: labelPadding
             background: Rectangle {
-                color: labelColor
+                color: labelBackgroundColor
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: 14
@@ -338,12 +414,13 @@ Item {
         // Zoom level
         Label {
             id: zoomLabel
+            color: labelColor
             width: labelLeftSideWidth
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             padding: labelPadding
             background: Rectangle {
-                color: labelColor
+                color: labelBackgroundColor
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: 14
@@ -353,12 +430,13 @@ Item {
         // Map View Mode
         Label {
             id: mapViewMode
+            color: labelColor
             width: labelLeftSideWidth
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             padding: labelPadding
             background: Rectangle {
-                color: labelColor
+                color: labelBackgroundColor
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: 14
@@ -368,12 +446,13 @@ Item {
         // Cursor position
         Label {
             id: cursorPosition
+            color: labelColor
             width: labelLeftSideWidth
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             padding: labelPadding
             background: Rectangle {
-                color: labelColor
+                color: labelBackgroundColor
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: 14
@@ -385,13 +464,14 @@ Item {
         // Cursor distance and bearing from boat
         Label {
             id: distanceBearinFromBoat
+            color: labelColor
             width: labelLeftSideWidth
             visible: boatPositionReceived
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             padding: labelPadding
             background: Rectangle {
-                color: labelColor
+                color: labelBackgroundColor
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: 14
@@ -403,12 +483,13 @@ Item {
         // Last Time Position Update
         Label {
             id: elapsedLabel
+            color: labelColor
             width: labelLeftSideWidth
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             padding: labelPadding
             background: Rectangle {
-                color: elapsedSec > timeBeforePositionLost ? "indianred" : labelColor
+                color: elapsedSec > timeBeforePositionLost ? "indianred" : labelBackgroundColor
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: 14
@@ -423,6 +504,7 @@ Item {
     ////////////////////////////////
     Column {
         id: rightSideInfoColumn
+
         anchors.top: parent.top
         anchors.topMargin: labelVerticalMargin * 2
         anchors.right: parent.right
@@ -432,13 +514,14 @@ Item {
         // Boat Date
         Label {
             id: dateLabel
+            color: labelColor
             visible: boatDateReceived
             width: labelRightSideWidth
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             padding: labelPadding
             background: Rectangle {
-                color: labelColor
+                color: labelBackgroundColor
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: labelFontSize
@@ -449,13 +532,14 @@ Item {
         // Boat Time
         Label {
             id: timeLabel
+            color: labelColor
             visible: boatTimeReceived
             width: labelRightSideWidth
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             padding: labelPadding
             background: Rectangle {
-                color: labelColor
+                color: labelBackgroundColor
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: labelFontSize
@@ -466,13 +550,14 @@ Item {
         // Boat Position
         Label {
             id: positionLabel
+            color: labelColor
             visible: boatPositionReceived
             width: labelRightSideWidth
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             padding: labelPadding
             background: Rectangle {
-                color: labelColor
+                color: labelBackgroundColor
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: labelFontSize
@@ -483,13 +568,14 @@ Item {
         // Heading
         Label {
             id: headingLabel
+            color: labelColor
             visible: boatHeadingReceived
             width: labelRightSideWidth
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             padding: labelPadding
             background: Rectangle {
-                color: labelColor
+                color: labelBackgroundColor
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: labelFontSize
@@ -500,13 +586,14 @@ Item {
         // Course
         Label {
             id: courseLabel
+            color: labelColor
             visible: boatCourseReceived
             width: labelRightSideWidth
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             padding: labelPadding
             background: Rectangle {
-                color: labelColor
+                color: labelBackgroundColor
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: labelFontSize
@@ -517,13 +604,14 @@ Item {
         // Speed
         Label {
             id: speedLabel
+            color: labelColor
             visible: boatSpeedReceived
             width: labelRightSideWidth
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             padding: labelPadding
             background: Rectangle {
-                color: labelColor
+                color: labelBackgroundColor
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: labelFontSize
@@ -534,13 +622,14 @@ Item {
         // Depth
         Label {
             id: depthLabel
+            color: labelColor
             visible: boatDepthReceived
             width: labelRightSideWidth
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             padding: labelPadding
             background: Rectangle {
-                color: labelColor
+                color: labelBackgroundColor
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: labelFontSize
@@ -551,13 +640,14 @@ Item {
         // Water Temperature
         Label {
             id: waterTemperatureLabel
+            color: labelColor
             visible: boatWaterTempratureReceived
             width: labelRightSideWidth
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             padding: labelPadding
             background: Rectangle {
-                color: labelColor
+                color: labelBackgroundColor
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: labelFontSize
@@ -565,6 +655,7 @@ Item {
                                               : "Water Temp: " + noData
         }
     }
+
 
 
     ///////////////////
@@ -575,6 +666,7 @@ Item {
         width: 150
         height: 150
         visible: boatHeadingReceived
+
         anchors.bottom: parent.bottom
         anchors.right: parent.right
         anchors.bottomMargin: labelVerticalMargin
@@ -620,7 +712,7 @@ Item {
             ctx.rotate((heading - 0) * Math.PI / 180)
 
             ctx.beginPath()
-            ctx.moveTo(0, -radius + 10)
+            ctx.moveTo(0, -radius + 15)
             ctx.lineTo(5, 0)
             ctx.lineTo(-5, 0)
             ctx.closePath()
@@ -635,14 +727,20 @@ Item {
             ctx.rotate((course - 0) * Math.PI / 180)
 
             ctx.beginPath()
-            ctx.moveTo(0, -radius + 15)  // same length
-            ctx.lineTo(3, 0)             // narrower base
+            ctx.moveTo(0, -radius + 20)
+            ctx.lineTo(3, 0)
             ctx.lineTo(-3, 0)
             ctx.closePath()
 
             ctx.fillStyle = "blue"
             ctx.fill()
             ctx.restore()
+
+            // Draw center black circle
+            ctx.beginPath()
+            ctx.arc(centerX, centerY, 5, 0, 2 * Math.PI)
+            ctx.fillStyle = "black"
+            ctx.fill()
         }
 
         // Redraw when heading changes
@@ -652,6 +750,7 @@ Item {
             onCourseChanged: compassCanvas.requestPaint()
         }
     }
+
 
 
     //////////////////
@@ -781,6 +880,13 @@ Item {
     /////////////////////////
     /// Generic Functions ///
     /////////////////////////
+    // Check if position is valid
+    function isPositionValid(lat, lon) {
+        if (isNaN(lat) || isNaN(lon))
+            return false
+
+        return lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180
+    }
     //Distance between 2 positions
     function haversineDistance(lat1, lon1, lat2, lon2) {
         const R = 6378137.0; // Earth radius in meters
