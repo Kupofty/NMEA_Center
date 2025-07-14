@@ -64,8 +64,11 @@ Item {
     property double lastWheelRotation: 0
 
     //Markers
-    property Component locationmarker: locmarker
-    property Component boatMapMarker: boatmarker
+    property Component redMarker: redMarkerImg
+    property Component boatMarker: boatMarkerImg
+
+    // Declare boat marker reference
+    property var boatMarkerRef: null
 
     //Right-click Menu
     property int rightClickMenuWidth: 150
@@ -112,14 +115,10 @@ Item {
     ////////////////
     /// Connects ///
     ////////////////
-    //Update mouse position from boat when boat position changes
+    //Update mouse position on boat movement
     Connections {
-        onBoatLatitudeChanged: {
-            updateCursorCalculations()
-        }
-        onBoatLongitudeChanged: {
-            updateCursorCalculations()
-        }
+        onBoatLatitudeChanged:  updateCursorCalculations()
+        onBoatLongitudeChanged: updateCursorCalculations()
     }
 
 
@@ -128,15 +127,17 @@ Item {
     /// Zoom ///
     ////////////
     WheelHandler {
-        id: wheelZoom
+        id: wheelZoomHandler
         target: map
 
         onWheel: {
             var wheelRotation = rotation - lastWheelRotation
+
             if (wheelRotation > 0)
                 map.zoomLevel = Math.min(map.maximumZoomLevel, map.zoomLevel + zoomSpeed);
             else if (wheelRotation < 0)
                 map.zoomLevel = Math.max(map.minimumZoomLevel, map.zoomLevel - zoomSpeed);
+
             lastWheelRotation = rotation
             mapZoomLevel = map.zoomLevel
         }
@@ -165,7 +166,6 @@ Item {
                 dragging = true
             }
         }
-
         onReleased: dragging = false
 
         onPositionChanged: {
@@ -187,13 +187,11 @@ Item {
             cursorBearingBoat = calculateBearing(boatLatitude, boatLongitude, cursorLatitude, cursorLongitude)
         }
 
-
         // Right-click menu
         onClicked: {
              if (mouse.button === Qt.RightButton) {
                  contextMenu.popup()
              }
-
          }
     }
 
@@ -205,6 +203,7 @@ Item {
     Menu {
         id: contextMenu
         width: rightClickMenuWidth
+
 
         MenuItem {
             contentItem: Label {
@@ -277,6 +276,26 @@ Item {
             }
         }
 
+        MenuItem{
+            contentItem: Label {
+                text: "Drop Marker"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+            onTriggered: addMarkerOnMap(cursorLatitude, cursorLongitude)
+        }
+
+        MenuItem{
+            contentItem: Label {
+                text: "Drop Marker On Boat"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+            onTriggered: addMarkerOnMap(boatLatitude, boatLongitude)
+        }
+
         MenuItem {
             contentItem: Label {
                 text: "Clear Markers"
@@ -307,7 +326,6 @@ Item {
         id: centerViewDialog
         modal: false
         closePolicy: Popup.NoAutoClose
-
         title: "Center View On Position"
         standardButtons: Dialog.Ok | Dialog.Cancel
 
@@ -348,6 +366,7 @@ Item {
         onAccepted: {
             var lat = parseFloat(latInput.text)
             var lon = parseFloat(lonInput.text)
+
             if (isPositionValid(lat,lon)){
                 setCenterPosition(lat, lon)
                 errorLabel.text = ""
@@ -366,27 +385,27 @@ Item {
     ////////////////////////
     //Markers
     Component {
-        id: locmarker
+        id: redMarkerImg
+
         MapQuickItem {
-            id: markerImg
             anchorPoint.x: image.width / 2
             anchorPoint.y: image.height / 2
             coordinate: position
 
             sourceItem: Image {
                 id: image
-                width: 20
-                height: 20
-                source: "qrc:/markers/blueMarker"
+                width: 30
+                height: 30
+                source: "qrc:/markers/redMarker"
             }
         }
     }
 
     //Main boat icon
     Component {
-        id: boatmarker
+        id: boatMarkerImg
+
         MapQuickItem {
-            id: boatMarkerImg
             anchorPoint.x: image.width / 2
             anchorPoint.y: image.height / 2
             coordinate: position
@@ -411,6 +430,7 @@ Item {
         interval: 1000
         running: true
         repeat: true
+
         onTriggered: {
             if (timeLastPosition === 0) {
                 return
@@ -435,6 +455,7 @@ Item {
         interval: 1000
         running: true
         repeat: true
+
         onTriggered: {
             if (followBoat){
                 setCenterPositionOnBoat()
@@ -834,30 +855,38 @@ Item {
     }
 
     //Add marker
-    function setLocationMarking(lat, lon) {
-        var item = locationmarker.createObject(window, {
+    function addMarkerOnMap(lat, lon) {
+        var item = redMarker.createObject(window, {
             coordinate: QtPositioning.coordinate(lat, lon),
         });
         map.addMapItem(item)
     }
 
     //Add boat icon
-    function updateBoatMap() {
-        clearMarkers()
+    function updateBoatIconOnMap() {
+        // Remove previous boat icon if it exists
+        if (boatMarkerRef !== null) {
+            map.removeMapItem(boatMarkerRef)
+            boatMarkerRef.destroy()
+            boatMarkerRef = null
+        }
 
-        var item = boatMapMarker.createObject(window, {
+        // Create and store new boat marker
+        boatMarkerRef = boatMarker.createObject(window, {
             coordinate: QtPositioning.coordinate(boatLatitude, boatLongitude),
             rotation: boatHeading - mapRotation
-        });
-        map.addMapItem(item)
+        })
+
+        map.addMapItem(boatMarkerRef)
     }
 
     //Remove all markers from map
     function clearMarkers() {
         map.clearMapItems()
+        updateBoatIconOnMap()
     }
 
-    // Increment Map Zoom
+    //Increment Map Zoom
     function incrementZoomMap(dz) {
         if (dz > 0)
             map.zoomLevel = Math.min(map.maximumZoomLevel, map.zoomLevel + dz);
@@ -866,7 +895,7 @@ Item {
         mapZoomLevel = map.zoomLevel
     }
 
-    // Go To Zoom Level Map
+    //Go To Zoom Level Map
     function goToZoomLevelMap(zoomLevel) {
         map.zoomLevel = zoomLevel;
         mapZoomLevel = map.zoomLevel
@@ -897,40 +926,40 @@ Item {
         timeLastPosition = Date.now()
         boatPositionReceived = true
 
-        updateBoatMap()
+        updateBoatIconOnMap()
     }
 
-    // Update boat heading
+    //Update boat heading
     function updateBoatHeading(head) {
         boatHeading = head
         boatHeadingReceived = true
     }
 
-    // Update boat depth
+    //Update boat depth
     function updateBoatDepth(depth) {
         boatDepth = depth
         boatDepthReceived = true
     }
 
-    // Update boat speed
+    //Update boat speed
     function updateBoatSpeed(speed) {
         boatSpeed = speed
         boatSpeedReceived = true
     }
 
-    // Update boat course
+    //Update boat course
     function updateBoatCourse(course) {
         boatCourse = course
         boatCourseReceived = true
     }
 
-    // Update boat water temperature
+    //Update boat water temperature
     function updateBoatWaterTemperature(temp) {
         boatWaterTemperature = temp
         boatWaterTemperatureReceived = true
     }
 
-    // Recalculate cursor coordinate relative to mouse position
+    //Recalculate cursor coordinate relative to mouse position
     function updateCursorCalculations() {
         var coord = map.toCoordinate(Qt.point(mouseArea.mouseX, mouseArea.mouseY))
         cursorLatitude = coord.latitude
@@ -979,7 +1008,7 @@ Item {
     /////////////////////////
     /// Generic Functions ///
     /////////////////////////
-    // Check if position is valid
+    //Check if position is valid
     function isPositionValid(lat, lon) {
         if (isNaN(lat) || isNaN(lon))
             return false
