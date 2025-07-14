@@ -16,13 +16,13 @@ Item {
     /// Global variables ///
     ////////////////////////
     //Position
-    property double latitude : 35
-    property double longitude : 0
+    property double mapCenterLatitude:  35
+    property double mapCenterLongitude: 0
 
     //Cursor
-    property double cursorLatitude : NaN
+    property double cursorLatitude: NaN
     property double cursorLongitude: NaN
-    property double cursorDistanceBoat : NaN
+    property double cursorDistanceBoat: NaN
     property double cursorBearingBoat: NaN
 
     //Boat data
@@ -45,23 +45,23 @@ Item {
     property bool boatCourseReceived: false
     property bool boatDepthReceived: false
     property bool boatSpeedReceived: false
-    property bool boatWaterTempratureReceived: false
+    property bool boatWaterTemperatureReceived: false
 
     //Labels
-    property int labelRightSideWidth : 135
-    property int labelLeftSideWidth : 135
-    property int labelPadding : 8
-    property int labelLateralMargin : 8
-    property int labelVerticalMargin : 8
-    property int labelFontSize : 14
-    property int labelBackgroundRadius : 4
-    property string labelColor : "white"
-    property string labelBackgroundColor : "grey"
+    property int labelRightSideWidth: 135
+    property int labelLeftSideWidth: 135
+    property int labelPadding: 8
+    property int labelLateralMargin: 8
+    property int labelVerticalMargin: 8
+    property int labelFontSize: 14
+    property int labelBackgroundRadius: 4
+    property string labelColor: "white"
+    property string labelBackgroundColor: "grey"
 
     //Zoom
-    property double mapZoomLevel : 3
-    property double zoomSpeed : 0.2
-    property double lastWheelRotation : 0
+    property double mapZoomLevel: 3
+    property double zoomSpeed: 0.2
+    property double lastWheelRotation: 0
 
     //Markers
     property Component locationmarker: locmarker
@@ -71,8 +71,8 @@ Item {
     property int rightClickMenuWidth: 150
 
     //Map
-    property bool showUI : true
-    property bool followBoat : false
+    property bool showUI: true
+    property bool followBoat: false
     property bool headingUpView: false
     property real mapRotation: headingUpView ? boatHeading : 0
 
@@ -84,11 +84,11 @@ Item {
 
 
 
-    //////////////
-    /// Plugin ///
-    //////////////
+    //////////////////
+    /// Map Plugin ///
+    //////////////////
     Plugin {
-        id: osmView
+        id: osmPlugin
         name: "osm"
         locales: "fr_FR"
         PluginParameter {
@@ -97,19 +97,29 @@ Item {
         }
     }
 
-
-
-    ///////////
-    /// Map ///
-    ///////////
     Map {
         id: map
         anchors.fill: parent
-        plugin: osmView
-        center: QtPositioning.coordinate(latitude, longitude)
+        plugin: osmPlugin
+        center: QtPositioning.coordinate(mapCenterLatitude, mapCenterLongitude)
         zoomLevel: mapZoomLevel
         activeMapType: map.supportedMapTypes[map.supportedMapTypes.length - 1]
         bearing: mapRotation
+    }
+
+
+
+    ////////////////
+    /// Connects ///
+    ////////////////
+    //Update mouse position from boat when boat position changes
+    Connections {
+        onBoatLatitudeChanged: {
+            updateCursorCalculations()
+        }
+        onBoatLongitudeChanged: {
+            updateCursorCalculations()
+        }
     }
 
 
@@ -129,21 +139,6 @@ Item {
                 map.zoomLevel = Math.max(map.minimumZoomLevel, map.zoomLevel - zoomSpeed);
             lastWheelRotation = rotation
             mapZoomLevel = map.zoomLevel
-        }
-    }
-
-
-
-    ////////////////
-    /// Connects ///
-    ////////////////
-    //Update mouse position from boat when boat position changes
-    Connections {
-        onBoatLatitudeChanged: {
-            updateCursorCalculations()
-        }
-        onBoatLongitudeChanged: {
-            updateCursorCalculations()
         }
     }
 
@@ -524,8 +519,8 @@ Item {
             }
             font.pixelSize: 14
             text: "Cursor Position" + "\n" +
-                   "Lat: " + cursorLatitude.toFixed(6) + "\n" +
-                   "Lon: " + cursorLongitude.toFixed(6)
+                   "Lat: " + formatLat(cursorLatitude) + "\n" +
+                   "Lon: " + formatLon(cursorLongitude)
         }
 
         // Cursor distance, bearing and ETA from boat
@@ -543,7 +538,9 @@ Item {
             }
             font.pixelSize: 14
             text: "From Boat" + "\n" +
-                  "Distance: " + metersToNauticalMiles(cursorDistanceBoat).toFixed(2) + "NM"  + "\n" +
+                  "Distance: " + (metersToNauticalMiles(cursorDistanceBoat) > 100
+                                 ? metersToNauticalMiles(cursorDistanceBoat).toFixed(0)
+                                 : metersToNauticalMiles(cursorDistanceBoat).toFixed(2)) + "NM" + "\n" +
                   "Bearing: " + cursorBearingBoat.toFixed(0) + "°" + "\n" +
                   "ETA: " + secondsToDHMS(getETA(cursorDistanceBoat, boatSpeed))
         }
@@ -630,7 +627,7 @@ Item {
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: labelFontSize
-            text: boatPositionReceived ? "Boat Position\nLat: " + boatLatitude.toFixed(6) + "\nLon: " + boatLongitude.toFixed(6)
+            text: boatPositionReceived ? "Boat Position\nLat: " + formatLat(boatLatitude) + "\nLon: " + formatLon(boatLongitude)
                                        : "Boat Position\n" + noData
         }
 
@@ -710,7 +707,7 @@ Item {
         Label {
             id: waterTemperatureLabel
             color: labelColor
-            visible: boatWaterTempratureReceived
+            visible: boatWaterTemperatureReceived
             width: labelRightSideWidth
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -720,7 +717,7 @@ Item {
                 radius :  labelBackgroundRadius
             }
             font.pixelSize: labelFontSize
-            text: boatWaterTempratureReceived ? "Water Temp: " + boatWaterTemperature.toFixed(1) + "°C"
+            text: boatWaterTemperatureReceived ? "Water Temp: " + boatWaterTemperature.toFixed(1) + "°C"
                                               : "Water Temp: " + noData
         }
     }
@@ -930,7 +927,7 @@ Item {
     // Update boat water temperature
     function updateBoatWaterTemperature(temp) {
         boatWaterTemperature = temp
-        boatWaterTempratureReceived = true
+        boatWaterTemperatureReceived = true
     }
 
     // Recalculate cursor coordinate relative to mouse position
@@ -962,6 +959,19 @@ Item {
 
     function knotsToMps(speedKnots) {
         return speedKnots * 0.514444;
+    }
+
+
+
+    //////////////
+    /// Format ///
+    //////////////
+    function formatLat(lat) {
+        return Math.abs(lat).toFixed(5) + "°" + (lat >= 0 ? "N" : "S")
+    }
+
+    function formatLon(lon) {
+        return Math.abs(lon).toFixed(5) + "°" + (lon >= 0 ? "E" : "W")
     }
 
 
