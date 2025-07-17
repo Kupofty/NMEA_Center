@@ -81,7 +81,9 @@ Item {
 
     //Timer Position Update
     property int timeBeforePositionLost: 30
+    property int timeBeforeHeadingLost: 5
     property double timeLastPosition: 0
+    property double timeLastHeading: 0
     property double elapsedSec: 0
     property string textTimerPositionUpdate: "No Position Data"
 
@@ -108,6 +110,18 @@ Item {
         zoomLevel: mapZoomLevel
         activeMapType: map.supportedMapTypes[map.supportedMapTypes.length - 1]
         bearing: mapRotation
+
+        //Heading line
+        MapPolyline {
+            visible: (boatPositionReceived && boatHeadingReceived)
+            line.width: 2
+            line.color: "red"
+
+            path: [
+                QtPositioning.coordinate(boatLatitude, boatLongitude),
+                destinationCoordinate(boatLatitude, boatLongitude, boatHeading, 155*boatSpeed)
+            ]
+        }
     }
 
 
@@ -537,6 +551,7 @@ Item {
     //////////////
     /// Timers ///
     //////////////
+    //Boat Position
     Timer {
         id: updateLastPositionTimer
         interval: 1000
@@ -562,6 +577,24 @@ Item {
         }
     }
 
+    //Boat Heading
+    Timer {
+        id: updateLastHeadingTimer
+        interval: 1000
+        running: true
+        repeat: true
+
+        onTriggered: {
+            if (timeLastHeading === 0)
+                return
+
+            elapsedSec = (Date.now() - timeLastHeading) / 1000
+            if(elapsedSec > timeBeforeHeadingLost)
+                boatHeadingReceived = false
+        }
+    }
+
+    //Update boat icon on map
     Timer {
         id: updateMapViewOnBoatTimer
         interval: 1000
@@ -981,6 +1014,7 @@ Item {
             map.removeMapItem(boatMarkerRef)
             boatMarkerRef.destroy()
             boatMarkerRef = null
+
         }
 
         // Create and store new boat marker
@@ -1046,6 +1080,8 @@ Item {
     //Update boat heading
     function updateBoatHeading(head) {
         boatHeading = head
+
+        timeLastHeading= Date.now()
         boatHeadingReceived = true
     }
 
@@ -1197,5 +1233,19 @@ Item {
         }
     }
 
+    //Calculate end position when adding distance to initial position/heading
+    function destinationCoordinate(lat, lon, bearingDeg, distanceMeters) {
+        const R = 6378137.0; // Earth radius in meters
+        const brng = toRadians(bearingDeg)
+        const phi_1 = lat * Math.PI / 180
+        const lambda_1 = lon * Math.PI / 180
+
+        const phi_2 = Math.asin(Math.sin(phi_1) * Math.cos(distanceMeters / R) +
+                             Math.cos(phi_1) * Math.sin(distanceMeters / R) * Math.cos(brng))
+        const lambda_2 = lambda_1 + Math.atan2(Math.sin(brng) * Math.sin(distanceMeters / R) * Math.cos(phi_1),
+                                   Math.cos(distanceMeters / R) - Math.sin(phi_1) * Math.sin(phi_2))
+
+        return QtPositioning.coordinate(phi_2 * 180 / Math.PI, lambda_2 * 180 / Math.PI)
+    }
 }
 
