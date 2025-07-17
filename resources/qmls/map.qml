@@ -200,20 +200,123 @@ Item {
     ////////////////////////
     /// Right-click Menu ///
     ////////////////////////
+    //Main Menu
     Menu {
         id: contextMenu
+        modal: true
         width: rightClickMenuWidth
 
+        //Center view
+        MenuItem{
+            id: centerViewItem
 
+            contentItem: Label {
+                text: "Center View..."
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+
+            onTriggered: {
+                centerViewSubmenu.popup(contextMenu.x + contextMenu.width, contextMenu.y + centerViewItem.y)
+            }
+        }
+
+        //Follow boat
+        MenuItem {
+            enabled: boatPositionReceived
+
+            contentItem: Label {
+                text: followBoat ? "Unfollow Boat" : "Follow Boat"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+
+            onTriggered: {
+                followBoat= !followBoat
+            }
+        }
+
+        //Zoom
+        MenuItem {
+            id: zoomItem
+
+            contentItem: Label {
+                text: "Zoom..."
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+
+            onTriggered: {
+                zoomSubmenu.popup(contextMenu.x + contextMenu.width, contextMenu.y + zoomItem.y)
+            }
+        }
+
+        //View up
         MenuItem {
             contentItem: Label {
-                text: "Center View On Boat"
+                text: headingUpView ? "North Up" : "Heading Up"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 width: parent.width
             }
             onTriggered: {
-                if(boatPositionReceived){
+                headingUpView = !headingUpView
+            }
+        }
+
+        //Markers
+        MenuItem{
+            id: markersItem
+
+            contentItem: Label {
+                text: "Markers..."
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+
+            onTriggered: {
+                markerSubmenu.popup(contextMenu.x + contextMenu.width, contextMenu.y + markersItem.y)
+            }
+        }
+
+        //UI Visibility
+        MenuItem {
+            contentItem: Label {
+                text: showUI ? "Hide UI" : "Show UI"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+            onTriggered: showUI = !showUI
+        }
+    }
+
+
+    ////////////////////////////
+    /// Right-click Submenus ///
+    ////////////////////////////
+    //Center View
+    Menu {
+        id: centerViewSubmenu
+        width: rightClickMenuWidth/1.5
+        modal: true
+
+        MenuItem {
+            enabled: boatPositionReceived
+
+            contentItem: Label {
+                text: "On Boat"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+
+            onTriggered: {
+                if (boatPositionReceived) {
                     setCenterPositionOnBoat()
                     goToZoomLevelMap(15)
                 }
@@ -222,22 +325,72 @@ Item {
 
         MenuItem {
             contentItem: Label {
-                text: "Center View..."
+                text: "On Position"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 width: parent.width
             }
             onTriggered: centerViewDialog.open()
         }
+    }
+
+    //Markers
+    Menu {
+        id: markerSubmenu
+        width: rightClickMenuWidth
+        modal: true
 
         MenuItem {
             contentItem: Label {
-                text: followBoat ? "Unfollow Boat" : "Follow Boat"
+                text: "Drop Marker On Cursor"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 width: parent.width
             }
-            onTriggered: followBoat= !followBoat
+            onTriggered: addMarkerOnMap(cursorLatitude, cursorLongitude)
+        }
+
+        MenuItem{
+            enabled: boatPositionReceived
+
+            contentItem: Label {
+                text: "Drop Marker On Boat"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+            onTriggered: {
+                addMarkerOnMap(boatLatitude, boatLongitude)
+            }
+        }
+
+        MenuItem {
+            contentItem: Label {
+                text: "Clear Markers"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+            onTriggered: clearMarkers()
+        }
+    }
+
+    //Zoom
+    Menu {
+        id: zoomSubmenu
+        width: rightClickMenuWidth
+        modal: true
+
+        MenuItem {
+            contentItem: Label {
+                text: "Maximum Zoom"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+            onTriggered:{
+                goToZoomLevelMap(map.maximumZoomLevel)
+            }
         }
 
         MenuItem {
@@ -266,57 +419,16 @@ Item {
 
         MenuItem {
             contentItem: Label {
-                text: headingUpView ? "North Up" : "Heading Up"
+                text: "Minimum Zoom"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 width: parent.width
             }
-            onTriggered: {
-                headingUpView = !headingUpView
+            onTriggered:{
+                goToZoomLevelMap(map.minimumZoomLevel)
             }
-        }
-
-        MenuItem{
-            contentItem: Label {
-                text: "Drop Marker"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                width: parent.width
-            }
-            onTriggered: addMarkerOnMap(cursorLatitude, cursorLongitude)
-        }
-
-        MenuItem{
-            contentItem: Label {
-                text: "Drop Marker On Boat"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                width: parent.width
-            }
-            onTriggered: addMarkerOnMap(boatLatitude, boatLongitude)
-        }
-
-        MenuItem {
-            contentItem: Label {
-                text: "Clear Markers"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                width: parent.width
-            }
-            onTriggered: clearMarkers()
-        }
-
-        MenuItem {
-            contentItem: Label {
-                text: showUI ? "Hide UI" : "Show UI"
-                horizontalAlignment: Text.AlignHCenter
-                verticalAlignment: Text.AlignVCenter
-                width: parent.width
-            }
-            onTriggered: showUI = !showUI
         }
     }
-
 
 
     ////////////////////
@@ -389,7 +501,7 @@ Item {
 
         MapQuickItem {
             anchorPoint.x: image.width / 2
-            anchorPoint.y: image.height / 2
+            anchorPoint.y: image.height
             coordinate: position
 
             sourceItem: Image {
@@ -883,7 +995,9 @@ Item {
     //Remove all markers from map
     function clearMarkers() {
         map.clearMapItems()
-        updateBoatIconOnMap()
+
+        if(boatPositionReceived)
+            updateBoatIconOnMap()
     }
 
     //Increment Map Zoom
