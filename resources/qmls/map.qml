@@ -41,6 +41,7 @@ Item {
     property bool boatDateReceived: false
     property bool boatTimeReceived: false
     property bool boatPositionReceived: false
+    property bool boatPositionInit: false
     property bool boatHeadingReceived: false
     property bool boatCourseReceived: false
     property bool boatDepthReceived: false
@@ -261,7 +262,7 @@ Item {
 
         //Follow boat
         MenuItem {
-            enabled: boatPositionReceived
+            enabled: boatPositionInit
 
             contentItem: Label {
                 text: followBoat ? "Unfollow Boat" : "Follow Boat"
@@ -340,11 +341,11 @@ Item {
     //Center View
     Menu {
         id: centerViewSubmenu
-        width: rightClickMenuWidth/1.5
+        width: rightClickMenuWidth/1.2
         modal: true
 
         MenuItem {
-            enabled: boatPositionReceived
+            enabled: boatPositionInit
 
             contentItem: Label {
                 text: "On Boat"
@@ -354,10 +355,8 @@ Item {
             }
 
             onTriggered: {
-                if (boatPositionReceived) {
-                    setCenterPositionOnBoat()
-                    goToZoomLevelMap(15)
-                }
+                setCenterPositionOnBoat()
+                goToZoomLevelMap(15)
             }
         }
 
@@ -375,7 +374,7 @@ Item {
     //Markers
     Menu {
         id: markerSubmenu
-        width: rightClickMenuWidth
+        width: rightClickMenuWidth/0.8
         modal: true
 
         MenuItem {
@@ -389,7 +388,7 @@ Item {
         }
 
         MenuItem{
-            enabled: boatPositionReceived
+            enabled: boatPositionInit
 
             contentItem: Label {
                 text: "Drop Marker On Boat"
@@ -601,8 +600,6 @@ Item {
     //////////////
     /// Timers ///
     //////////////
-
-
     //Boat Date
     Timer {
         id: updateLastDateTimer
@@ -619,7 +616,6 @@ Item {
                 boatDateReceived = false
         }
     }
-
 
     //Boat Time
     Timer {
@@ -849,7 +845,7 @@ Item {
             id: distanceBearinFromBoat
             color: labelColor
             width: labelLeftSideWidth
-            visible: boatPositionReceived
+            visible: boatPositionInit
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
             padding: labelPadding
@@ -938,7 +934,7 @@ Item {
         Label {
             id: positionLabel
             color: labelColor
-            visible: boatPositionReceived
+            visible: boatPositionInit
             width: labelRightSideWidth
             horizontalAlignment: Text.AlignHCenter
             verticalAlignment: Text.AlignVCenter
@@ -949,7 +945,7 @@ Item {
             }
             font.pixelSize: labelFontSize
             text: boatPositionReceived ? "Boat Position\nLat: " + formatLat(boatLatitude) + "\nLon: " + formatLon(boatLongitude)
-                                       : "Boat Position\n" + noData
+                                       : "Last Boat Position\nLat: " + formatLat(boatLatitude) + "\nLon: " + formatLon(boatLongitude)
         }
 
         // Heading
@@ -1236,6 +1232,7 @@ Item {
 
         timeLastPosition = Date.now()
         boatPositionReceived = true
+        boatPositionInit = true
 
         updateBoatIconOnMap()
     }
