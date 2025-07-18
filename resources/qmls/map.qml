@@ -79,13 +79,17 @@ Item {
     property bool headingUpView: false
     property real mapRotation: headingUpView ? boatHeading : 0
 
-    //Timer Position Update
+    //Timer Data Update
     property int timeBeforePositionLost: 30
-    property int timeBeforeHeadingLost: 5
+    property int timeBeforeGeneralDataLost: 5
     property double timeLastPosition: 0
     property double timeLastHeading: 0
+    property double timeLastCourse: 0
     property double elapsedSec: 0
     property string textTimerPositionUpdate: "No Position Data"
+
+    //Heading & COG lines
+    property int boatLinesDistance: 155*boatSpeed // ~5min trip
 
 
 
@@ -111,6 +115,18 @@ Item {
         activeMapType: map.supportedMapTypes[map.supportedMapTypes.length - 1]
         bearing: mapRotation
 
+        //COG line
+        MapPolyline {
+            visible: (boatPositionReceived && boatCourseReceived)
+            line.width: 2
+            line.color: "blue"
+
+            path: [
+                QtPositioning.coordinate(boatLatitude, boatLongitude),
+                destinationCoordinate(boatLatitude, boatLongitude, boatCourse, boatLinesDistance)
+            ]
+        }
+
         //Heading line
         MapPolyline {
             visible: (boatPositionReceived && boatHeadingReceived)
@@ -119,9 +135,10 @@ Item {
 
             path: [
                 QtPositioning.coordinate(boatLatitude, boatLongitude),
-                destinationCoordinate(boatLatitude, boatLongitude, boatHeading, 155*boatSpeed)
+                destinationCoordinate(boatLatitude, boatLongitude, boatHeading, boatLinesDistance)
             ]
         }
+
     }
 
 
@@ -589,8 +606,25 @@ Item {
                 return
 
             elapsedSec = (Date.now() - timeLastHeading) / 1000
-            if(elapsedSec > timeBeforeHeadingLost)
+            if(elapsedSec > timeBeforeGeneralDataLost)
                 boatHeadingReceived = false
+        }
+    }
+
+    //Boat Course
+    Timer {
+        id: updateLastCourseTimer
+        interval: 1000
+        running: true
+        repeat: true
+
+        onTriggered: {
+            if (timeLastCourse === 0)
+                return
+
+            elapsedSec = (Date.now() - timeLastCourse) / 1000
+            if(elapsedSec > timeBeforeGeneralDataLost)
+                boatCourseReceived = false
         }
     }
 
@@ -1100,6 +1134,8 @@ Item {
     //Update boat course
     function updateBoatCourse(course) {
         boatCourse = course
+
+        timeLastCourse= Date.now()
         boatCourseReceived = true
     }
 
