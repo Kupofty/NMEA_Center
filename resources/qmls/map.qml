@@ -82,11 +82,17 @@ Item {
     //Timer Data Update
     property int timeBeforePositionLost: 30
     property int timeBeforeGeneralDataLost: 5
+    property string textTimerPositionUpdate: "No Position Data"
+
+    property double timeLastUtcDate: 0
+    property double timeLastUtcTime: 0
     property double timeLastPosition: 0
     property double timeLastHeading: 0
     property double timeLastCourse: 0
+    property double timeLastSpeed: 0
+    property double timeLastDepth: 0
+    property double timeLastWaterTemp: 0
     property double elapsedSec: 0
-    property string textTimerPositionUpdate: "No Position Data"
 
     //Heading & COG lines
     property int boatLinesDistance: 155*boatSpeed // ~5min trip
@@ -327,6 +333,7 @@ Item {
     }
 
 
+
     ////////////////////////////
     /// Right-click Submenus ///
     ////////////////////////////
@@ -426,6 +433,18 @@ Item {
 
         MenuItem {
             contentItem: Label {
+                text: "Minimum Zoom"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+            onTriggered:{
+                goToZoomLevelMap(map.minimumZoomLevel)
+            }
+        }
+
+        MenuItem {
+            contentItem: Label {
                 text: "Close View"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
@@ -450,16 +469,30 @@ Item {
 
         MenuItem {
             contentItem: Label {
-                text: "Minimum Zoom"
+                text: "Zoom+"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
                 width: parent.width
             }
             onTriggered:{
-                goToZoomLevelMap(map.minimumZoomLevel)
+                goToZoomLevelMap(mapZoomLevel+1)
             }
         }
+
+        MenuItem {
+            contentItem: Label {
+                text: "Zoom-"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+            onTriggered:{
+                goToZoomLevelMap(mapZoomLevel-1)
+            }
+        }
+
     }
+
 
 
     ////////////////////
@@ -568,6 +601,43 @@ Item {
     //////////////
     /// Timers ///
     //////////////
+
+
+    //Boat Date
+    Timer {
+        id: updateLastDateTimer
+        interval: 1000
+        running: true
+        repeat: true
+
+        onTriggered: {
+            if (timeLastUtcDate === 0)
+                return
+
+            elapsedSec = (Date.now() - timeLastUtcDate) / 1000
+            if(elapsedSec > timeBeforeGeneralDataLost)
+                boatDateReceived = false
+        }
+    }
+
+
+    //Boat Time
+    Timer {
+        id: updateLastTimeTimer
+        interval: 1000
+        running: true
+        repeat: true
+
+        onTriggered: {
+            if (timeLastUtcTime === 0)
+                return
+
+            elapsedSec = (Date.now() - timeLastUtcTime) / 1000
+            if(elapsedSec > timeBeforeGeneralDataLost)
+                boatTimeReceived = false
+        }
+    }
+
     //Boat Position
     Timer {
         id: updateLastPositionTimer
@@ -625,6 +695,57 @@ Item {
             elapsedSec = (Date.now() - timeLastCourse) / 1000
             if(elapsedSec > timeBeforeGeneralDataLost)
                 boatCourseReceived = false
+        }
+    }
+
+    //Boat Speed
+    Timer {
+        id: updateLastSpeedTimer
+        interval: 1000
+        running: true
+        repeat: true
+
+        onTriggered: {
+            if (timeLastSpeed === 0)
+                return
+
+            elapsedSec = (Date.now() - timeLastSpeed) / 1000
+            if(elapsedSec > timeBeforeGeneralDataLost)
+                boatSpeedReceived = false
+        }
+    }
+
+    //Boat Depth
+    Timer {
+        id: updateLastDepthTimer
+        interval: 1000
+        running: true
+        repeat: true
+
+        onTriggered: {
+            if (timeLastDepth === 0)
+                return
+
+            elapsedSec = (Date.now() - timeLastDepth) / 1000
+            if(elapsedSec > timeBeforeGeneralDataLost)
+                boatDepthReceived = false
+        }
+    }
+
+    //Boat WaterTemp
+    Timer {
+        id: updateLastWaterTempTimer
+        interval: 1000
+        running: true
+        repeat: true
+
+        onTriggered: {
+            if (timeLastWaterTemp === 0)
+                return
+
+            elapsedSec = (Date.now() - timeLastWaterTemp) / 1000
+            if(elapsedSec > timeBeforeGeneralDataLost)
+                boatWaterTemperatureReceived = false
         }
     }
 
@@ -1079,6 +1200,11 @@ Item {
 
     //Go To Zoom Level Map
     function goToZoomLevelMap(zoomLevel) {
+        if(zoomLevel > map.maximumZoomLevel)
+            zoomLevel = map.maximumZoomLevel
+        else if(zoomLevel < map.minimumZoomLevel)
+            zoomLevel = map.minimumZoomLevel
+
         map.zoomLevel = zoomLevel;
         mapZoomLevel = map.zoomLevel
     }
@@ -1091,12 +1217,15 @@ Item {
     //Update boat UTC time
     function updateBoatTime(time) {
         boatTime = time
+
+        timeLastUtcTime = Date.now()
         boatTimeReceived = true
     }
 
     //Update boat UTC Date
     function updateBoatDate(date) {
         boatDate = date
+        timeLastUtcDate = Date.now()
         boatDateReceived = true
     }
 
@@ -1122,12 +1251,16 @@ Item {
     //Update boat depth
     function updateBoatDepth(depth) {
         boatDepth = depth
+
+        timeLastDepth = Date.now()
         boatDepthReceived = true
     }
 
     //Update boat speed
     function updateBoatSpeed(speed) {
         boatSpeed = speed
+
+        timeLastSpeed = Date.now()
         boatSpeedReceived = true
     }
 
@@ -1142,6 +1275,8 @@ Item {
     //Update boat water temperature
     function updateBoatWaterTemperature(temp) {
         boatWaterTemperature = temp
+
+        timeLastWaterTemp = Date.now()
         boatWaterTemperatureReceived = true
     }
 
