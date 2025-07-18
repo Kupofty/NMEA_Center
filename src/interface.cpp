@@ -470,8 +470,8 @@ void Interface::updateDataMWV(double angle, QString ref, double speed, QString u
 void Interface::clearDecodedDataScreens()
 {
     //RMC
-    ui->label_utcTime_rmc->clear();
-    ui->label_date_rmc->clear();
+    ui->label_utcTime_rmc->setText("No Data");
+    ui->label_date_rmc->setText("No Data");
     ui->lcdNumber_latitude_rmc->display(0);
     ui->lcdNumber_longitude_rmc->display(0);
     ui->lcdNumber_sog_rmc->display(0);
@@ -496,10 +496,10 @@ void Interface::clearDecodedDataScreens()
     ui->lcdNumber_frequency_gsa->display(0);
 
     //GLL
+    ui->label_utcTime_gll->setText("No Data");
     ui->lcdNumber_latitude_gll->display(0);
     ui->lcdNumber_longitude_gll->display(0);
     ui->lcdNumber_frequency_gll->display(0);
-    ui->label_utcTime_gll->clear();
 
     //GSV
     ui->lcdNumber_satellites_gsv->display(0);
@@ -522,12 +522,39 @@ void Interface::clearDecodedDataScreens()
     ui->lcdNumber_depth_fathom_dbt->display(0);
     ui->lcdNumber_frequency_dbt->display(0);
 
+    //DPT
+    ui->lcdNumber_depth_dpt->display(0);
+    ui->lcdNumber_depth_offset_dpt->display(0);
+    ui->lcdNumber_frequency_dpt->display(0);
+
     //VHW
     ui->lcdNumber_heading_true_vhw->display(0);
     ui->lcdNumber_heading_mag_vhw->display(0);
     ui->lcdNumber_speed_knot_vhw->display(0);
     ui->lcdNumber_speed_kmh_vhw->display(0);
     ui->lcdNumber_frequency_vhw->display(0);
+
+    //ZDA
+    ui->label_utcTime_zda->setText("No Data");
+    ui->label_date_zda->setText("No Data");
+    ui->label_localZone_zda->setText("No Data");
+    ui->lcdNumber_frequency_zda->display(0);
+
+    //MWD
+    ui->lcdNumber_windDirection_mwd->display(0);
+    ui->lcdNumber_windDirection_mwd_2->display(0);
+    ui->lcdNumber_windSpeed_mwd->display(0);
+    ui->lcdNumber_windSpeed_mwd_2->display(0);
+    ui->lcdNumber_frequency_mwd->display(0);
+
+    //MTW
+    ui->lcdNumber_waterTemp_mtw->display(0);
+    ui->lcdNumber_frequency_mtw->display(0);
+
+    //MWV
+    ui->lcdNumber_windAngle_mwv->display(0);
+    ui->lcdNumber_windSpeed_mwv->display(0);
+    ui->lcdNumber_frequency_mwv->display(0);
 }
 
 
