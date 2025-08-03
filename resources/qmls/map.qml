@@ -67,6 +67,7 @@ Item {
     //Markers
     property Component redMarker: redMarkerImg
     property Component boatMarker: boatMarkerImg
+    property int userMarkerCount: 0
 
     // Declare boat marker reference
     property var boatMarkerRef: null
@@ -81,7 +82,7 @@ Item {
     property real mapRotation: headingUpView ? boatHeading : 0
 
     //Timer Data Update
-    property int timeBeforePositionLost: 30
+    property int timeBeforePositionLost: 10
     property int timeBeforeGeneralDataLost: 5
     property string textTimerPositionUpdate: "No Position Data"
 
@@ -402,6 +403,7 @@ Item {
         }
 
         MenuItem {
+            enabled: userMarkerCount > 0
             contentItem: Label {
                 text: "Clear Markers"
                 horizontalAlignment: Text.AlignHCenter
@@ -1154,8 +1156,11 @@ Item {
     function addMarkerOnMap(lat, lon) {
         var item = redMarker.createObject(window, {
             coordinate: QtPositioning.coordinate(lat, lon),
+            objectName: "marker"
         });
         map.addMapItem(item)
+
+        userMarkerCount++;
     }
 
     //Add boat icon
@@ -1179,10 +1184,14 @@ Item {
 
     //Remove all markers from map
     function clearMarkers() {
-        map.clearMapItems()
+        for (var i = map.mapItems.length - 1; i >= 0; i--) {
+            var item = map.mapItems[i];
+            if (item.objectName === "marker") { //Remove all markers with objectName: "marker"
+                map.removeMapItem(item);
+            }
+        }
 
-        if(boatPositionReceived)
-            updateBoatIconOnMap()
+        userMarkerCount = 0;
     }
 
     //Increment Map Zoom
