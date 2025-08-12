@@ -123,22 +123,10 @@ Item {
         activeMapType: map.supportedMapTypes[map.supportedMapTypes.length - 1]
         bearing: mapRotation
 
-        //COG line
-        MapPolyline {
-            visible: (boatPositionReceived && boatCourseReceived)
-            line.width: 2
-            line.color: "blue"
-
-            path: [
-                QtPositioning.coordinate(boatLatitude, boatLongitude),
-                destinationCoordinate(boatLatitude, boatLongitude, boatCourse, boatLinesDistance)
-            ]
-        }
-
         //Heading line
         MapPolyline {
             visible: (boatPositionReceived && boatHeadingReceived)
-            line.width: 2
+            line.width: 3
             line.color: "red"
 
             path: [
@@ -147,6 +135,17 @@ Item {
             ]
         }
 
+        //COG line
+        MapPolyline {
+            visible: (boatPositionReceived && boatCourseReceived)
+            line.width: 1
+            line.color: "blue"
+
+            path: [
+                QtPositioning.coordinate(boatLatitude, boatLongitude),
+                destinationCoordinate(boatLatitude, boatLongitude, boatCourse, boatLinesDistance)
+            ]
+        }
     }
 
 
@@ -363,6 +362,16 @@ Item {
 
         MenuItem {
             contentItem: Label {
+                text: "On Cursor"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+            onTriggered: setCenterPosition(cursorLatitude, cursorLongitude)
+        }
+
+        MenuItem {
+            contentItem: Label {
                 text: "On Position"
                 horizontalAlignment: Text.AlignHCenter
                 verticalAlignment: Text.AlignVCenter
@@ -400,6 +409,16 @@ Item {
             onTriggered: {
                 addMarkerOnMap(boatLatitude, boatLongitude)
             }
+        }
+
+        MenuItem {
+            contentItem: Label {
+                text: "Drop Marker On Position"
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+                width: parent.width
+            }
+            onTriggered: dropMarkerDialog.open()
         }
 
         MenuItem {
@@ -491,7 +510,6 @@ Item {
                 goToZoomLevelMap(mapZoomLevel-1)
             }
         }
-
     }
 
 
@@ -546,6 +564,62 @@ Item {
 
             if (isPositionValid(lat,lon)){
                 setCenterPosition(lat, lon)
+                errorLabel.text = ""
+            }
+            else{
+                errorLabel.text = "Wrong input"
+                centerViewDialog.acc
+            }
+        }
+    }
+
+    Dialog {
+        id: dropMarkerDialog
+        modal: false
+        closePolicy: Popup.NoAutoClose
+        title: "Drop Marker On Position"
+        standardButtons: Dialog.Ok | Dialog.Cancel
+
+        x: (parent.width  - width)  / 2
+        y: (parent.height - height) / 2
+
+        background: Rectangle {
+            color: "white"
+            radius: 12
+        }
+
+        Column {
+            spacing: 10
+            padding: 20
+
+            Label { text: "Latitude:" }
+            TextField {
+                id: latInputMarker
+                placeholderText: " "
+                inputMethodHints: Qt.ImhFormattedNumbersOnly
+            }
+
+            Label { text: "Longitude:" }
+            TextField {
+                id: lonInputMarker
+                placeholderText: " "
+                inputMethodHints: Qt.ImhFormattedNumbersOnly
+            }
+
+            Label {
+                id: errorLabelMarker
+                text: ""
+                color: "red"
+                visible: text !== ""
+            }
+        }
+
+        onAccepted: {
+            var lat = parseFloat(latInputMarker.text)
+            var lon = parseFloat(lonInputMarker.text)
+
+            if (isPositionValid(lat,lon)){
+                addMarkerOnMap(lat, lon)
                 errorLabel.text = ""
             }
             else{
