@@ -107,10 +107,32 @@ Item {
     Plugin {
         id: osmPlugin
         name: "osm"
-        locales: "fr_FR"
+
         PluginParameter {
             name:"osm.mapping.custom.host"
             value: "https://tile.openstreetmap.org/"
+        }
+
+        PluginParameter {
+           name: "osm.mapping.providersrepository.disabled"
+           value: true
+        }
+
+        // optional, for offline tiles
+        PluginParameter {
+           name: "osm.mapping.offline.directory"
+           value: "/path/to/tiles"
+        }
+
+        PluginParameter {
+           name: "osm.mapping.highdpi_tiles"
+           value: true
+        }
+
+       // Custom tile server (OpenStreetMap standard)
+        PluginParameter {
+           name: "osm.mapping.host"
+           value: "https://tile.openstreetmap.org/"
         }
     }
 
