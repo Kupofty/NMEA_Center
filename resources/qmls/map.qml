@@ -225,25 +225,27 @@ Item {
         property var coordinate: map.toCoordinate(Qt.point(mouseX, mouseY))
 
         //Dragging map
-        onPressed: {
+        onPressed: function(mouse) {
             if (mouse.button === Qt.LeftButton) {
-                lastCoord = map.toCoordinate(Qt.point(mouseX, mouseY))
+                lastCoord = map.toCoordinate(Qt.point(mouse.x, mouse.y))
                 dragging = true
             }
         }
-        onReleased: dragging = false
 
-        onPositionChanged: {
-            if (dragging && mouse.buttons === Qt.LeftButton)
-            {
-                var currentCoord = map.toCoordinate(Qt.point(mouseX, mouseY))
+        onReleased: function(mouse) {
+            dragging = false
+        }
+
+        onPositionChanged: function(mouse) {
+            if (dragging && mouse.buttons === Qt.LeftButton) {
+                var currentCoord = map.toCoordinate(Qt.point(mouse.x, mouse.y))
                 var dx = lastCoord.longitude - currentCoord.longitude
                 var dy = lastCoord.latitude - currentCoord.latitude
                 map.center = QtPositioning.coordinate(map.center.latitude + dy, map.center.longitude + dx)
-                lastCoord = map.toCoordinate(Qt.point(mouseX, mouseY))
+                lastCoord = map.toCoordinate(Qt.point(mouse.x, mouse.y))
             }
             else
-                lastCoord = map.toCoordinate(Qt.point(mouseX, mouseY))
+                lastCoord = map.toCoordinate(Qt.point(mouse.x, mouse.y))
 
             cursorLatitude = coordinate.latitude
             cursorLongitude = coordinate.longitude
@@ -253,7 +255,7 @@ Item {
         }
 
         // Right-click menu
-        onClicked: {
+        onClicked: function(mouse){
              if (mouse.button === Qt.RightButton) {
                  contextMenu.popup()
              }
