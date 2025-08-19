@@ -366,7 +366,7 @@ void NMEA_Handler::handleMWV(const QList<QByteArray> &fields)
     QString ref   = fields[2]; // R=relative, T=true
     double speed  = fields[3].toDouble();
     QString unit  = fields[4]; // N=knots, M=m/s, K=km/h
-    QString valid = fields[5]; //A:valid / V=invalid
+    QString valid = removeAsterisk(fields[5]); //A:valid / V=invalid
     double freqHz = calculateFrequency(timer_mwv, lastUpdateTimeMWV);
 
     if(valid != "A")
