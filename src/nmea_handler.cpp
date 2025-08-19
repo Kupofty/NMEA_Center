@@ -202,7 +202,7 @@ void NMEA_Handler::handleGLL(const QList<QByteArray> &fields)
     double freqHz = calculateFrequency(timer_gll, lastUpdateTimeGLL);
 
     if (status != "A")
-        latitude = longitude = 0;
+        return;
 
     emit newDecodedGLL(utcTime.toString(), latitude, longitude, freqHz);
 }
@@ -370,7 +370,7 @@ void NMEA_Handler::handleMWV(const QList<QByteArray> &fields)
     double freqHz = calculateFrequency(timer_mwv, lastUpdateTimeMWV);
 
     if(valid != "A")
-        angle = speed = 0;
+        return;
 
     emit newDecodedMWV(angle, ref, speed, unit, freqHz);
 }
@@ -428,11 +428,5 @@ QByteArray NMEA_Handler::removeAsterisk(const QByteArray lastField)
 void NMEA_Handler::checkMinimumLineSize(const QList<QByteArray> &fields, int minSize)
 {
     if (fields.size() < minSize)
-        return;
-}
-
-void NMEA_Handler::checkEqualLineSize(const QList<QByteArray> &fields, int minSize)
-{
-    if (fields.size() == minSize)
         return;
 }

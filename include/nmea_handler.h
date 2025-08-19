@@ -49,7 +49,6 @@ class NMEA_Handler : public QObject
         double calculateFrequency(QElapsedTimer &timer, qint64 &lastTime);
         QByteArray removeAsterisk(const QByteArray lastField);
         void checkMinimumLineSize(const QList<QByteArray> &fields, int minSize);
-        void checkEqualLineSize(const QList<QByteArray> &fields, int size);
 
     signals:
         void newNMEASentence(const QString &type, const QString &nmeaText);
