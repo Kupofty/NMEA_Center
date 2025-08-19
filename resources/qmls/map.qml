@@ -155,8 +155,13 @@ Item {
     ////////////////
     //Update mouse position on boat movement
     Connections {
-        onBoatLatitudeChanged:  updateCursorCalculations()
-        onBoatLongitudeChanged: updateCursorCalculations()
+        function onBoatLatitudeChanged() {
+            updateCursorCalculations()
+        }
+
+        function onBoatLongitudeChanged() {
+            updateCursorCalculations()
+        }
     }
 
 
@@ -1206,8 +1211,14 @@ Item {
         // Redraw when heading changes
         Connections {
             target: compassCanvas
-            onHeadingChanged: compassCanvas.requestPaint()
-            onCourseChanged: compassCanvas.requestPaint()
+
+            function onHeadingChanged() {
+                compassCanvas.requestPaint()
+            }
+
+            function onCourseChanged() {
+                compassCanvas.requestPaint()
+            }
         }
     }
 
