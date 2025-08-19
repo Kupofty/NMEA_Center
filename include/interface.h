@@ -7,6 +7,9 @@
 #include <QStandardPaths>
 #include <QTimer>
 #include <QScrollBar>
+#include <QVariant>
+#include <QtGui>
+#include <QtQuick>
 
 #include "ui_interface.h"
 
@@ -45,6 +48,7 @@ class Interface : public QMainWindow
         QMap<QString, QPlainTextEdit*> nmeaSentenceMap;
         QList<QCheckBox*> checkboxOutputSerial;
         QList<QCheckBox*> checkboxOutputUDP;
+        QQuickItem *qmlMapObject;
 
     private:
         QMap<QString, QPlainTextEdit*> getSentenceMap() const;
@@ -147,6 +151,16 @@ class Interface : public QMainWindow
         void updateDataMWD(double dir1, QString dir1Unit, double dir2, QString dir2Unit, double speed1, QString speed1Unit, double speed2, QString speed2Unit, double freqHz);
         void updateDataMTW(double temp, QString tempUnit, double freqHz);
         void updateDataMWV(double angle, QString ref, double speed, QString unit, double freqHz);
+
+    signals:
+        void updateBoatPositionMap(QVariant, QVariant);
+        void updateBoatHeadingMap(QVariant);
+        void updateBoatDepthMap(QVariant);
+        void updateBoatSpeedMap(QVariant);
+        void updateBoatCourseMap(QVariant);
+        void updateBoatWaterTemperatureMap(QVariant);
+        void updateBoatDateMap(QVariant);
+        void updateBoatTimeMap(QVariant);
 };
 
 #endif // INTERFACE_H
