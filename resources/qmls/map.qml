@@ -113,37 +113,41 @@ Item {
             value: "https://tile.openstreetmap.org/"
         }
 
-        PluginParameter {
-           name: "osm.mapping.providersrepository.disabled"
-           value: true
-        }
-
-        // optional, for offline tiles
+        //For offline tiles (optionnal)
         PluginParameter {
            name: "osm.mapping.offline.directory"
            value: "/path/to/tiles"
         }
 
+        //Disable Qt default provider
         PluginParameter {
-           name: "osm.mapping.highdpi_tiles"
+           name: "osm.mapping.providersrepository.disabled"
            value: true
         }
 
-       // Custom tile server (OpenStreetMap standard)
+       //Custom tile server (OpenStreetMap standard)
         PluginParameter {
            name: "osm.mapping.host"
            value: "https://tile.openstreetmap.org/"
+        }
+
+        //For high-DPI tiles on high-resolution displays (optionnal)
+        PluginParameter {
+           name: "osm.mapping.highdpi_tiles"
+           value: true
         }
     }
 
     Map {
         id: map
         anchors.fill: parent
-        plugin: osmPlugin
         center: QtPositioning.coordinate(mapCenterLatitude, mapCenterLongitude)
         zoomLevel: mapZoomLevel
         activeMapType: map.supportedMapTypes[map.supportedMapTypes.length - 1]
         bearing: mapRotation
+
+        //Load OSM plugin
+        plugin: osmPlugin
 
         //Heading line
         MapPolyline {
