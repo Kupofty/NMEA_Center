@@ -1,4 +1,4 @@
-# NMEA Center — Monitoring & Forwarding Tool for NMEA0183
+# OpenSeaNav — Monitoring & Forwarding Tool for NMEA0183
 
 ## Features 
 

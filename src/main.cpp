@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
     //Icon & Name
     QIcon appIcon(":/icons/pictures/icons/nmea_icon.ico");
     app.setWindowIcon(appIcon);
-    gui.setWindowTitle("NMEA Center");
+    gui.setWindowTitle("OpenSeaNav");
 
     gui.show();
     return app.exec();
